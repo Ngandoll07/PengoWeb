@@ -6,6 +6,7 @@ import MyProfilePage from "../pages/MyProfilePage/MyProfilePage"
 import RoadmapPage from "../pages/RoadmapPage/RoadmapPage"
 import SignupPage from "../pages/SignupPage/SignupPage";
 import PracticeLisnRead from "../pages/PracticeLisnRead/PracticeLisnRead";
+import PracticeListening from "../pages/PracticeListening/PracticeListening";
 
 export const routes = [
     {
@@ -41,6 +42,11 @@ export const routes = [
     {
         path: '/practicelisnread',
         page: PracticeLisnRead,
+        isShowHeader: true
+    },
+    {
+        path: '/practicelistening',
+        page: PracticeListening,
         isShowHeader: true
     },
     {
