@@ -4,35 +4,47 @@ import NotFoundPage from "../pages/NotFoundPage/NotFoundPage"
 import LoginPage from "../pages/LoginPage/LoginPage"
 import MyProfilePage from "../pages/MyProfilePage/MyProfilePage"
 import RoadmapPage from "../pages/RoadmapPage/RoadmapPage"
+import SignupPage from "../pages/SignupPage/SignupPage";
+import PracticeLisnRead from "../pages/PracticeLisnRead/PracticeLisnRead";
 
-export const routes=[ 
+export const routes = [
     {
-        path:'/',
+        path: '/',
         page: HomePage,
-        isShowHeader:true
+        isShowHeader: true
     },
     {
-        path:'/practice',
+        path: '/practice',
         page: PracticePage,
-        isShowHeader:true
+        isShowHeader: true
     },
     {
-        path:'/login',
+        path: '/login',
         page: LoginPage,
-        isShowHeader:false
+        isShowHeader: false
     },
     {
-        path:'/profile',
+        path: '/profile',
         page: MyProfilePage,
-        isShowHeader:true
+        isShowHeader: true
     },
     {
-        path:'/roadmap',
+        path: '/roadmap',
         page: RoadmapPage,
-        isShowHeader:true
+        isShowHeader: true
     },
     {
-        path:'*',
+        path: '/signup',
+        page: SignupPage,
+        isShowHeader: false,
+    },
+    {
+        path: '/practicelisnread',
+        page: PracticeLisnRead,
+        isShowHeader: true
+    },
+    {
+        path: '*',
         page: NotFoundPage
     }
 ]
