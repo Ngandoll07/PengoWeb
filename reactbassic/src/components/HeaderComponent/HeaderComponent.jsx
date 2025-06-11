@@ -12,7 +12,7 @@ const HeaderComponent = () => {
       <nav className="nav">
         <a href="/">TRANG CHỦ</a>
         <a href="#">KHÓA HỌC</a>
-        <a href="#">LUYỆN TẬP</a>
+        <a href="practicelisnread">LUYỆN TẬP</a>
         <a href="#">GIỚI THIỆU</a>
       </nav>
       <div className="icon-area">
@@ -26,6 +26,7 @@ const HeaderComponent = () => {
     </div>
 
         <span className="login"> <a href="login">ĐĂNG NHẬP</a></span>
+        <span className="signup"> <a href="signup">ĐĂNG KÍ</a></span>
       </div>
     </header>
   );
