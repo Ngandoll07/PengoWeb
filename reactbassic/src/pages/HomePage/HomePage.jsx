@@ -25,10 +25,10 @@ export default function HomePage() {
 
 
   const tools = [
-    { image: "/assets/homepage/Route.png", title: "Lộ trình học" },
-    { image: "/assets/homepage/Test.png", title: "Kho đề thi" },
-    { image: "/assets/homepage/Headphones.png", title: "Luyện nghe TOEIC" },
-    { image: "/assets/homepage/Dictionary.png", title: "Luyện từ vựng" },
+    { image: "/assets/homepage/Route.png", title: "Lộ trình học", href: "#" },
+    { image: "/assets/homepage/Test.png", title: "Kho đề thi" , href: "#"},
+    { image: "/assets/homepage/Headphones.png", title: "Luyện nghe TOEIC", href: "/practicelistening" },
+    { image: "/assets/homepage/Dictionary.png", title: "Luyện từ vựng", href: "#" },
   ];
 
   const [activeTab, setActiveTab] = useState("lr");
@@ -83,7 +83,7 @@ export default function HomePage() {
         <div className="tool-section">
           {tools.map((tool, index) => (
             <div key={index} className="tool-item">
-              <img src={tool.image} alt={tool.title} className="tool-image" />
+              <a href= {tool.href}><img src={tool.image} alt={tool.title} className="tool-image" /></a>
               <h3>{tool.title}</h3>
             </div>
           ))}
