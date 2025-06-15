@@ -73,6 +73,7 @@
 .user-dropdown a {
   display: block;
   padding: 10px 16px;
+  border-radius: 8px;
   color: #dd0051;
   text-decoration: none;
   transition: background-color 0.2s ease;
@@ -80,4 +81,47 @@
 
 .user-dropdown a:hover {
   background-color: #f3f3f3;
+}
+
+/*dropdown luyen tap*/
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropbtn {
+   text-decoration: none;
+  font-weight: bold;
+  color: #2c2c54;
+  font-size: 16px;
+  padding: 10px 16px;
+  border: none;
+  cursor: pointer;
+}
+
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: white;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+  border-radius: 20px;
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 10px 14px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+    border-radius: 20px;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
 }
