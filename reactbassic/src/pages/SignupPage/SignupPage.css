@@ -108,3 +108,17 @@
     width: 90%;
     max-width: 300px;
 }
+
+.back-to-home {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 10px;
+    color: #1a1a1a;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.back-icon {
+    margin-right: 6px;
+}
