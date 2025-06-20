@@ -17,13 +17,26 @@ const ResultPage = () => {
     });
   };
 
+  // Xác định tiêu đề dựa trên phần đã làm
+  const parts = result.partsSubmitted || [];
+  const partTitle =
+    parts.length === 3
+      ? "TOEIC Reading"
+      : parts.length === 1
+      ? `Part ${parts[0]}`
+      : parts.map(p => `Part ${p}`).join(", ");
+
   return (
     <div className="result-container">
-      <h1 className="result-title">📘 Kết quả thi: New Economy TOEIC Test 9</h1>
+      <h1 className="result-title">📘 Kết quả thi: {partTitle}</h1>
 
       <div className="result-header-buttons">
-        <button className="btn view-answers" onClick={handleViewAnswers}>📄 Xem đáp án</button>
-        <button className="btn back-test" onClick={() => navigate("/practice")}>🔙 Quay lại đề thi</button>
+        <button className="btn view-answers" onClick={handleViewAnswers}>
+          📄 Xem đáp án
+        </button>
+        <button className="btn back-test" onClick={() => navigate("/practice")}>
+          🔙 Quay lại đề thi
+        </button>
       </div>
 
       <div className="result-main">
@@ -32,7 +45,9 @@ const ResultPage = () => {
 
           <div className="summary-row">
             <span className="summary-label">📝 Câu đã làm:</span>
-            <span className="summary-value">{result.correct}/{result.total} câu</span>
+            <span className="summary-value">
+              {result.correct}/{result.total} câu
+            </span>
           </div>
 
           <div className="summary-row">
@@ -71,20 +86,19 @@ const ResultPage = () => {
       </div>
 
       {result.listeningScore && result.readingScore && (
-  <div className="score-section">
-    <div className="score-box">
-      <h3>🎧 Listening</h3>
-      <p className="score">{result.listeningScore}/495</p>
-      <p className="sub-info">Trả lời đúng: {result.listeningCorrect}/100</p>
-    </div>
-    <div className="score-box">
-      <h3>📖 Reading</h3>
-      <p className="score">{result.readingScore}/495</p>
-      <p className="sub-info">Trả lời đúng: {result.readingCorrect}/100</p>
-    </div>
-  </div>
-)}
-
+        <div className="score-section">
+          <div className="score-box">
+            <h3>🎧 Listening</h3>
+            <p className="score">{result.listeningScore}/495</p>
+            <p className="sub-info">Trả lời đúng: {result.listeningCorrect}/100</p>
+          </div>
+          <div className="score-box">
+            <h3>📖 Reading</h3>
+            <p className="score">{result.readingScore}/495</p>
+            <p className="sub-info">Trả lời đúng: {result.readingCorrect}/100</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

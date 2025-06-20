@@ -20,8 +20,10 @@ const ReadingBlockSchema = new mongoose.Schema({
 const ReadingTestSchema = new mongoose.Schema({
   title: String,
   part: Number,
+
   questions: [ReadingQuestionSchema], // Part 5 & 7
   blocks: [ReadingBlockSchema],       // Part 6
+
   createdAt: { type: Date, default: Date.now },
 });
 

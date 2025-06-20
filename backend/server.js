@@ -1,3 +1,4 @@
+
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -17,11 +18,14 @@ import StudyPlan from "./models/StudyPlan.js";
 import uploadReadingRoutes from "./routes/uploadReading.js";
 import readingRoutes from "./routes/readingRoutes.js";
 
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+
 // MongoDB
+
 mongoose.connect("mongodb://127.0.0.1:27017/Pengo", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -103,14 +107,17 @@ app.get("/api/reading-tests", async (req, res) => {
 
 // API đề xuất lộ trình học từ Groq
 app.post("/api/recommend", async (req, res) => {
+
     const { listeningScore, readingScore, targetScore, studyDuration } = req.body;
     const token = req.headers.authorization?.split(" ")[1];
+
 
     const prompt = `
 Tôi là học viên đang luyện thi TOEIC.
 Kết quả đầu vào:
 - Listening: ${listeningScore}/50
 - Reading: ${readingScore}/50
+
 
 🎯 Mục tiêu của tôi là đạt khoảng ${targetScore} điểm TOEIC.
 ⏰ Tôi có khoảng ${studyDuration} để luyện thi.
@@ -123,6 +130,7 @@ Hãy:
 
     try {
         const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,

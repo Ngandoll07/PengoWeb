@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./PracticeLisnRead.css";
+import { useNavigate } from "react-router-dom";
+
 
 const partList = [
   "Part 1", "Part 2", "Part 3", "Part 4",
@@ -100,6 +102,7 @@ export default function PracticeLisnRead() {
     let readingCorrect = 0;
     const seenIds = new Set();
 
+
     allQuestions.forEach((q) => {
       const part = parseInt(q.part);
       if (q.questions) {
@@ -115,6 +118,7 @@ export default function PracticeLisnRead() {
         if (seenIds.has(q.id)) return;
         seenIds.add(q.id);
         total++;
+
         if (selectedAnswers[q.id] === q.answer) correct++;
         if (part <= 4 && selectedAnswers[q.id] === q.answer) listeningCorrect++;
         if (part > 4 && selectedAnswers[q.id] === q.answer) readingCorrect++;
@@ -152,6 +156,7 @@ export default function PracticeLisnRead() {
       console.error("❌ Lỗi gọi API:", err);
     }
   };
+
 
   const handleReset = () => {
     setSelectedAnswers({});

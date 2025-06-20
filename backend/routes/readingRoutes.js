@@ -22,6 +22,7 @@ router.get("/reading-tests/part/:partNumber", async (req, res) => {
     }
 
     return res.status(404).json({ message: "Không có câu hỏi hoặc đoạn văn." });
+
   } catch (err) {
     console.error("Lỗi đọc part:", err);
     res.status(500).json({ message: "Lỗi server!" });
