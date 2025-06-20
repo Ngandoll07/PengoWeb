@@ -10,23 +10,26 @@ export default function HomePage() {
       title: "TOEIC 2 kỹ năng LISTENING & READING",
       button: "LÀM NGAY",
       image: "/assets/homepage/Rectangle 5.png"
+      , href: "/practicelisnread"
     },
     {
       title: "TOEIC 2 kỹ năng SPEAKING & WRITING",
       button: "LÀM NGAY",
       image: "/assets/homepage/Rectangle 7.png"
+      , href: "#"
     },
     {
       title: "TOEIC 4 KỸ NĂNG",
       button: "LÀM NGAY",
       image: "/assets/homepage/Rectangle 9.png"
+      , href: "#"
     }
   ];
 
 
   const tools = [
     { image: "/assets/homepage/Route.png", title: "Lộ trình học", href: "#" },
-    { image: "/assets/homepage/Test.png", title: "Kho đề thi" , href: "#"},
+    { image: "/assets/homepage/Test.png", title: "Kho đề thi", href: "#" },
     { image: "/assets/homepage/Headphones.png", title: "Luyện nghe TOEIC", href: "/practicelistening" },
     { image: "/assets/homepage/Dictionary.png", title: "Luyện từ vựng", href: "#" },
   ];
@@ -74,8 +77,8 @@ export default function HomePage() {
           {skills.map((item, index) => (
             <div key={index} className="skill-card">
               <img src={item.image} alt={item.title} className="skill-image" />
-              <h3>{item.title}</h3>
-              <button>{item.button}</button>
+                <h3>{item.title}</h3>
+              <a href={item.href}><button>{item.button}</button></a>
             </div>
           ))}
         </div>
@@ -83,8 +86,8 @@ export default function HomePage() {
         <div className="tool-section">
           {tools.map((tool, index) => (
             <div key={index} className="tool-item">
-              <a href= {tool.href}><img src={tool.image} alt={tool.title} className="tool-image" /></a>
-              <h3>{tool.title}</h3>
+              <a href={tool.href}><img src={tool.image} alt={tool.title} className="tool-image" />
+                <h3>{tool.title}</h3></a>
             </div>
           ))}
         </div>

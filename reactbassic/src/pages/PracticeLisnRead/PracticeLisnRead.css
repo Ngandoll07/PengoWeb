@@ -170,3 +170,31 @@
   color: white;
   font-weight: bold;
 }
+
+.study-plan-box {
+  background-color: #f4faff;
+  border: 2px solid #b2dfff;
+  padding: 20px;
+  margin: 20px auto;
+  border-radius: 12px;
+  max-width: 800px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.study-plan-box h3 {
+  margin-bottom: 10px;
+  color: #0077cc;
+}
+
+.study-plan-text {
+  white-space: pre-wrap;
+  line-height: 1.6;
+  font-size: 15px;
+  color: #333;
+}
+
+.question-circle.answered {
+  background-color: #b2e0ff;
+  border-color: #2a9df4;
+  color: #000;
+}
