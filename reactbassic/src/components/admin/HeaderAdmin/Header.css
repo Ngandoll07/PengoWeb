@@ -1,0 +1,267 @@
+/* Container */
+.admin-container {
+    display: flex;
+    height: 90px;
+}
+
+/* Sidebar */
+.admin-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    padding: 10px;
+}
+
+.admin-logo-image {
+    max-width: 100%;
+    max-height: 100px;
+    object-fit: contain;
+}
+
+.sidebar1 {
+    position: fixed; /* Cố định sidebar bên trái */
+    top: 0;
+    left: 0;
+      padding: 15px;
+    width: 250px;
+    height: 100vh; /* Chiều cao full màn hình */
+    background-color: #fde0e5;
+    color: white;
+    overflow-y: auto; /* ✅ Cho phép cuộn khi nội dung vượt */
+    padding-top: 20px;
+    z-index: 100;
+}
+
+/* Tùy chọn: làm thanh cuộn đẹp hơn */
+.sidebar1::-webkit-scrollbar {
+    width: 6px;
+}
+.sidebar1::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 10px;
+}
+.sidebar1::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+
+.sidebar1 ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 30px;
+}
+
+.sidebar1 li {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    color: #E21033;
+    font-size: larger;
+
+}
+
+.sidebar1 li:hover {
+    background: rgba(226, 16, 51, 0.84);
+    color: #FFD6E4;
+    border-radius: 30px;
+}
+
+/* Content */
+.main-content {
+    position: relative;
+    top: 0;
+    margin-top: 0 !important;
+    padding-top: 10px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+
+/* Header */
+.admin-header {
+    position: fixed;
+    top: 0;
+    left: 280px;
+    width: calc(100% - 200px);
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #FFD6E4;
+    padding: 0 0px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.admin-title {
+    font-size: 35px;
+    font-weight: bold;
+    color: #E21033;
+    justify-content: center;
+    flex: 1;
+    align-items: center;
+    margin-top: 15px;
+}
+
+
+.admin-header .header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.admin-searchBar {
+    display: flex;
+    align-items: center;
+    border: dashed 1px #E21033;;
+    border-radius: 20px;
+    padding: 5px 10px;
+    width: 250px;
+    position: relative;
+    right: 200px;
+}
+
+.admin-searchBar input {
+    border: none;
+    outline: none;
+    flex: 1;
+    padding: 5px;
+    background-color: transparent;
+    color: #E21033;
+
+}
+
+.admin-searchBar input::placeholder {
+    color: #E21033;
+}
+
+.admin-searchButton {
+    position: absolute;
+    right: 10px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-search-admin {
+    color: #E21033;
+}
+/*ava*/
+.admin-avatar {
+    position: relative;
+    cursor: pointer;
+    color: #E21033;
+    right: 170px;
+}
+
+.admin-avatar .avatar-icon {
+    font-size: 30px;
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+    width: 150px;
+}
+
+.dropdown-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.dropdown-menu li {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.dropdown-menu li:hover {
+    background: #f1f1f1;
+}
+
+.icon-dropdown-admin {
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+/*responsive */
+@media screen and (max-width: 768px) {
+    .sidebar {
+        width: 60px;
+        padding: 10px;
+    }
+    .sidebar-text {
+        display: none;
+    }
+
+    .sidebar ul {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0;
+    }
+
+    .sidebar li {
+        justify-content: center;
+        padding: 15px 15px;
+    }
+
+    .sidebar li span {
+        display: none;
+    }
+
+    .admin-logo {
+        height: 60px;
+        padding: 5px;
+    }
+
+    .admin-logo-image {
+        max-width: 60px;
+        max-height: 60px;
+    }
+
+    .main-content {
+        margin-left: 70px;
+        width: calc(100% - 70px);
+    }
+
+    .admin-header {
+        left: 60px;
+        width: calc(100% - 60px);
+    }
+
+    .admin-searchBar {
+        max-width: 150px;
+        padding: 3px 8px;
+    }
+
+    .admin-searchBar input {
+        font-size: 12px;
+        padding-right: 25px;
+
+    }
+
+    .icon-search-admin {
+        font-size: 14px;
+    }
+
+    .admin-title {
+        font-size: 20px;
+    }
+
+    .admin-searchBar input {
+        font-size: 14px;
+    }
+}

@@ -50,7 +50,7 @@ export default function PracticeLisnRead() {
     return (
         <div className="practice-lisn-read">
             <h1 className="page-title">Luyện tập TOEIC Listening & Reading</h1>
-            <div className="toeic-page">
+            <div className="toeic-page1">
                 <div className="sidebar">
                     <div className="sidebar-header">
                         <button className="score-button">Chấm điểm</button>

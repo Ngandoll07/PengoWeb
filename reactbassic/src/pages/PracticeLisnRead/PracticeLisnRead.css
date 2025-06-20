@@ -1,5 +1,5 @@
 /* Layout tổng */
-.toeic-page {
+.toeic-page1 {
   display: flex;
   font-family: Arial, sans-serif;
 }
@@ -23,6 +23,7 @@
   overflow-y: auto;
   position: sticky;
   top: 0;
+  margin-left: 10px;
 }
 
 .sidebar-header {

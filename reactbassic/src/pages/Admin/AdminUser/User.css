@@ -1,0 +1,158 @@
+
+.user-admin-wrapper {
+    padding: 20px;
+    overflow-x: hidden;
+    margin-left: 300px;
+}
+
+.manage-user-title{
+    margin-left: 140px;
+    font-size: xx-large;
+    color: #E21033;
+}
+
+.user-card {
+    background: #fff;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 4px 4px 8px 4px rgba(0, 0, 0, 0.1);
+    max-width: 90%;
+    margin: 60px auto;
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.user-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+}
+
+
+.user-table th, .user-table td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    font-size: larger;
+}
+
+.user-table th {
+    background: #E21033;
+    color: #FFD6E4;
+}
+
+.user-table tr:hover {
+    background: #f5f5f5;
+}
+
+.status {
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+
+.status.active {
+    background-color: #a2f6a6;
+    color: black;
+}
+
+.status.inactive {
+    background-color: #ff7189;
+    color: black;
+}
+
+
+.edit-btn, .delete-btn {
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+
+
+}
+
+.edit-btn {
+    background: transparent;
+    color: #fa79a7;
+    border: none;
+    font-size: xx-large;
+}
+
+.delete-btn {
+    background: transparent;
+    color: #fa79a7;
+    border: none;
+    font-size: xx-large;
+}
+
+.icon-divider {
+    font-size: xx-large;
+    color: #E21033;
+}
+
+@media (max-width: 768px) {
+    .user-admin-wrapper {
+        margin-left: 60px;
+    }
+
+    .user-card {
+        max-width: 100%;
+        padding: 15px;
+    }
+
+    .user-table, .user-table thead, .user-table tbody, .user-table th, .user-table td, .user-table tr {
+        display: block;
+        width: 100%;
+    }
+
+    .user-table thead {
+        display: none;
+    }
+
+    .user-table tr {
+        margin-top: 20px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .user-table td {
+        text-align: left;
+        padding: 10px;
+        font-size: large;
+        display: flex;
+        justify-content: space-between;
+
+    }
+
+    .manage-user-title{
+        margin-left: 120px;
+        font-size: x-large;
+    }
+
+
+    .user-table td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        color: #E21033;
+    }
+
+    .edit-btn, .delete-btn {
+        padding: 2px;
+        font-size: x-large;
+    }
+
+    .icon-divider {
+        font-size: x-large;
+
+    }
+}
