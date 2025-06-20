@@ -12,7 +12,16 @@ const HeaderComponent = () => {
       <nav className="nav">
         <a href="/">TRANG CHỦ</a>
         <a href="#">KHÓA HỌC</a>
-        <a href="practicelisnread">LUYỆN TẬP</a>
+     <div className="dropdown">
+          <span className="dropbtn">LUYỆN TẬP</span>
+          <div className="dropdown-content">
+            <a href="/practicelistening">Luyện nghe</a>
+            <a href="/practiceread">Luyện đọc</a>
+            <a href="/practicespeak">Luyện nói</a>
+            <a href="/practicewrite">Luyện viết</a>
+          </div>
+        </div>
+
         <a href="#">GIỚI THIỆU</a>
       </nav>
       <div className="icon-area">

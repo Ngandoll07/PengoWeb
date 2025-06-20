@@ -50,6 +50,7 @@ export default function PracticeLisnRead() {
             <h1 className="page-title">Luyện tập TOEIC Listening & Reading</h1>
             <div className="toeic-page1">
                 {/* ==== SIDEBAR ==== */}
+
                 <div className="sidebar">
                     <div className="sidebar-header">
                         <button className="score-button">Chấm điểm</button>

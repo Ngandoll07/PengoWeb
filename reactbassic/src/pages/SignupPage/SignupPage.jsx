@@ -53,7 +53,7 @@ export default function SignupPage() {
         <div className="signup-page">
             <div className="signup-box">
                 <div className="signup-left">
-                    <img src="/assets/user/signupimg.png" alt="signup" className="signup" />
+                    <img src="/assets/user/signup.png" alt="signup" className="signup" />
                 </div>
 
                 <div className="signup-right">

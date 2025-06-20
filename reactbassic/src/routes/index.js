@@ -1,5 +1,5 @@
 import HomePage from "../pages/HomePage/HomePage"
-import PracticePage from "../pages/PracticePage/PracticePage"
+import PracticePage from "../pages/PracticeRead/PracticeRead"
 import NotFoundPage from "../pages/NotFoundPage/NotFoundPage"
 import LoginPage from "../pages/LoginPage/LoginPage"
 import MyProfilePage from "../pages/MyProfilePage/MyProfilePage"
@@ -7,6 +7,12 @@ import RoadmapPage from "../pages/RoadmapPage/RoadmapPage"
 import SignupPage from "../pages/SignupPage/SignupPage";
 import PracticeLisnRead from "../pages/PracticeLisnRead/PracticeLisnRead";
 import PracticeListening from "../pages/PracticeListening/PracticeListening";
+import PracticeRead from "../pages/PracticeRead/PracticeRead";
+import ResultPage from "../pages/ResultPage/ResultPage";
+
+import Dashboard from "../pages/Admin/AdminDashboard/Dashboard.jsx";
+import AdminUser from "../pages/Admin/AdminUser/User";
+import ReadingTopic from "../pages/Admin/ReadingTopic/ReadingTopic";
 
 export const routes = [
     {
@@ -48,6 +54,30 @@ export const routes = [
         path: '/practicelistening',
         page: PracticeListening,
         isShowHeader: true
+    },
+     {
+        path: '/practiceread',
+        page: PracticeRead,
+        isShowHeader: true
+    },
+      {
+        path: '/result',
+        page: ResultPage,
+        isShowHeader: true
+    },
+
+    //  admin
+    {
+        path: '/admin',
+        page: Dashboard,
+    },
+      {
+        path: '/admin/manage_user',
+        page: AdminUser,
+    },
+        {
+        path: '/admin/readtopic',
+        page: ReadingTopic,
     },
     {
         path: '*',
