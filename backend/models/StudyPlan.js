@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const StudyPlanSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -8,5 +8,6 @@ const StudyPlanSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model("StudyPlan", StudyPlanSchema);
-    
+const StudyPlan = mongoose.model("StudyPlan", StudyPlanSchema);
+export default StudyPlan;
+
