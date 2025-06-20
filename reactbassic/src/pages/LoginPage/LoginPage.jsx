@@ -21,7 +21,9 @@ export default function LoginPage() {
         email,
         password,
       });
-      localStorage.setItem("token", response.data.token);
+       // 👉 Lưu token và thông tin user vào localStorage
+    localStorage.setItem("token", response.data.token);
+    localStorage.setItem("user", JSON.stringify(response.data.user));
       alert("Đăng nhập thành công!");
       navigate("/"); // 🔁 Chuyển đến trang Home
     } catch (err) {

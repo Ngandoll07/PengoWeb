@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './MyProfilePage.css';
 import Footer from '../../components/FooterComponents/FooterComponent';
 
@@ -15,6 +15,19 @@ export default function MyProfilePage() {
   const [activeTab, setActiveTab] = useState('info');
   const [image, setImage] = useState(null);
 
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        email: user.email || '',
+        name: user.name || '',
+        phone: user.phone || '',
+        birthdate: user.birthdate || ''
+      }));
+    }
+  }, []);
+
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -28,26 +41,22 @@ export default function MyProfilePage() {
 
   return (
     <div className="profile-container">
-
-      {/* Main Content */}
       <div className="main">
-        {/* Sidebar */}
         <div className="sidebar-custom">
-      <button
-        className={`sidebar-btn ${activeTab === 'info' ? 'active' : ''}`}
-        onClick={() => setActiveTab('info')}
-      >
-        <span className="icon">👁‍🗨</span> Thông tin
-      </button>
-      <button
-        className={`sidebar-btn ${activeTab === 'password' ? 'active' : ''}`}
-        onClick={() => setActiveTab('password')}
-      >
-        <span className="icon key">🗝️</span> Mật khẩu
-      </button>
-    </div>
+          <button
+            className={`sidebar-btn ${activeTab === 'info' ? 'active' : ''}`}
+            onClick={() => setActiveTab('info')}
+          >
+            <span className="icon">👁‍🗨</span> Thông tin
+          </button>
+          <button
+            className={`sidebar-btn ${activeTab === 'password' ? 'active' : ''}`}
+            onClick={() => setActiveTab('password')}
+          >
+            <span className="icon key">🗝️</span> Mật khẩu
+          </button>
+        </div>
 
-        {/* Form */}
         <div className="content">
           {activeTab === 'info' && (
             <>
@@ -60,7 +69,7 @@ export default function MyProfilePage() {
               </div>
               <div className="form">
                 <input name="name" placeholder="Tên" value={formData.name} onChange={handleInputChange} />
-                <input name="email" placeholder="Email" value={formData.email} onChange={handleInputChange} />
+                <input name="email" placeholder="Email" value={formData.email} onChange={handleInputChange} readOnly />
                 <input name="phone" placeholder="Số điện thoại" value={formData.phone} onChange={handleInputChange} />
                 <input name="birthdate" type="date" value={formData.birthdate} onChange={handleInputChange} />
                 <div className="form-buttons">
@@ -85,8 +94,7 @@ export default function MyProfilePage() {
         </div>
       </div>
 
-      {/* Footer */}
-<Footer/>
+      <Footer />
     </div>
   );
 }

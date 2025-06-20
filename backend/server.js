@@ -16,9 +16,14 @@ const fetch = (...args) => import("node-fetch").then(({ default: fetch }) => fet
 const ReadingTest = require("./models/ReadingTest");
 const StudyPlan = require("./models/StudyPlan");
 const uploadReadingRoutes = require("./routes/uploadReading");
+const testResultRoutes = require("./routes/testResult");
+
 
 app.use(cors());
 app.use(express.json());
+
+app.use("/api", testResultRoutes);
+
 
 // Mount routes
 app.use("/api", uploadReadingRoutes);
@@ -107,8 +112,9 @@ app.get("/api/reading-tests", async (req, res) => {
 
 // Gợi ý lộ trình học dùng Gemini API thủ công (v1)
 app.post("/api/recommend", async (req, res) => {
-    const { listeningScore, readingScore } = req.body;
-    const token = req.headers.authorization?.split(" ")[1];
+  const { listeningScore, readingScore } = req.body;
+    const token = req.headers.authorization?.split(" ")[1]; // ✅ BỔ SUNG 
+  console.log("📨 Đã nhận yêu cầu recommend với:", listeningScore, readingScore);
 
     const prompt = `
 Tôi là học viên đang luyện thi TOEIC.
@@ -116,18 +122,26 @@ Kết quả đầu vào của tôi là:
 - Listening: ${listeningScore}/50
 - Reading: ${readingScore}/50
 
-Hãy:
-1. Phân tích điểm mạnh, điểm yếu của tôi.
-2. Đề xuất một lộ trình học trong 4 tuần.
-3. Chia rõ theo từng tuần và từng kỹ năng nếu có thể.
+Hãy phân tích điểm mạnh, điểm yếu của tôi.
+Sau đó, hãy đề xuất lộ trình học 12 ngày dưới định dạng JSON sau:
+
+[
+  { "day": 1, "title": "Luyện nghe Part 1 - xác định hình ảnh đúng", "status": "pending", "progress": 0 },
+  { "day": 2, "title": "Part 5 - ngữ pháp cơ bản: thì và câu điều kiện", "status": "pending", "progress": 0 },
+  ...
+  { "day": 12, "title": "Luyện tập tổng hợp Listening + Reading", "status": "pending", "progress": 0 }
+]
+
+Chỉ trả về mảng JSON. Không cần mô tả thêm.
 `;
 
-    try {
-        if (!process.env.GEMINI_API_KEY) {
-            return res.status(500).json({ error: "Thiếu GEMINI_API_KEY trong .env" });
-        }
+ try {
+    if (!process.env.GEMINI_API_KEY) {
+      console.error("❌ Thiếu GEMINI_API_KEY");
+      return res.status(500).json({ error: "Thiếu GEMINI_API_KEY trong .env" });
+    }
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${process.env.GEMINI_API_KEY}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

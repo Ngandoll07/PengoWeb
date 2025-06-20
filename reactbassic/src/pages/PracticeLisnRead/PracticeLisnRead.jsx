@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./PracticeLisnRead.css";
+import { useNavigate } from "react-router-dom";
+
 
 const partList = [
   "Part 1", "Part 2", "Part 3", "Part 4",
@@ -90,10 +92,14 @@ export default function PracticeLisnRead() {
 
  // phần đầu giữ nguyên...
 
+const navigate = useNavigate();
+
 const handleSubmitScore = async () => {
   const allQuestions = [...listeningQuestions, ...readingQuestions];
   let total = 0;
   let correct = 0;
+  let incorrect = 0;
+  let skipped = 0;
   let listeningCorrect = 0;
   let readingCorrect = 0;
   const seenIds = new Set();
@@ -105,46 +111,95 @@ const handleSubmitScore = async () => {
         if (seenIds.has(subQ.id)) return;
         seenIds.add(subQ.id);
         total++;
-        if (selectedAnswers[subQ.id] === subQ.answer) correct++;
-        if (part <= 4 && selectedAnswers[subQ.id] === subQ.answer) listeningCorrect++;
-        if (part > 4 && selectedAnswers[subQ.id] === subQ.answer) readingCorrect++;
+        const userAnswer = selectedAnswers[subQ.id];
+        if (!userAnswer) {
+          skipped++;
+        } else if (userAnswer === subQ.answer) {
+          correct++;
+          if (part <= 4) listeningCorrect++;
+          else readingCorrect++;
+        } else {
+          incorrect++;
+        }
       });
     } else if (q.answer) {
       if (seenIds.has(q.id)) return;
       seenIds.add(q.id);
       total++;
-      if (selectedAnswers[q.id] === q.answer) correct++;
-      if (part <= 4 && selectedAnswers[q.id] === q.answer) listeningCorrect++;
-      if (part > 4 && selectedAnswers[q.id] === q.answer) readingCorrect++;
+      const userAnswer = selectedAnswers[q.id];
+      if (!userAnswer) {
+        skipped++;
+      } else if (userAnswer === q.answer) {
+        correct++;
+        if (part <= 4) listeningCorrect++;
+        else readingCorrect++;
+      } else {
+        incorrect++;
+      }
     }
   });
 
-  const percent = ((correct / total) * 100).toFixed(2);
-  const confirmReset = window.confirm(
-    `🎯 Bạn đã đúng ${correct}/${total} câu (${percent}%)\n\nBạn có muốn làm lại bài không?`
-  );
-  if (confirmReset) handleReset(); // ✅ chỉ reset khi người dùng xác nhận
+  const accuracy = ((correct / total) * 100).toFixed(2);
+  const partsSubmitted = [...new Set(
+    Object.keys(selectedAnswers).map(id => {
+      const q = allQuestions.find(q => q.id === id || (q.questions && q.questions.some(sq => sq.id === id)));
+      return q ? parseInt(q.part) : null;
+    }).filter(p => p !== null)
+  )];
 
-  try {
-    const token = localStorage.getItem("token");
-    const res = await fetch("http://localhost:5000/api/recommend", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : ""
-      },
-      body: JSON.stringify({ listeningScore: listeningCorrect, readingScore: readingCorrect })
-    });
+  const timeUsed = 60 * 60 - timeLeft;
+  const formattedTime = new Date(timeUsed * 1000).toISOString().substr(11, 8);
 
-    const data = await res.json();
-    if (res.status === 401) {
-      alert("⚠️ Bạn cần đăng nhập để lưu lộ trình học cá nhân.");
+  // Tính điểm theo cách đơn giản
+  const listeningScore = Math.round((listeningCorrect / 100) * 495);
+  const readingScore = Math.round((readingCorrect / 100) * 495);
+  const totalScore = listeningScore + readingScore;
+
+  const token = localStorage.getItem("token");
+
+try {
+  await fetch("http://localhost:5000/api/save-result", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      correct,
+      incorrect,
+      skipped,
+      score: totalScore,
+      listeningCorrect,
+      readingCorrect,
+      listeningScore,
+      readingScore,
+      partsSubmitted,
+      time: formattedTime
+    })
+  });
+  console.log("✅ Đã lưu kết quả bài test vào server");
+} catch (err) {
+  console.error("❌ Lỗi khi lưu kết quả:", err);
+}
+
+  navigate("/result", {
+    state: {
+      total,
+      correct,
+      incorrect,
+      skipped,
+      accuracy,
+      time: formattedTime,
+      partsSubmitted,
+      listeningCorrect,
+      readingCorrect,
+      listeningScore,
+      readingScore,
+      score: totalScore
     }
-    setStudyPlan(data.suggestion);
-  } catch (err) {
-    console.error("❌ Lỗi gọi API:", err);
-  }
+  });
 };
+
 
 
   const handleReset = () => {
