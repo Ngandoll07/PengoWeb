@@ -14,6 +14,10 @@ export default function PracticeLisnRead() {
   const [readingQuestions, setReadingQuestions] = useState([]);
   const [timeLeft, setTimeLeft] = useState(60 * 60);
   const [studyPlan, setStudyPlan] = useState(null);
+  const [showGoalPopup, setShowGoalPopup] = useState(false);
+  const [targetScore, setTargetScore] = useState("");
+  const [studyDuration, setStudyDuration] = useState("");
+
   const questionRefs = useRef({});
   const timerRef = useRef(null);
 
@@ -44,7 +48,7 @@ export default function PracticeLisnRead() {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timerRef.current);
-          handleSubmitScore();
+          setShowGoalPopup(true);
           return 0;
         }
         return prev - 1;
@@ -88,64 +92,66 @@ export default function PracticeLisnRead() {
     </div>
   );
 
- // phần đầu giữ nguyên...
+  const handleSubmitScore = async () => {
+    const allQuestions = [...listeningQuestions, ...readingQuestions];
+    let total = 0;
+    let correct = 0;
+    let listeningCorrect = 0;
+    let readingCorrect = 0;
+    const seenIds = new Set();
 
-const handleSubmitScore = async () => {
-  const allQuestions = [...listeningQuestions, ...readingQuestions];
-  let total = 0;
-  let correct = 0;
-  let listeningCorrect = 0;
-  let readingCorrect = 0;
-  const seenIds = new Set();
-
-  allQuestions.forEach((q) => {
-    const part = parseInt(q.part);
-    if (q.questions) {
-      q.questions.forEach((subQ) => {
-        if (seenIds.has(subQ.id)) return;
-        seenIds.add(subQ.id);
+    allQuestions.forEach((q) => {
+      const part = parseInt(q.part);
+      if (q.questions) {
+        q.questions.forEach((subQ) => {
+          if (seenIds.has(subQ.id)) return;
+          seenIds.add(subQ.id);
+          total++;
+          if (selectedAnswers[subQ.id] === subQ.answer) correct++;
+          if (part <= 4 && selectedAnswers[subQ.id] === subQ.answer) listeningCorrect++;
+          if (part > 4 && selectedAnswers[subQ.id] === subQ.answer) readingCorrect++;
+        });
+      } else if (q.answer) {
+        if (seenIds.has(q.id)) return;
+        seenIds.add(q.id);
         total++;
-        if (selectedAnswers[subQ.id] === subQ.answer) correct++;
-        if (part <= 4 && selectedAnswers[subQ.id] === subQ.answer) listeningCorrect++;
-        if (part > 4 && selectedAnswers[subQ.id] === subQ.answer) readingCorrect++;
-      });
-    } else if (q.answer) {
-      if (seenIds.has(q.id)) return;
-      seenIds.add(q.id);
-      total++;
-      if (selectedAnswers[q.id] === q.answer) correct++;
-      if (part <= 4 && selectedAnswers[q.id] === q.answer) listeningCorrect++;
-      if (part > 4 && selectedAnswers[q.id] === q.answer) readingCorrect++;
-    }
-  });
-
-  const percent = ((correct / total) * 100).toFixed(2);
-  const confirmReset = window.confirm(
-    `🎯 Bạn đã đúng ${correct}/${total} câu (${percent}%)\n\nBạn có muốn làm lại bài không?`
-  );
-  if (confirmReset) handleReset(); // ✅ chỉ reset khi người dùng xác nhận
-
-  try {
-    const token = localStorage.getItem("token");
-    const res = await fetch("http://localhost:5000/api/recommend", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: token ? `Bearer ${token}` : ""
-      },
-      body: JSON.stringify({ listeningScore: listeningCorrect, readingScore: readingCorrect })
+        if (selectedAnswers[q.id] === q.answer) correct++;
+        if (part <= 4 && selectedAnswers[q.id] === q.answer) listeningCorrect++;
+        if (part > 4 && selectedAnswers[q.id] === q.answer) readingCorrect++;
+      }
     });
 
-    const data = await res.json();
-    if (res.status === 401) {
-      alert("⚠️ Bạn cần đăng nhập để lưu lộ trình học cá nhân.");
-    }
-    setStudyPlan(data.suggestion);
-  } catch (err) {
-    console.error("❌ Lỗi gọi API:", err);
-  }
-};
+    const percent = ((correct / total) * 100).toFixed(2);
+    const confirmReset = window.confirm(
+      `🎯 Bạn đã đúng ${correct}/${total} câu (${percent}%)\n\nBạn có muốn làm lại bài không?`
+    );
+    if (confirmReset) handleReset();
 
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch("http://localhost:5000/api/recommend", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : ""
+        },
+        body: JSON.stringify({
+          listeningScore: listeningCorrect,
+          readingScore: readingCorrect,
+          targetScore,
+          studyDuration
+        })
+      });
+
+      const data = await res.json();
+      if (res.status === 401) {
+        alert("⚠️ Bạn cần đăng nhập để lưu lộ trình học cá nhân.");
+      }
+      setStudyPlan(data.suggestion);
+    } catch (err) {
+      console.error("❌ Lỗi gọi API:", err);
+    }
+  };
 
   const handleReset = () => {
     setSelectedAnswers({});
@@ -155,13 +161,18 @@ const handleSubmitScore = async () => {
     startTimer();
   };
 
+  const submitWithGoal = () => {
+    setShowGoalPopup(false);
+    handleSubmitScore();
+  };
+
   return (
     <div className="practice-lisn-read">
       <h1 className="page-title">Luyện tập TOEIC Listening & Reading</h1>
       <div className="toeic-page1">
         <div className="sidebar">
           <div className="sidebar-header">
-            <button className="score-button" onClick={handleSubmitScore}>Chấm điểm</button>
+            <button className="score-button" onClick={() => setShowGoalPopup(true)}>Chấm điểm</button>
             <span className="timer">{new Date(timeLeft * 1000).toISOString().substr(11, 8)}</span>
             <button className="reset-button" onClick={handleReset}>
               <img src="/assets/Undo Arrow.png" className="undo" alt="reset" />Làm lại
@@ -255,6 +266,37 @@ const handleSubmitScore = async () => {
           )}
         </div>
       </div>
+
+      {showGoalPopup && (
+        <div className="goal-popup-overlay">
+          <div className="goal-popup-box">
+            <h3>🎯 Mục tiêu & Thời gian học</h3>
+
+            <label>
+              Mục tiêu điểm số:
+              <select value={targetScore} onChange={(e) => setTargetScore(e.target.value)}>
+                <option value="">--Chọn--</option>
+                <option value="450">450+</option>
+                <option value="550">550+</option>
+                <option value="650">650+</option>
+                <option value="750">750+</option>
+              </select>
+            </label>
+
+            <label>
+              Thời gian học:
+              <select value={studyDuration} onChange={(e) => setStudyDuration(e.target.value)}>
+                <option value="">--Chọn--</option>
+                <option value="2 tuần">2 tuần</option>
+                <option value="1 tháng">1 tháng</option>
+                <option value="2 tháng">2 tháng</option>
+              </select>
+            </label>
+
+            <button onClick={submitWithGoal}>Xác nhận & Chấm điểm</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

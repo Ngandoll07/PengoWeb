@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const ReadingQuestionSchema = new mongoose.Schema({
   question: String,
@@ -6,17 +6,24 @@ const ReadingQuestionSchema = new mongoose.Schema({
     A: String,
     B: String,
     C: String,
-    D: String
+    D: String,
   },
   answer: String,
-  part: Number
+  part: Number,
+});
+
+const ReadingBlockSchema = new mongoose.Schema({
+  passage: String,
+  questions: [ReadingQuestionSchema],
 });
 
 const ReadingTestSchema = new mongoose.Schema({
   title: String,
   part: Number,
-  questions: [ReadingQuestionSchema],
-  createdAt: { type: Date, default: Date.now }
+  questions: [ReadingQuestionSchema], // Part 5 & 7
+  blocks: [ReadingBlockSchema],       // Part 6
+  createdAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model("ReadingTest", ReadingTestSchema);
+const ReadingTest = mongoose.model("ReadingTest", ReadingTestSchema);
+export default ReadingTest;

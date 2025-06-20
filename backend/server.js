@@ -1,57 +1,53 @@
-require("dotenv").config();
-const express = require("express");
+import dotenv from "dotenv";
+dotenv.config();
+
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import multer from "multer";
+import xlsx from "xlsx";
+import fs from "fs";
+import path from "path";
+import fetch from "node-fetch";
+
+import ReadingTest from "./models/ReadingTest.js";
+import StudyPlan from "./models/StudyPlan.js";
+import uploadReadingRoutes from "./routes/uploadReading.js";
+import readingRoutes from "./routes/readingRoutes.js";
+
 const app = express();
-
-const mongoose = require("mongoose");
-const cors = require("cors");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const multer = require("multer");
-const xlsx = require("xlsx");
-const fs = require("fs");
-const path = require("path");
-
-const fetch = (...args) => import("node-fetch").then(({ default: fetch }) => fetch(...args));
-
-const ReadingTest = require("./models/ReadingTest");
-const StudyPlan = require("./models/StudyPlan");
-const uploadReadingRoutes = require("./routes/uploadReading");
-
 app.use(cors());
 app.use(express.json());
 
-// Mount routes
-app.use("/api", uploadReadingRoutes);
-app.use("/api", require("./routes/readingRoutes"));
-
-// MongoDB connection
+// MongoDB
 mongoose.connect("mongodb://127.0.0.1:27017/Pengo", {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
 }).then(() => {
     console.log("✅ Đã kết nối MongoDB");
 }).catch(err => {
     console.error("❌ Lỗi kết nối MongoDB:", err);
 });
 
-// JWT secret
 const JWT_SECRET = "123";
 
-// User schema
-const UserSchema = new mongoose.Schema({
+// User model
+const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: String,
     role: { type: String, default: "user" },
     createdAt: { type: Date, default: Date.now }
 });
-const User = mongoose.model("User", UserSchema);
+const User = mongoose.model("User", userSchema);
 
 // Đăng ký
 app.post("/api/register", async (req, res) => {
     const { email, password } = req.body;
     try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ email, password: hashedPassword });
+        const hashed = await bcrypt.hash(password, 10);
+        const newUser = new User({ email, password: hashed });
         await newUser.save();
         res.status(201).json({ message: "Đăng ký thành công!" });
     } catch (err) {
@@ -105,43 +101,49 @@ app.get("/api/reading-tests", async (req, res) => {
     }
 });
 
-// Gợi ý lộ trình học dùng Gemini API thủ công (v1)
+// API đề xuất lộ trình học từ Groq
 app.post("/api/recommend", async (req, res) => {
-    const { listeningScore, readingScore } = req.body;
+    const { listeningScore, readingScore, targetScore, studyDuration } = req.body;
     const token = req.headers.authorization?.split(" ")[1];
 
     const prompt = `
 Tôi là học viên đang luyện thi TOEIC.
-Kết quả đầu vào của tôi là:
+Kết quả đầu vào:
 - Listening: ${listeningScore}/50
 - Reading: ${readingScore}/50
 
+🎯 Mục tiêu của tôi là đạt khoảng ${targetScore} điểm TOEIC.
+⏰ Tôi có khoảng ${studyDuration} để luyện thi.
+
 Hãy:
 1. Phân tích điểm mạnh, điểm yếu của tôi.
-2. Đề xuất một lộ trình học trong 4 tuần.
+2. Đề xuất một lộ trình học phù hợp với mục tiêu và thời gian học.
 3. Chia rõ theo từng tuần và từng kỹ năng nếu có thể.
 `;
 
     try {
-        if (!process.env.GEMINI_API_KEY) {
-            return res.status(500).json({ error: "Thiếu GEMINI_API_KEY trong .env" });
-        }
-
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+                "Content-Type": "application/json"
+            },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }]
+                model: "llama-3.1-8b-instant",
+                messages: [{ role: "user", content: prompt }],
+                temperature: 0.7
             })
         });
 
         const data = await response.json();
-        console.log("📦 Gemini raw response:", JSON.stringify(data, null, 2));
+        console.log("🧠 Groq response:", JSON.stringify(data, null, 2));
 
-        const suggestion = data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-            "⚠️ Gemini không trả lời nội dung nào. Vui lòng thử lại sau.";
+        let suggestion = "Không có phản hồi từ Groq.";
+        if (Array.isArray(data.choices) && data.choices[0]?.message?.content) {
+            suggestion = data.choices[0].message.content;
+        }
 
-        // Lưu nếu user đăng nhập
+
         if (token) {
             try {
                 const decoded = jwt.verify(token, JWT_SECRET);
@@ -152,28 +154,28 @@ Hãy:
                     suggestion
                 });
                 await plan.save();
-            } catch (err) {
+            } catch {
                 console.warn("⚠️ Token không hợp lệ hoặc hết hạn, không lưu lộ trình.");
             }
         }
 
         res.json({ suggestion });
-
     } catch (err) {
-        console.error("❌ Lỗi khi gọi Gemini:", err);
-        res.status(500).json({
-            error: "Không thể tạo lộ trình học từ Gemini.",
-            debug: err.message || err
-        });
+        console.error("❌ Lỗi khi gọi Groq:", err);
+        res.status(500).json({ error: "Không thể tạo lộ trình học từ Groq." });
     }
 });
+
+// Mount routes
+app.use("/api", uploadReadingRoutes);
+app.use("/api", readingRoutes);
 
 // Trang gốc
 app.get("/", (req, res) => {
     res.send("✅ Backend Pengo đang hoạt động!");
 });
 
-// Chạy server
+// Start server
 app.listen(5000, () => {
     console.log("🚀 Backend chạy tại http://localhost:5000");
 });
