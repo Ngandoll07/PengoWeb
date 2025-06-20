@@ -1,0 +1,1300 @@
+[
+    {
+        "id": "q101",
+        "part": 5,
+        "question": "According to the terms of the rental agreement, the tenant is responsible for —— any damage to the property.",
+        "options": {
+            "A": "repairing",
+            "B": "repaired",
+            "C": "repairs",
+            "D": "repair"
+        },
+        "answer": "A"
+    },
+    {
+        "id": "q102",
+        "part": 5,
+        "question": "The research team was praised for its —— to detail during the data analysis process.",
+        "options": {
+            "A": "attends",
+            "B": "attending",
+            "C": "attentive",
+            "D": "attention"
+        },
+        "answer": "D"
+    },
+    {
+        "id": "q103",
+        "part": 5,
+        "question": "Ms. Gomez will receive a bonus —— she meets her sales target for the third quarter.",
+        "options": {
+            "A": "unless",
+            "B": "if",
+            "C": "without",
+            "D": "besides"
+        },
+        "answer": "B"
+    },
+    {
+        "id": "q104",
+        "part": 5,
+        "question": "The production team was able to complete the project ahead of schedule —— the new equipment arrived on time.",
+        "options": {
+            "A": "although",
+            "B": "because",
+            "C": "despite",
+            "D": "unless"
+        },
+        "answer": "B"
+    },
+    {
+        "id": "q105",
+        "part": 5,
+        "question": "To improve customer satisfaction, the company plans to enhance the —— of its service representatives.",
+        "options": {
+            "A": "responsive",
+            "B": "responsibility",
+            "C": "responsiveness",
+            "D": "responds"
+        },
+        "answer": "C"
+    },
+    {
+        "id": "q106",
+        "part": 5,
+        "question": "Mr. Chen’s presentation on marketing strategies was so —— that everyone in the audience took notes.",
+        "options": {
+            "A": "inform",
+            "B": "informs",
+            "C": "informative",
+            "D": "information"
+        },
+        "answer": "C"
+    },
+    {
+        "id": "q107",
+        "part": 5,
+        "question": "All personal belongings should be removed from the room —— the cleaning begins.",
+        "options": {
+            "A": "unless",
+            "B": "before",
+            "C": "until",
+            "D": "beside"
+        },
+        "answer": "B"
+    },
+    {
+        "id": "q108",
+        "part": 5,
+        "question": "Due to the high volume of orders, we will need to hire additional —— to help with packaging.",
+        "options": {
+            "A": "assists",
+            "B": "assistance",
+            "C": "assistants",
+            "D": "assisting"
+        },
+        "answer": "C"
+    },
+    {
+        "id": "q109",
+        "part": 5,
+        "question": "The manager asked the staff to submit their monthly reports —— the end of the day.",
+        "options": {
+            "A": "on",
+            "B": "by",
+            "C": "at",
+            "D": "to"
+        },
+        "answer": "B"
+    },
+    {
+        "id": "q110",
+        "part": 5,
+        "question": "The new employee handbook outlines the company’s policies and procedures in a clear and —— manner.",
+        "options": {
+            "A": "organizes",
+            "B": "organize",
+            "C": "organized",
+            "D": "organizing"
+        },
+        "answer": "C"
+    },
+    {
+        "id": "q111",
+        "part": 5,
+        "question": "The CEO is scheduled to deliver the keynote address at the annual —— in Chicago.",
+        "options": {
+            "A": "convention",
+            "B": "convenient",
+            "C": "convenience",
+            "D": "convey"
+        },
+        "answer": "A"
+    },
+    {
+        "id": "q112",
+        "part": 5,
+        "question": "The IT department will be conducting a system upgrade —— the weekend.",
+        "options": {
+            "A": "through",
+            "B": "from",
+            "C": "during",
+            "D": "under"
+        },
+        "answer": "C"
+    },
+    {
+        "id": "q113",
+        "part": 5,
+        "question": "To ensure safety, the factory’s machines are inspected —— by certified engineers.",
+        "options": {
+            "A": "regular",
+            "B": "regulation",
+            "C": "regularly",
+            "D": "regularize"
+        },
+        "answer": "C"
+    },
+    {
+        "id": "q114",
+        "part": 5,
+        "question": "Ms. Patel was promoted to regional manager because of her —— performance.",
+        "options": {
+            "A": "exception",
+            "B": "exceptionally",
+            "C": "exceptional",
+            "D": "exceptions"
+        },
+        "answer": "C"
+    },
+    {
+        "id": "q115",
+        "part": 5,
+        "question": "The airline offers complimentary snacks and beverages to passengers on all —— flights.",
+        "options": {
+            "A": "domestically",
+            "B": "domestic",
+            "C": "domesticate",
+            "D": "domesticates"
+        },
+        "answer": "B"
+    },
+    {
+        "id": "q116",
+        "part": 5,
+        "question": "The finance report was submitted to the board of directors for final ——.",
+        "options": {
+            "A": "approval",
+            "B": "approve",
+            "C": "approved",
+            "D": "approves"
+        },
+        "answer": "A"
+    },
+    {
+        "id": "q117",
+        "part": 5,
+        "question": "Employees are encouraged to provide feedback —— their recent training experience.",
+        "options": {
+            "A": "regarding",
+            "B": "regards",
+            "C": "regard",
+            "D": "regarded"
+        },
+        "answer": "A"
+    },
+    {
+        "id": "q118",
+        "part": 5,
+        "question": "Because of the high volume of applicants, the hiring process may take —— than usual.",
+        "options": {
+            "A": "long",
+            "B": "longer",
+            "C": "length",
+            "D": "lengthen"
+        },
+        "answer": "B"
+    },
+    {
+        "id": "q119",
+        "part": 5,
+        "question": "The developer submitted plans for a new housing —— near the river.",
+        "options": {
+            "A": "develop",
+            "B": "development",
+            "C": "developed",
+            "D": "developer"
+        },
+        "answer": "B"
+    },
+    {
+        "id": "q120",
+        "part": 5,
+        "question": "All staff must wear ID badges while on company ——.",
+        "options": {
+            "A": "premise",
+            "B": "premises",
+            "C": "permission",
+            "D": "permissions"
+        },
+        "answer": "B"
+    },
+    {
+        "id": "q121",
+        "part": 5,
+        "question": "The marketing department will launch a new campaign to —— brand awareness.",
+        "options": {
+            "A": "raise",
+            "B": "arise",
+            "C": "arouse",
+            "D": "rise"
+        },
+        "answer": "A"
+    },
+    {
+        "id": "q122",
+        "part": 5,
+        "question": "Construction of the new headquarters is expected to be —— by next April.",
+        "options": {
+            "A": "complete",
+            "B": "completely",
+            "C": "completion",
+            "D": "completes"
+        },
+        "answer": "A"
+    },
+    {
+        "id": "q123",
+        "part": 5,
+        "question": "The director asked the team to be —— in submitting the final report.",
+        "options": {
+            "A": "punctual",
+            "B": "punctually",
+            "C": "punctuate",
+            "D": "punctuation"
+        },
+        "answer": "A"
+    },
+    {
+        "id": "q124",
+        "part": 5,
+        "question": "All visitors must sign in at the front desk before —— the office area.",
+        "options": {
+            "A": "entering",
+            "B": "entered",
+            "C": "enter",
+            "D": "enters"
+        },
+        "answer": "A"
+    },
+    {
+        "id": "q125",
+        "part": 5,
+        "question": "We are pleased to inform you that your application has been ——.",
+        "options": {
+            "A": "accept",
+            "B": "accepting",
+            "C": "accepted",
+            "D": "acceptance"
+        },
+        "answer": "C"
+    },
+    {
+        "id": "q126",
+        "part": 5,
+        "question": "The company is planning to expand its operations into several new ——.",
+        "options": {
+            "A": "market",
+            "B": "marketers",
+            "C": "marketing",
+            "D": "markets"
+        },
+        "answer": "D"
+    },
+    {
+        "id": "q127",
+        "part": 5,
+        "question": "Please ensure that all documents are —— filed and stored securely.",
+        "options": {
+            "A": "neat",
+            "B": "neaten",
+            "C": "neatly",
+            "D": "neatness"
+        },
+        "answer": "C"
+    },
+    {
+        "id": "q128",
+        "part": 5,
+        "question": "The new security system was installed to protect the building —— unauthorized access.",
+        "options": {
+            "A": "against",
+            "B": "under",
+            "C": "from",
+            "D": "over"
+        },
+        "answer": "A"
+    },
+    {
+        "id": "q129",
+        "part": 5,
+        "question": "Mr. Delgado received an award for his outstanding —— to the company.",
+        "options": {
+            "A": "contribute",
+            "B": "contribution",
+            "C": "contributing",
+            "D": "contributed"
+        },
+        "answer": "B"
+    },
+    {
+        "id": "q130",
+        "part": 5,
+        "question": "The staff was instructed to update the client database ——.",
+        "options": {
+            "A": "routinely",
+            "B": "routine",
+            "C": "routineness",
+            "D": "routines"
+        },
+        "answer": "A"
+    },
+    {
+        "id": "set1",
+        "part": 6,
+        "paragraph": "Dear Mr. Thompson,\n\nI am writing to confirm your reservation at the Lakeside Hotel for the weekend of October 12–14. —— (131) ——— your request, we have reserved a lake-view room with a king-sized bed.\n\nThe total cost for your stay will be $345.50, which includes all taxes and fees. If you need to make any changes to your reservation, please contact us at least 48 hours before your scheduled arrival.\n\nSincerely,\nThe Reservations Team",
+        "image": "/images/part6/set1.jpg",
+        "questions": [
+            {
+                "id": "q131",
+                "question": "Which word best completes the sentence?",
+                "options": {
+                    "A": "Instead of",
+                    "B": "According to",
+                    "C": "Because of",
+                    "D": "Aside from"
+                },
+                "answer": "B"
+            },
+            {
+                "id": "q132",
+                "question": "Which of the following would best complete the sentence 'The total cost for your stay will be ____'?",
+                "options": {
+                    "A": "$345.50",
+                    "B": "weekend",
+                    "C": "arrival",
+                    "D": "reservation"
+                },
+                "answer": "A"
+            },
+            {
+                "id": "q133",
+                "question": "What does the letter imply about making changes to the reservation?",
+                "options": {
+                    "A": "It can be done anytime.",
+                    "B": "It must be done 48 hours in advance.",
+                    "C": "It is not allowed.",
+                    "D": "It must be approved by the manager."
+                },
+                "answer": "B"
+            },
+            {
+                "id": "q134",
+                "question": "What is the main purpose of this letter?",
+                "options": {
+                    "A": "To offer a discount",
+                    "B": "To confirm a reservation",
+                    "C": "To request a payment",
+                    "D": "To promote a hotel"
+                },
+                "answer": "B"
+            }
+        ]
+    },
+    {
+        "id": "set2",
+        "part": 6,
+        "paragraph": "To: All Employees\nSubject: New Recycling Policy\n\nAs part of our continued efforts to become more environmentally responsible, we are implementing a new recycling policy. —— (135) ———, all paper, plastic, and aluminum waste should be disposed of in the clearly marked recycling bins located throughout the office. Please be sure to rinse containers before disposal to avoid odors and pests. We appreciate your cooperation in making our workplace more sustainable.",
+        "image": "/images/part6/set2.jpg",
+        "questions": [
+            {
+                "id": "q135",
+                "question": "Which word best completes the sentence?",
+                "options": {
+                    "A": "However",
+                    "B": "Therefore",
+                    "C": "Furthermore",
+                    "D": "Otherwise"
+                },
+                "answer": "B"
+            },
+            {
+                "id": "q136",
+                "question": "What should employees do before disposing of containers?",
+                "options": {
+                    "A": "Throw them away with regular waste",
+                    "B": "Label them with names",
+                    "C": "Rinse them",
+                    "D": "Flatten them"
+                },
+                "answer": "C"
+            },
+            {
+                "id": "q137",
+                "question": "Why is the new policy being implemented?",
+                "options": {
+                    "A": "To increase office space",
+                    "B": "To protect employee health",
+                    "C": "To reduce energy bills",
+                    "D": "To be environmentally responsible"
+                },
+                "answer": "D"
+            },
+            {
+                "id": "q138",
+                "question": "What is the main topic of the notice?",
+                "options": {
+                    "A": "Holiday schedule",
+                    "B": "New cafeteria menu",
+                    "C": "Office recycling",
+                    "D": "Dress code changes"
+                },
+                "answer": "C"
+            }
+        ]
+    },
+    {
+        "id": "set3",
+        "part": 6,
+        "paragraph": "To: Staff Members\nSubject: Printer Maintenance\n\nThe printers on the second floor will be undergoing routine maintenance this Thursday and Friday. —— (139) ———, please plan to use the printers on the first or third floors during this time. We apologize for the inconvenience and appreciate your understanding. The printers should be back in service by Monday morning.",
+        "image": "/images/part6/set3.jpg",
+        "questions": [
+            {
+                "id": "q139",
+                "question": "Which word best completes the sentence?",
+                "options": {
+                    "A": "In conclusion",
+                    "B": "On the other hand",
+                    "C": "For example",
+                    "D": "Therefore"
+                },
+                "answer": "D"
+            },
+            {
+                "id": "q140",
+                "question": "When will the maintenance take place?",
+                "options": {
+                    "A": "Monday and Tuesday",
+                    "B": "Thursday and Friday",
+                    "C": "Only Wednesday",
+                    "D": "All next week"
+                },
+                "answer": "B"
+            },
+            {
+                "id": "q141",
+                "question": "What is suggested as an alternative?",
+                "options": {
+                    "A": "Using email instead",
+                    "B": "Using different printers",
+                    "C": "Postponing printing jobs",
+                    "D": "Moving the printers"
+                },
+                "answer": "B"
+            },
+            {
+                "id": "q142",
+                "question": "What will happen on Monday morning?",
+                "options": {
+                    "A": "The printers will be moved",
+                    "B": "New printers will be installed",
+                    "C": "Printers will return to normal",
+                    "D": "A new policy starts"
+                },
+                "answer": "C"
+            }
+        ]
+    },
+    {
+        "id": "set4",
+        "part": 6,
+        "paragraph": "To: Apartment Residents\nSubject: Water Supply Interruption\n\nDue to scheduled maintenance, the water supply in Building C will be turned off on Saturday from 9:00 A.M. to 3:00 P.M. —— (143) ———, residents are advised to store enough water in advance for their needs. We apologize for the inconvenience and thank you for your understanding.",
+        "image": "/images/part6/set4.jpg",
+        "questions": [
+            {
+                "id": "q143",
+                "question": "Which word best completes the sentence?",
+                "options": {
+                    "A": "Consequently",
+                    "B": "Nevertheless",
+                    "C": "In fact",
+                    "D": "Moreover"
+                },
+                "answer": "A"
+            },
+            {
+                "id": "q144",
+                "question": "What is the subject of the notice?",
+                "options": {
+                    "A": "Construction work",
+                    "B": "Power outage",
+                    "C": "Water supply maintenance",
+                    "D": "New rental agreement"
+                },
+                "answer": "C"
+            },
+            {
+                "id": "q145",
+                "question": "When will the water supply be turned off?",
+                "options": {
+                    "A": "On Saturday from 9 A.M. to 3 P.M.",
+                    "B": "On Sunday evening",
+                    "C": "Next Monday morning",
+                    "D": "On Friday from 9 A.M. to 3 P.M."
+                },
+                "answer": "A"
+            },
+            {
+                "id": "q146",
+                "question": "What should residents do before the maintenance?",
+                "options": {
+                    "A": "Contact management",
+                    "B": "Report leaks",
+                    "C": "Leave the building",
+                    "D": "Store water"
+                },
+                "answer": "D"
+            }
+        ]
+    },
+    {
+        "id": "set5",
+        "part": 6,
+        "paragraph": "To: All Conference Attendees\nSubject: Schedule Change\n\nPlease note that the keynote speech originally scheduled for 10:00 A.M. has been moved to 11:30 A.M. —— (147) ———, all other events will proceed as planned. The updated agenda has been posted on the event website. We apologize for any inconvenience this may cause.",
+        "image": "/images/part6/set5.jpg",
+        "questions": [
+            {
+                "id": "q147",
+                "question": "Which word best completes the sentence?",
+                "options": {
+                    "A": "Similarly",
+                    "B": "For instance",
+                    "C": "Otherwise",
+                    "D": "However"
+                },
+                "answer": "D"
+            },
+            {
+                "id": "q148",
+                "question": "What change has been made to the conference schedule?",
+                "options": {
+                    "A": "The keynote speech is canceled.",
+                    "B": "All events are delayed.",
+                    "C": "The keynote speech is rescheduled.",
+                    "D": "The event is extended by a day."
+                },
+                "answer": "C"
+            },
+            {
+                "id": "q149",
+                "question": "Where can attendees find the new agenda?",
+                "options": {
+                    "A": "At the venue entrance",
+                    "B": "In a printed program",
+                    "C": "On the event website",
+                    "D": "By email"
+                },
+                "answer": "C"
+            },
+            {
+                "id": "q150",
+                "question": "What is the tone of the message?",
+                "options": {
+                    "A": "Apologetic",
+                    "B": "Humorous",
+                    "C": "Aggressive",
+                    "D": "Confused"
+                },
+                "answer": "A"
+            }
+        ]
+    },
+    {
+        "id": "set6",
+        "part": 6,
+        "paragraph": "To: All Department Heads\nSubject: Budget Review Meeting\n\nThis is a reminder that the quarterly budget review meeting will be held on Friday at 2:00 P.M. —— (151) ———, please bring all relevant financial reports and proposals for your department. The meeting will be in Conference Room A and is expected to last approximately two hours.",
+        "image": "/images/part6/set6.jpg",
+        "questions": [
+            {
+                "id": "q151",
+                "question": "Which word best completes the sentence?",
+                "options": {
+                    "A": "As a result",
+                    "B": "For that reason",
+                    "C": "In preparation",
+                    "D": "Otherwise"
+                },
+                "answer": "C"
+            },
+            {
+                "id": "q152",
+                "question": "When is the budget review meeting scheduled?",
+                "options": {
+                    "A": "Thursday morning",
+                    "B": "Friday afternoon",
+                    "C": "Monday morning",
+                    "D": "Friday evening"
+                },
+                "answer": "B"
+            },
+            {
+                "id": "q153",
+                "question": "What are participants required to bring?",
+                "options": {
+                    "A": "Name badges",
+                    "B": "Lunch",
+                    "C": "Reports and proposals",
+                    "D": "Laptops only"
+                },
+                "answer": "C"
+            },
+            {
+                "id": "q154",
+                "question": "Where will the meeting be held?",
+                "options": {
+                    "A": "Auditorium",
+                    "B": "Main lobby",
+                    "C": "Conference Room A",
+                    "D": "Online"
+                },
+                "answer": "C"
+            }
+        ]
+    },
+    {
+        "id": "set1",
+        "part": 7,
+        "paragraph": "You are invited to the annual Grand Book Fair at the City Convention Center on October 10–12. Join us for three days of literary events, book signings, and family activities. Admission is free. —— (155) ——. Visit www.citybookfair.org for more details.",
+        "image": "/images/part7/set1.jpg",
+        "questions": [
+            {
+                "id": "q155",
+                "question": "What is the purpose of the notice?",
+                "options": {
+                    "A": "To advertise a literary event",
+                    "B": "To announce a book release",
+                    "C": "To offer discounts on books",
+                    "D": "To inform about library rules"
+                },
+                "answer": "A"
+            },
+            {
+                "id": "q156",
+                "question": "When will the event take place?",
+                "options": {
+                    "A": "Next weekend",
+                    "B": "October 10–12",
+                    "C": "Every Saturday",
+                    "D": "The first week of November"
+                },
+                "answer": "B"
+            },
+            {
+                "id": "q157",
+                "question": "What is stated about admission?",
+                "options": {
+                    "A": "It requires pre-registration",
+                    "B": "It is free of charge",
+                    "C": "It is limited to members",
+                    "D": "It includes a meal voucher"
+                },
+                "answer": "B"
+            }
+        ]
+    },
+    {
+        "id": "set2",
+        "part": 7,
+        "paragraph": "To: Marketing Team\nSubject: Upcoming Campaign Meeting\n\nHi everyone,\n\nWe will hold a meeting to finalize the details for our next marketing campaign on Wednesday at 2:00 P.M. in Room 301. —— (158) ——. Please come prepared to share your updates on social media strategies and advertisement materials.\n\nBest,\nThomas",
+        "image": "/images/part7/set2.jpg",
+        "questions": [
+            {
+                "id": "q158",
+                "question": "What is the purpose of the meeting?",
+                "options": {
+                    "A": "To hire new marketing staff",
+                    "B": "To launch a new product",
+                    "C": "To finalize campaign details",
+                    "D": "To train the sales team"
+                },
+                "answer": "C"
+            },
+            {
+                "id": "q159",
+                "question": "What are team members expected to bring to the meeting?",
+                "options": {
+                    "A": "New client proposals",
+                    "B": "Social media and ad updates",
+                    "C": "Expense reports",
+                    "D": "Event invitations"
+                },
+                "answer": "B"
+            },
+            {
+                "id": "q160",
+                "question": "Where will the meeting take place?",
+                "options": {
+                    "A": "Room 301",
+                    "B": "Main hall",
+                    "C": "Conference Center",
+                    "D": "Marketing Office"
+                },
+                "answer": "A"
+            }
+        ]
+    },
+    {
+        "id": "set3",
+        "part": 7,
+        "paragraph": "Green Leaf Cafe is happy to announce that we are now open on Sundays from 8:00 A.M. to 3:00 P.M. Stop by and enjoy our all-day brunch menu featuring locally sourced ingredients. —— (161) ——. We look forward to seeing you soon!",
+        "image": "/images/part7/set3.jpg",
+        "questions": [
+            {
+                "id": "q161",
+                "question": "What is the main purpose of the notice?",
+                "options": {
+                    "A": "To offer a new discount",
+                    "B": "To announce a new menu",
+                    "C": "To share updated hours",
+                    "D": "To introduce a new chef"
+                },
+                "answer": "C"
+            },
+            {
+                "id": "q162",
+                "question": "When is the cafe open on Sundays?",
+                "options": {
+                    "A": "7:00 A.M. to 2:00 P.M.",
+                    "B": "8:00 A.M. to 3:00 P.M.",
+                    "C": "9:00 A.M. to 4:00 P.M.",
+                    "D": "10:00 A.M. to 5:00 P.M."
+                },
+                "answer": "B"
+            },
+            {
+                "id": "q163",
+                "question": "What is emphasized about the food?",
+                "options": {
+                    "A": "It is imported",
+                    "B": "It is available all day",
+                    "C": "It is made from local ingredients",
+                    "D": "It includes seafood"
+                },
+                "answer": "C"
+            }
+        ]
+    },
+    {
+        "id": "set4",
+        "part": 7,
+        "paragraph": "To: All Employees\nSubject: Mandatory Cybersecurity Training\n\nPlease be advised that our annual cybersecurity training is scheduled for next Monday at 10:00 A.M. in the main conference room. —— (164) ——. Attendance is required for all employees. If you are unable to attend, notify your supervisor as soon as possible.",
+        "image": "/images/part7/set4.jpg",
+        "questions": [
+            {
+                "id": "q164",
+                "question": "What is the main topic of the e-mail?",
+                "options": {
+                    "A": "Scheduling team-building activities",
+                    "B": "Announcing a training session",
+                    "C": "Requesting employee feedback",
+                    "D": "Reporting security breaches"
+                },
+                "answer": "B"
+            },
+            {
+                "id": "q165",
+                "question": "Where will the training be held?",
+                "options": {
+                    "A": "At a nearby office",
+                    "B": "In the company cafeteria",
+                    "C": "In the main conference room",
+                    "D": "At an off-site location"
+                },
+                "answer": "C"
+            },
+            {
+                "id": "q166",
+                "question": "What should employees do if they cannot attend?",
+                "options": {
+                    "A": "Submit a form",
+                    "B": "Reschedule the meeting",
+                    "C": "Inform their supervisor",
+                    "D": "Call the IT department"
+                },
+                "answer": "C"
+            }
+        ]
+    },
+    {
+        "id": "set5",
+        "part": 7,
+        "paragraph": "Visit the new Sunnydale Farmers’ Market every Saturday from 8:00 A.M. to 1:00 P.M. at the town square. Local vendors will be selling fresh produce, baked goods, flowers, and handmade crafts. —— (167) ——. Free parking is available nearby.",
+        "image": "/images/part7/set5.jpg",
+        "questions": [
+            {
+                "id": "q167",
+                "question": "What is being advertised?",
+                "options": {
+                    "A": "A neighborhood meeting",
+                    "B": "A local food festival",
+                    "C": "A weekly market",
+                    "D": "A community clean-up"
+                },
+                "answer": "C"
+            },
+            {
+                "id": "q168",
+                "question": "When is the event held?",
+                "options": {
+                    "A": "Every Sunday morning",
+                    "B": "Every Saturday morning",
+                    "C": "The first weekend of the month",
+                    "D": "On holidays only"
+                },
+                "answer": "B"
+            },
+            {
+                "id": "q169",
+                "question": "What is mentioned as available at the event?",
+                "options": {
+                    "A": "Cooking classes",
+                    "B": "Free samples",
+                    "C": "Fresh produce and crafts",
+                    "D": "Live music shows"
+                },
+                "answer": "C"
+            }
+        ]
+    },
+    {
+        "id": "set6",
+        "part": 7,
+        "paragraph": "To: All Staff\nSubject: Updated Break Room Policy\n\nDear Team,\n\nWe’ve received feedback regarding the cleanliness of the break room. To address this, we are implementing a new policy effective next Monday. All employees are expected to clean up after themselves, and a rotating schedule will be posted for weekly cleaning duties. —— (170) ——.\n\nThank you for helping maintain a pleasant environment.\nManagement",
+        "image": "/images/part7/set6.jpg",
+        "questions": [
+            {
+                "id": "q170",
+                "question": "What is the purpose of the memo?",
+                "options": {
+                    "A": "To assign new work shifts",
+                    "B": "To announce an updated policy",
+                    "C": "To introduce a new team leader",
+                    "D": "To share renovation updates"
+                },
+                "answer": "B"
+            },
+            {
+                "id": "q171",
+                "question": "What issue prompted the memo?",
+                "options": {
+                    "A": "Low attendance at meetings",
+                    "B": "Complaints about the break room",
+                    "C": "Technical problems with equipment",
+                    "D": "Lack of supplies in the kitchen"
+                },
+                "answer": "B"
+            },
+            {
+                "id": "q172",
+                "question": "What action is expected from employees?",
+                "options": {
+                    "A": "Arrive earlier for meetings",
+                    "B": "Prepare monthly reports",
+                    "C": "Follow a cleaning schedule",
+                    "D": "Bring their own utensils"
+                },
+                "answer": "C"
+            }
+        ]
+    },
+    {
+        "id": "set7",
+        "part": 7,
+        "paragraph": "To: All Customers\nSubject: Holiday Shipping Schedule\n\nAs the holiday season approaches, we would like to inform you of changes to our delivery service. Orders placed between December 20 and January 2 may experience delays of up to three days. —— (173) ——. We appreciate your patience and understanding.\n\nSincerely,\nCustomer Service Team",
+        "image": "/images/part7/set7.jpg",
+        "questions": [
+            {
+                "id": "q173",
+                "question": "What is the purpose of the e-mail?",
+                "options": {
+                    "A": "To apologize for incorrect orders",
+                    "B": "To notify of a holiday delay",
+                    "C": "To confirm order tracking",
+                    "D": "To introduce new shipping providers"
+                },
+                "answer": "B"
+            },
+            {
+                "id": "q174",
+                "question": "When might delays occur?",
+                "options": {
+                    "A": "Before December 20",
+                    "B": "After January 2",
+                    "C": "During the holiday period",
+                    "D": "Throughout the entire year"
+                },
+                "answer": "C"
+            },
+            {
+                "id": "q175",
+                "question": "What is the company asking for?",
+                "options": {
+                    "A": "More volunteers for deliveries",
+                    "B": "Updated mailing addresses",
+                    "C": "Customer understanding",
+                    "D": "Alternative shipping methods"
+                },
+                "answer": "C"
+            }
+        ]
+    },
+    {
+        "id": "set8",
+        "part": 7,
+        "paragraph": "From: HR Department\nTo: All Staff\nSubject: Office Renovation Update\n\nWe are excited to announce that the renovation of the 3rd floor office space will begin on August 1. The project is expected to last approximately six weeks. —— (176) ——. During this time, teams currently located on the 3rd floor will temporarily work in the training rooms on the 2nd floor.\n\nThank you for your cooperation,\nHR Department",
+        "image": "/images/part7/set8.jpg",
+        "questions": [
+            {
+                "id": "q176",
+                "question": "What is the main purpose of the message?",
+                "options": {
+                    "A": "To notify about staff relocation",
+                    "B": "To request office repairs",
+                    "C": "To confirm a project cancellation",
+                    "D": "To distribute employee schedules"
+                },
+                "answer": "A"
+            },
+            {
+                "id": "q177",
+                "question": "When will the renovation begin?",
+                "options": {
+                    "A": "Immediately",
+                    "B": "On August 1",
+                    "C": "Next week",
+                    "D": "After six weeks"
+                },
+                "answer": "B"
+            },
+            {
+                "id": "q178",
+                "question": "Where will affected teams work temporarily?",
+                "options": {
+                    "A": "On the 1st floor",
+                    "B": "From home",
+                    "C": "In the training rooms",
+                    "D": "At a branch office"
+                },
+                "answer": "C"
+            }
+        ]
+    },
+    {
+        "id": "set9",
+        "part": 7,
+        "paragraph": "To: Valued Customers\nSubject: Change in Store Hours\n\nDear Customers,\n\nBeginning September 15, our store will be open from 10:00 A.M. to 6:00 P.M., Monday through Saturday. We will no longer be open on Sundays to allow our staff time to rest and recharge. —— (179) ——.\n\nThank you for your continued support.\n\nSincerely,\nStore Management",
+        "image": "/images/part7/set9.jpg",
+        "questions": [
+            {
+                "id": "q179",
+                "question": "What is the main change mentioned in the notice?",
+                "options": {
+                    "A": "New return policy",
+                    "B": "Shortened weekday hours",
+                    "C": "Closure on Sundays",
+                    "D": "Introduction of delivery service"
+                },
+                "answer": "C"
+            },
+            {
+                "id": "q180",
+                "question": "Why is the change being made?",
+                "options": {
+                    "A": "To expand operations",
+                    "B": "To improve customer satisfaction",
+                    "C": "To reduce energy costs",
+                    "D": "To give staff rest"
+                },
+                "answer": "D"
+            },
+            {
+                "id": "q181",
+                "question": "When will the new hours start?",
+                "options": {
+                    "A": "Immediately",
+                    "B": "September 15",
+                    "C": "Next weekend",
+                    "D": "Monday only"
+                },
+                "answer": "B"
+            }
+        ]
+    },
+    {
+        "id": "set10",
+        "part": 7,
+        "paragraph": "From: Admissions Office\nTo: Prospective Students\nSubject: Campus Visit Day Reminder\n\nDear Student,\n\nThis is a reminder that our Campus Visit Day is scheduled for Saturday, October 7. The event begins at 9:00 A.M. with a welcome session, followed by campus tours and opportunities to meet current students and faculty. —— (182) ——. Please register by October 1 to reserve your spot.\n\nWe look forward to meeting you!\nAdmissions Office",
+        "image": "/images/part7/set10.jpg",
+        "questions": [
+            {
+                "id": "q182",
+                "question": "What is the purpose of the event mentioned?",
+                "options": {
+                    "A": "To hold a graduation ceremony",
+                    "B": "To conduct job interviews",
+                    "C": "To introduce the school to visitors",
+                    "D": "To start a new semester"
+                },
+                "answer": "C"
+            },
+            {
+                "id": "q183",
+                "question": "What will happen first at the event?",
+                "options": {
+                    "A": "A campus tour",
+                    "B": "A welcome session",
+                    "C": "A lunch break",
+                    "D": "A faculty lecture"
+                },
+                "answer": "B"
+            },
+            {
+                "id": "q184",
+                "question": "By when should attendees register?",
+                "options": {
+                    "A": "October 1",
+                    "B": "October 7",
+                    "C": "Next Monday",
+                    "D": "The day of the event"
+                },
+                "answer": "A"
+            }
+        ]
+    },
+    {
+        "id": "set11",
+        "part": 7,
+        "paragraph": "From: Mary Lewis <mary.lewis@westwoodbooks.com>\nTo: All Staff\nSubject: Temporary Closure\n\nDear Team,\n\nDue to a scheduled electrical upgrade, our store will be closed from March 12 to March 14. All staff are advised not to enter the premises during this time. —— (185) ——. We will resume operations on March 15 at our regular hours.\n\nThank you for your cooperation,\nMary Lewis\nManager",
+        "image": "/images/part7/set11.jpg",
+        "questions": [
+            {
+                "id": "q185",
+                "question": "What is the reason for the store's temporary closure?",
+                "options": {
+                    "A": "Inventory inspection",
+                    "B": "Electrical maintenance",
+                    "C": "Public holiday",
+                    "D": "Staff training"
+                },
+                "answer": "B"
+            },
+            {
+                "id": "q186",
+                "question": "What should staff do during the closure?",
+                "options": {
+                    "A": "Work remotely",
+                    "B": "Attend a training session",
+                    "C": "Avoid entering the store",
+                    "D": "Complete an online form"
+                },
+                "answer": "C"
+            },
+            {
+                "id": "q187",
+                "question": "When will the store reopen?",
+                "options": {
+                    "A": "March 12",
+                    "B": "March 14",
+                    "C": "March 15",
+                    "D": "March 16"
+                },
+                "answer": "C"
+            }
+        ]
+    },
+    {
+        "id": "set12",
+        "part": 7,
+        "paragraph": "From: Customer Service <support@greenleaftech.com>\nTo: Jordan Lee <jlee@unitech.org>\nSubject: Your Request Regarding the X200 Printer\n\nDear Mr. Lee,\n\nThank you for contacting GreenLeaf Tech. We have reviewed your inquiry about the X200 printer’s wireless connectivity issue. Please make sure that your firmware is updated to version 5.3.1. —— (188) ——. If the issue persists, we recommend visiting our authorized service center for further assistance.\n\nBest regards,\nCustomer Support Team",
+        "image": "/images/part7/set12.jpg",
+        "questions": [
+            {
+                "id": "q188",
+                "question": "What product is being discussed in the e-mail?",
+                "options": {
+                    "A": "Wireless router",
+                    "B": "Ink cartridge",
+                    "C": "X200 printer",
+                    "D": "Computer monitor"
+                },
+                "answer": "C"
+            },
+            {
+                "id": "q189",
+                "question": "What is the suggested action before seeking service?",
+                "options": {
+                    "A": "Update the firmware",
+                    "B": "Buy a new device",
+                    "C": "Contact the technician",
+                    "D": "Replace a part"
+                },
+                "answer": "A"
+            },
+            {
+                "id": "q190",
+                "question": "Who sent the e-mail?",
+                "options": {
+                    "A": "Jordan Lee",
+                    "B": "Customer Service",
+                    "C": "Sales Department",
+                    "D": "Repair Technician"
+                },
+                "answer": "B"
+            }
+        ]
+    },
+    {
+        "id": "set13",
+        "part": 7,
+        "paragraph": "From: Event Coordinator <events@novadigital.com>\nTo: Marketing Team\nSubject: Reminder: Product Launch Meeting Tomorrow\n\nHello Team,\n\nJust a reminder that we will be holding our meeting for the new product launch tomorrow, Wednesday, at 10:00 A.M. in Conference Room B. —— (191) ——. Please bring your presentation materials and be ready to share progress updates.\n\nThank you,\nEvent Coordinator",
+        "image": "/images/part7/set13.jpg",
+        "questions": [
+            {
+                "id": "q191",
+                "question": "What is the purpose of the meeting?",
+                "options": {
+                    "A": "To hire new employees",
+                    "B": "To review financial reports",
+                    "C": "To plan a product launch",
+                    "D": "To discuss event security"
+                },
+                "answer": "C"
+            },
+            {
+                "id": "q192",
+                "question": "When will the meeting take place?",
+                "options": {
+                    "A": "This afternoon",
+                    "B": "Tomorrow morning",
+                    "C": "Next Monday",
+                    "D": "On the weekend"
+                },
+                "answer": "B"
+            },
+            {
+                "id": "q193",
+                "question": "What are attendees expected to bring?",
+                "options": {
+                    "A": "Lunch",
+                    "B": "Name badges",
+                    "C": "Presentation materials",
+                    "D": "Security passes"
+                },
+                "answer": "C"
+            }
+        ]
+    },
+    {
+        "id": "set14",
+        "part": 7,
+        "paragraph": "To: All Employees\nFrom: HR Department <hr@sunvalleyresort.com>\nSubject: Changes to Parking Policy\n\nDear Team,\n\nWe are implementing a new parking policy starting next Monday. Employees must use the designated staff parking area located behind Building C. —— (194) ——. Visitor parking in front of the main entrance is no longer available for employee use.\n\nThank you for your cooperation.\nHR Department",
+        "image": "/images/part7/set14.jpg",
+        "questions": [
+            {
+                "id": "q194",
+                "question": "What is the main change mentioned in the memo?",
+                "options": {
+                    "A": "New security requirements",
+                    "B": "Updated working hours",
+                    "C": "Designated employee parking area",
+                    "D": "Closure of Building C"
+                },
+                "answer": "C"
+            },
+            {
+                "id": "q195",
+                "question": "Where is the new parking area located?",
+                "options": {
+                    "A": "In front of the main entrance",
+                    "B": "Next to the cafeteria",
+                    "C": "Behind Building C",
+                    "D": "Near the security booth"
+                },
+                "answer": "C"
+            },
+            {
+                "id": "q196",
+                "question": "Who sent the message?",
+                "options": {
+                    "A": "The CEO",
+                    "B": "The HR Department",
+                    "C": "The Maintenance Team",
+                    "D": "The Receptionist"
+                },
+                "answer": "B"
+            }
+        ]
+    },
+    {
+        "id": "set15",
+        "part": 7,
+        "paragraph": "From: Editor <editor@cityviewpress.org>\nTo: Writers and Contributors\nSubject: Submission Guidelines Reminder\n\nDear All,\n\nThis is a reminder that all articles for the upcoming October issue must be submitted by the 15th of this month. —— (197) ——. Please also ensure that your articles adhere to the style guide provided on our website. Thank you for your cooperation.\n\nSincerely,\nEditor",
+        "image": "/images/part7/set15.jpg",
+        "questions": [
+            {
+                "id": "q197",
+                "question": "What is the main purpose of the message?",
+                "options": {
+                    "A": "To announce a new editor",
+                    "B": "To request article submissions",
+                    "C": "To cancel a publication",
+                    "D": "To change the issue date"
+                },
+                "answer": "B"
+            },
+            {
+                "id": "q198",
+                "question": "What is the deadline for article submissions?",
+                "options": {
+                    "A": "The 1st of the month",
+                    "B": "The 10th of the month",
+                    "C": "The 15th of the month",
+                    "D": "The 30th of the month"
+                },
+                "answer": "C"
+            },
+            {
+                "id": "q199",
+                "question": "What additional instruction is given?",
+                "options": {
+                    "A": "Print copies must be mailed",
+                    "B": "Topics should be approved first",
+                    "C": "Use the online style guide",
+                    "D": "Contact the editor by phone"
+                },
+                "answer": "C"
+            },
+            {
+                "id": "q200",
+                "question": "Who is expected to respond to the message?",
+                "options": {
+                    "A": "The editorial board",
+                    "B": "Office managers",
+                    "C": "Writers and contributors",
+                    "D": "Print subscribers"
+                },
+                "answer": "C"
+            }
+        ]
+    }
+]
