@@ -17,11 +17,14 @@ import ReadingTest from "./models/ReadingTest.js";
 import StudyPlan from "./models/StudyPlan.js";
 import uploadReadingRoutes from "./routes/uploadReading.js";
 import readingRoutes from "./routes/readingRoutes.js";
+
 import uploadDayReadingRoutes from './routes/uploadDayReading.js';
 import dayReadingRoutes from "./routes/dayReadingRoutes.js";
 import uploadLessonRoutes from "./routes/uploadLesson.js";
 import lessonRoutes from "./routes/lessonRoutes.js";
 import recommendRoutes from "./routes/recommend.js";
+import uploadListeningRoutes from "./routes/uploadListening.js";
+import listeningRoutes from "./routes/listeningRoutes.js";
 
 
 
@@ -198,3 +201,8 @@ app.get("/", (req, res) => {
 app.listen(5000, () => {
     console.log("🚀 Backend chạy tại http://localhost:5000");
 });
+
+
+app.use("/api", uploadListeningRoutes);
+app.use("/api", listeningRoutes);
+

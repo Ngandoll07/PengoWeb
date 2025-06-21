@@ -1,69 +1,85 @@
-.reading-admin-wrapper {
+.listening-admin-wrapper {
     padding: 20px;
 }
 
-.manage-reading-title {
+/* Tiêu đề */
+.manage-listening-title {
     font-size: 28px;
     color: #E21033;
     margin-bottom: 20px;
-      margin-left:300px;
+    margin-left: 300px;
 }
 
-.reading-upload-section {
+/* Khu vực upload */
+.upload-listening-json {
     margin-bottom: 30px;
-    margin-left:300px;
+    margin-left: 300px;
 }
 
-.reading-upload-section input[type="file"] {
+.upload-listening-json input[type="file"] {
     margin-right: 10px;
 }
 
-.reading-test-list {
+/* Nút chọn part */
+.listening-part-select {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 10px;
     margin-bottom: 30px;
-      margin-left:300px;
+    margin-left: 300px;
 }
 
-.reading-test-card {
+.listening-part-select button {
     background: #ffe6ec;
-    padding: 15px 20px;
-    border-radius: 12px;
-    cursor: pointer;
+    padding: 8px 16px;
     border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
     transition: 0.3s ease;
-    width: 220px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.reading-test-card.active {
-    border-color: #E21033;
-    background: #FFD6E4;
+.listening-part-select button.active {
+    background: #E21033;
+    color: white;
+    font-weight: bold;
 }
 
-.reading-detail {
-    margin-top: 20px;
-      margin-left:300px;
+/* Table Container: Có scroll ngang nếu tràn */
+.table-scroll-wrapper {
+    margin-left: 300px;
+    overflow-x: auto;
+    max-width: calc(100vw - 320px);
+    /* để tránh bị tràn sang trái */
 }
 
-.reading-table {
+/* Bảng */
+.listening-table {
     width: 100%;
+    min-width: 1200px;
     border-collapse: collapse;
     background: white;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     overflow: hidden;
 }
 
-.reading-table th,
-.reading-table td {
+/* Ô */
+.listening-table th,
+.listening-table td {
     border: 1px solid #ddd;
     padding: 10px 12px;
     text-align: left;
+    vertical-align: middle;
+    white-space: nowrap;
 }
 
-.reading-table th {
+/* Header của bảng */
+.listening-table th {
     background: #f9b5c6;
     color: white;
+}
+
+/* Cột audio */
+.listening-table td audio {
+    width: 160px;
 }

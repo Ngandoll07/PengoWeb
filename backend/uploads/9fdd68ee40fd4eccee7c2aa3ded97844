@@ -770,6 +770,160 @@
     "image": null
   },
   {
+    "id": "q45",
+    "part": 3,
+    "question": "What does the speaker imply when he says, “Erina’s at the back of the room”?",
+    "options": {
+      "A": "A guest speaker has just arrived.",
+      "B": "Assistance is available.",
+      "C": "Attendees should speak clearly and loudly.",
+      "D": "An extra chair should be provided."
+    },
+    "answer": "B",
+    "audio": "/assets/audio/Test1/part3/q44-q46.mp3",
+    "image": null
+  },
+  {
+    "id": "q46",
+    "part": 3,
+    "question": "What will the listeners do next?",
+    "options": {
+      "A": "Sign their names on a list",
+      "B": "Take a break",
+      "C": "Participate in an introductory activity",
+      "D": "Fill out a questionnaire"
+    },
+    "answer": "C",
+    "audio": "/assets/audio/Test1/part3/q44-q46.mp3",
+    "image": null
+  },
+  {
+    "id": "q47",
+    "part": 3,
+    "question": "What is a historical site famous for?",
+    "options": {
+      "A": "Its defensive walls",
+      "B": "Its royal inhabitants",
+      "C": "An event that happened there",
+      "D": "Some artwork"
+    },
+    "answer": "C",
+    "audio": "/assets/audio/Test1/part3/q47-q49.mp3",
+    "image": null
+  },
+  {
+    "id": "q48",
+    "part": 3,
+    "question": "Why does the speaker apologize?",
+    "options": {
+      "A": "The listeners cannot take pictures.",
+      "B": "An area is closed to the listeners.",
+      "C": "There is no gift shop.",
+      "D": "A tour started late."
+    },
+    "answer": "B",
+    "audio": "/assets/audio/Test1/part3/q47-q49.mp3",
+    "image": null
+  },
+  {
+    "id": "q49",
+    "part": 3,
+    "question": "What does the speaker ask the listeners to do?",
+    "options": {
+      "A": "Show their tickets",
+      "B": "Put on protective clothing",
+      "C": "Use some handrails",
+      "D": "Speak quietly"
+    },
+    "answer": "D",
+    "audio": "/assets/audio/Test1/part3/q47-q49.mp3",
+    "image": null
+  },
+  {
+    "id": "q50",
+    "part": 3,
+    "question": "What is the speaker mainly discussing?",
+    "options": {
+      "A": "An advertising campaign",
+      "B": "A market expansion",
+      "C": "Some contract negotiations",
+      "D": "Some audit procedures"
+    },
+    "answer": "A",
+    "audio": "/assets/audio/Test1/part3/q50-q52.mp3",
+    "image": null
+  },
+  {
+    "id": "q51",
+    "part": 3,
+    "question": "What does the speaker imply when he says, “this is a priority”?",
+    "options": {
+      "A": "Overtime pay has been approved.",
+      "B": "A deadline must be met.",
+      "C": "A client expressed concern.",
+      "D": "A supervisor will be observing closely."
+    },
+    "answer": "B",
+    "audio": "/assets/audio/Test1/part3/q50-q52.mp3",
+    "image": null
+  },
+  {
+    "id": "q52",
+    "part": 3,
+    "question": "What will the listeners do next?",
+    "options": {
+      "A": "View a presentation",
+      "B": "Review a budget",
+      "C": "Revise some work",
+      "D": "Do some research"
+    },
+    "answer": "C",
+    "audio": "/assets/audio/Test1/part3/q50-q52.mp3",
+    "image": null
+  },
+  {
+    "id": "q53",
+    "part": 3,
+    "question": "Where do the listeners most likely work?",
+    "options": {
+      "A": "At a hospital",
+      "B": "At a restaurant",
+      "C": "At a grocery store",
+      "D": "At an electronics store"
+    },
+    "answer": "C",
+    "audio": "/assets/audio/Test1/part3/q53-q55.mp3",
+    "image": null
+  },
+  {
+    "id": "q54",
+    "part": 3,
+    "question": "What is the main purpose of the talk?",
+    "options": {
+      "A": "To make a request",
+      "B": "To address staff complaints",
+      "C": "To present a new schedule",
+      "D": "To explain a technical process"
+    },
+    "answer": "A",
+    "audio": "/assets/audio/Test1/part3/q53-q55.mp3",
+    "image": null
+  },
+  {
+    "id": "q55",
+    "part": 3,
+    "question": "What does the speaker imply when she says, “That will require management approval”?",
+    "options": {
+      "A": "A process has not been followed.",
+      "B": "The listeners may be asked to work extra shifts.",
+      "C": "The listeners should contact a manager.",
+      "D": "A change will not be immediate."
+    },
+    "answer": "D",
+    "audio": "/assets/audio/Test1/part3/q53-q55.mp3",
+    "image": null
+  },
+  {
     "id": "q56",
     "part": 3,
     "question": "Why is the woman calling?",
