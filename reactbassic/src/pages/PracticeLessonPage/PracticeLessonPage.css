@@ -1,0 +1,119 @@
+.practice-lesson-page {
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+}
+
+.practice-lesson-page h2 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.practice-lesson-page p {
+  text-align: center;
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 40px;
+}
+
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
+}
+
+@media screen and (max-width: 600px) {
+  table,
+  thead,
+  tbody,
+  th,
+  td,
+  tr {
+    display: block;
+  }
+
+  td {
+    padding-left: 50%;
+    position: relative;
+  }
+
+  td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    font-weight: bold;
+  }
+}
+.practice-lesson-page {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 30px;
+  background: #fefefe;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.practice-lesson-page h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.practice-lesson-page p {
+  margin-bottom: 20px;
+  color: #555;
+}
+
+.question-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.question-table th,
+.question-table td {
+  padding: 10px;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+.passage-row td {
+  background-color: #f5faff;
+  font-style: italic;
+}
+.option.correct {
+  background-color: #d4edda;
+  border: 1px solid #28a745;
+}
+.option.incorrect {
+  background-color: #f8d7da;
+  border: 1px solid #dc3545;
+}
+.feedback.correct {
+  color: #28a745;
+}
+.feedback.incorrect {
+  color: #dc3545;
+}
