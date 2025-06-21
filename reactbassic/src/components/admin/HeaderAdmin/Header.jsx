@@ -4,13 +4,13 @@ import { IoIosSearch } from "react-icons/io";
 import { FaUserCircle, FaHome, FaCog, FaSignOutAlt, FaShoppingBasket } from "react-icons/fa";
 import { IoPerson, IoLogInOutline } from "react-icons/io5";
 import { BiCategoryAlt } from "react-icons/bi";
-import { FaTicket, FaRocketchat  } from "react-icons/fa6";
+import { FaTicket, FaRocketchat } from "react-icons/fa6";
 import "./Header.css";
 
 const Header = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const location = useLocation(); 
-    const navigate = useNavigate(); 
+    const location = useLocation();
+    const navigate = useNavigate();
 
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
@@ -40,32 +40,32 @@ const Header = () => {
                         <FaShoppingBasket />
                         <span className="sidebar-text">Lộ trình học cá nhân</span>
                     </li>
-                    <li className={location.pathname === "/coupons" ? "active" : ""} onClick={() => navigate("/admin/manage_coupon")}>
+                    <li className={location.pathname === "/listeningtopic" ? "active" : ""} onClick={() => navigate("/admin/listeningtopic")}>
                         <FaTicket />
                         <span className="sidebar-text">Đề luyện nghe</span>
                     </li>
-                     <li className={location.pathname === "/readtopic" ? "active" : ""} onClick={() => navigate("/admin/readtopic")}>
+                    <li className={location.pathname === "/readtopic" ? "active" : ""} onClick={() => navigate("/admin/readtopic")}>
                         <FaTicket />
                         <span className="sidebar-text">Đề luyện đọc</span>
                     </li>
-                     <li className={location.pathname === "/coupons" ? "active" : ""} onClick={() => navigate("/admin/manage_coupon")}>
+                    <li className={location.pathname === "/coupons" ? "active" : ""} onClick={() => navigate("/admin/manage_coupon")}>
                         <FaTicket />
                         <span className="sidebar-text">Đề luyện viết</span>
                     </li>
-                     <li className={location.pathname === "/coupons" ? "active" : ""} onClick={() => navigate("/admin/manage_coupon")}>
+                    <li className={location.pathname === "/coupons" ? "active" : ""} onClick={() => navigate("/admin/manage_coupon")}>
                         <FaTicket />
                         <span className="sidebar-text">Đề luyện nói</span>
                     </li>
                     <li className={location.pathname === "/reviews" ? "active" : ""} onClick={() => navigate("/admin/manage_review")}>
-                        <FaRocketchat  />
+                        <FaRocketchat />
                         <span className="sidebar-text">Đề thi TOEIC LR</span>
                     </li>
-                     <li className={location.pathname === "/reviews" ? "active" : ""} onClick={() => navigate("/admin/manage_review")}>
-                        <FaRocketchat  />
+                    <li className={location.pathname === "/reviews" ? "active" : ""} onClick={() => navigate("/admin/manage_review")}>
+                        <FaRocketchat />
                         <span className="sidebar-text">Đề thi TOEIC SW</span>
                     </li>
                     <li className={location.pathname === "/reviews" ? "active" : ""} onClick={() => navigate("/admin/manage_review")}>
-                        <FaRocketchat  />
+                        <FaRocketchat />
                         <span className="sidebar-text">Đề thi TOEIC 4 kỹ năng</span>
                     </li>
                     <li className={location.pathname === "/settings" ? "active" : ""} onClick={() => navigate("/settings")}>
@@ -76,7 +76,7 @@ const Header = () => {
                         <FaCog />
                         <span className="sidebar-text">Lộ trình học</span>
                     </li>
-                     <li className={location.pathname === "/settings" ? "active" : ""} onClick={() => navigate("/settings")}>
+                    <li className={location.pathname === "/settings" ? "active" : ""} onClick={() => navigate("/settings")}>
                         <FaCog />
                         <span className="sidebar-text">Điểm trung bình</span>
                     </li> <li className={location.pathname === "/settings" ? "active" : ""} onClick={() => navigate("/settings")}>

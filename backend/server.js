@@ -17,6 +17,8 @@ import ReadingTest from "./models/ReadingTest.js";
 import StudyPlan from "./models/StudyPlan.js";
 import uploadReadingRoutes from "./routes/uploadReading.js";
 import readingRoutes from "./routes/readingRoutes.js";
+import uploadListeningRoutes from "./routes/uploadListening.js";
+import listeningRoutes from "./routes/listeningRoutes.js";
 
 
 const app = express();
@@ -187,3 +189,8 @@ app.get("/", (req, res) => {
 app.listen(5000, () => {
     console.log("🚀 Backend chạy tại http://localhost:5000");
 });
+
+
+app.use("/api", uploadListeningRoutes);
+app.use("/api", listeningRoutes);
+
