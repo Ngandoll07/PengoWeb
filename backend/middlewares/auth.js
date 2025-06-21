@@ -1,4 +1,4 @@
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 const JWT_SECRET = "123"; // Nên thay bằng process.env.JWT_SECRET nếu cần bảo mật hơn
 
 const authenticate = (req, res, next) => {
@@ -16,4 +16,4 @@ const authenticate = (req, res, next) => {
     }
 };
 
-module.exports = authenticate;
+export default authenticate;

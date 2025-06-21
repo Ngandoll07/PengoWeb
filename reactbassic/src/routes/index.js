@@ -13,6 +13,8 @@ import CoursesPage from "../pages/CoursesPage/CoursesPage.jsx";
 import CartPage from "../pages/CartPage/CartPage.jsx";
 import DoTestPage from "../pages/DoTestPage/DoTestPage";
 import PracticeLessonPage from "../pages/PracticeLessonPage/PracticeLessonPage";
+import MyCourses from "../pages/MyCourses/MyCourses";
+
 
 import Dashboard from "../pages/Admin/AdminDashboard/Dashboard.jsx";
 import AdminUser from "../pages/Admin/AdminUser/User";
@@ -21,6 +23,7 @@ import ReadingTopic from "../pages/Admin/ReadingTopic/ReadingTopic";
 import UploadLessonPage from "../pages/Admin/UploadLessonPage/UploadLessonPage.jsx"
 import ListeningTopic from "../pages/Admin/ListeningTopic/ListeningTopic";
 import CourseAdmin from "../pages/Admin/CourseAdmin/CourseAdmin";
+import AdminOrders from "../pages/Admin/AdminOrders/AdminOrders";
 
 
 
@@ -96,6 +99,12 @@ export const routes = [
         isShowHeader: true
     },
 
+    {
+        path: '/mycourses',
+        page: MyCourses,
+        isShowHeader: true
+    },
+
     //  admin
     {
         path: '/admin',
@@ -124,5 +133,9 @@ export const routes = [
     {
         path: "/admin/courseadmin",
         page: CourseAdmin,
+    },
+    {
+        path: "/admin/orders",
+        page: AdminOrders,
     }
 ]
