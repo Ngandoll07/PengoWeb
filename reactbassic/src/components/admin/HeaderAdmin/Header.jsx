@@ -40,6 +40,10 @@ const Header = () => {
                         <FaShoppingBasket />
                         <span className="sidebar-text">Lộ trình học cá nhân</span>
                     </li>
+                    <li className={location.pathname === "/courseadmin" ? "active" : ""} onClick={() => navigate("/admin/courseadmin")}>
+                        <FaCog />
+                        <span className="sidebar-text">Khoá học</span>
+                    </li>
                     <li className={location.pathname === "/listeningtopic" ? "active" : ""} onClick={() => navigate("/admin/listeningtopic")}>
                         <FaTicket />
                         <span className="sidebar-text">Đề luyện nghe</span>

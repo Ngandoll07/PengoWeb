@@ -1,0 +1,88 @@
+[
+    {
+        "id": 1,
+        "title": "Khóa học TOEIC online 4 kỹ năng",
+        "image": "/assets/courses/combo4.png",
+        "price": 2500000,
+        "originalPrice": 2900000,
+        "tag": "GIẢM GIÁ!",
+        "description": "Tặng ebook từ vựng & ý tưởng",
+        "details": [
+            "Kỹ năng Listening",
+            "Kỹ năng Reading",
+            "Kỹ năng Speaking",
+            "Kỹ năng Writing",
+            "Tặng kèm Ebook Ý tưởng & Từ vựng"
+        ]
+    },
+    {
+        "id": 2,
+        "title": "Khóa học TOEIC Vocabulary online",
+        "image": "/assets/courses/vocab.png",
+        "price": 600000,
+        "description": "Từ vựng theo chủ đề",
+        "details": [
+            "700+ từ vựng TOEIC phổ biến",
+            "Chia theo 20 chủ đề thông dụng",
+            "Flashcard và bài tập tương tác",
+            "Phù hợp mọi trình độ",
+            "Học mọi lúc, mọi nơi"
+        ]
+    },
+    {
+        "id": 3,
+        "title": "Khóa học TOEIC Lisening & Reading 450+",
+        "image": "/assets/courses/lr450.png",
+        "price": 1200000,
+        "description": "Học theo dạng bài",
+        "details": [
+            "Chiến lược làm bài Listening & Reading",
+            "Phân tích từng dạng câu hỏi",
+            "Bài tập luyện tập theo level",
+            "Định hướng đạt mục tiêu 450+",
+            "Tài liệu PDF đi kèm"
+        ]
+    },
+    {
+        "id": 4,
+        "title": "Khóa học TOEIC Listening online",
+        "image": "/assets/courses/listening.png",
+        "price": 500000,
+        "description": "Luyện nghe Part 1-4 theo cấp độ",
+        "details": [
+            "Luyện nghe từ cơ bản đến nâng cao",
+            "Chia theo từng Part 1 → 4",
+            "Có transcript và giải thích",
+            "Bài tập + audio đi kèm",
+            "Dễ học, dễ ôn luyện"
+        ]
+    },
+    {
+        "id": 5,
+        "title": "Khóa học TOEIC Reading online",
+        "image": "/assets/courses/reading.png",
+        "price": 500000,
+        "description": "Luyện đọc Part 5-7 có giải thích",
+        "details": [
+            "Chiến thuật giải nhanh Part 5, 6, 7",
+            "Luyện từng dạng câu hỏi",
+            "Giải thích rõ từng đáp án",
+            "Bộ đề cập nhật liên tục",
+            "Tăng kỹ năng đọc hiểu thực tế"
+        ]
+    },
+    {
+        "id": 6,
+        "title": "Khóa học TOEIC Lisening & Reading 650+",
+        "image": "/assets/courses/lr650.png",
+        "price": 1500000,
+        "description": "700 từ vựng trọng tâm theo chủ đề thi thật",
+        "details": [
+            "Luyện thi đạt mục tiêu 650+",
+            "Tập trung vào kỹ năng làm đề",
+            "700 từ vựng chuyên sâu theo đề thi thật",
+            "Bài test trình độ + bài luyện theo lộ trình",
+            "File PDF + Hướng dẫn ôn tập"
+        ]
+    }
+]

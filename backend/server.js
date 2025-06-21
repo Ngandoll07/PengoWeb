@@ -25,6 +25,9 @@ import lessonRoutes from "./routes/lessonRoutes.js";
 import recommendRoutes from "./routes/recommend.js";
 import uploadListeningRoutes from "./routes/uploadListening.js";
 import listeningRoutes from "./routes/listeningRoutes.js";
+import courseRoute from "./routes/courseRoute.js";
+
+
 
 
 
@@ -205,4 +208,7 @@ app.listen(5000, () => {
 
 app.use("/api", uploadListeningRoutes);
 app.use("/api", listeningRoutes);
+
+app.use("/api", courseRoute);
+
 
