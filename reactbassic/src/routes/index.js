@@ -9,11 +9,15 @@ import PracticeLisnRead from "../pages/PracticeLisnRead/PracticeLisnRead";
 import PracticeListening from "../pages/PracticeListening/PracticeListening";
 import PracticeRead from "../pages/PracticeRead/PracticeRead";
 import ResultPage from "../pages/ResultPage/ResultPage";
+import CoursesPage from "../pages/CoursesPage/CoursesPage.jsx";
+import CartPage from "../pages/CartPage/CartPage.jsx";
 
 import Dashboard from "../pages/Admin/AdminDashboard/Dashboard.jsx";
 import AdminUser from "../pages/Admin/AdminUser/User";
 import ReadingTopic from "../pages/Admin/ReadingTopic/ReadingTopic";
 import ListeningTopic from "../pages/Admin/ListeningTopic/ListeningTopic";
+import CourseAdmin from "../pages/Admin/CourseAdmin/CourseAdmin";
+
 
 export const routes = [
     {
@@ -66,7 +70,16 @@ export const routes = [
         page: ResultPage,
         isShowHeader: true
     },
-
+    {
+        path: '/coursespage',
+        page: CoursesPage,
+        isShowHeader: true
+    },
+    {
+        path: '/cartpage',
+        page: CartPage,
+        isShowHeader: true
+    },
     //  admin
     {
         path: '/admin',
@@ -87,5 +100,9 @@ export const routes = [
     {
         path: '/admin/listeningtopic',
         page: ListeningTopic,
+    },
+    {
+        path: "/admin/courseadmin",
+        page: CourseAdmin,
     }
 ]

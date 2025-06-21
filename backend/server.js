@@ -19,6 +19,9 @@ import uploadReadingRoutes from "./routes/uploadReading.js";
 import readingRoutes from "./routes/readingRoutes.js";
 import uploadListeningRoutes from "./routes/uploadListening.js";
 import listeningRoutes from "./routes/listeningRoutes.js";
+import courseRoute from "./routes/courseRoute.js";
+
+
 
 
 const app = express();
@@ -193,4 +196,7 @@ app.listen(5000, () => {
 
 app.use("/api", uploadListeningRoutes);
 app.use("/api", listeningRoutes);
+
+app.use("/api", courseRoute);
+
 

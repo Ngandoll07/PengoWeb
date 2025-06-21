@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import './style.css';
-import { FaBell, FaUser, FaSignOutAlt } from 'react-icons/fa';
+import { FaBell, FaUser, FaSignOutAlt, FaShoppingCart } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { useCart } from '../../context/CartContext';
 
 const HeaderComponent = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
+  const { cart } = useCart(); // 🧠 Lấy giỏ hàng từ Context
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -28,7 +30,7 @@ const HeaderComponent = () => {
 
       <nav className="nav">
         <a href="/">TRANG CHỦ</a>
-        <a href="#">KHÓA HỌC</a>
+        <a href="/coursespage">KHÓA HỌC</a>
         <div className="dropdown">
           <span className="dropbtn">LUYỆN TẬP</span>
           <div className="dropdown-content">
@@ -42,7 +44,16 @@ const HeaderComponent = () => {
       </nav>
 
       <div className="icon-area">
+        {/* 🛒 Giỏ hàng */}
+        <div className="cart-icon" onClick={() => navigate("/cartpage")}>
+          <FaShoppingCart className="icon" />
+          {cart.length > 0 && <span className="cart-count">{cart.length}</span>}
+        </div>
+
+        {/* 🔔 Thông báo */}
         <FaBell className="icon" />
+
+        {/* 👤 Tài khoản */}
         {isLoggedIn ? (
           <div
             className="user-menu-container"

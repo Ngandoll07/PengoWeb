@@ -52,7 +52,7 @@ export default function LoginPage() {
           </div>
           <div className="login-links">
             <a href="#">Quên mật khẩu?</a>
-            <a href="#">Đăng ký</a>
+            <a href="/signup">Đăng ký</a>
           </div>
           <button className="login-btn" onClick={handleLogin}>Đăng nhập</button>
           <p className="or-text">Đăng nhập bằng:</p>
