@@ -8,14 +8,16 @@ const ResultPage = () => {
   const navigate = useNavigate();
   const result = location.state || {};
 
-  const handleViewAnswers = () => {
-    navigate("/practice", {
-      state: {
-        showAnswers: true,
-        result: result,
-      },
-    });
-  };
+const handleViewAnswers = () => {
+  navigate(`/practicelesson/${result.lessonId}`, {
+    state: {
+      showAnswers: true,
+      answers: result.answers,
+    },
+  });
+};
+
+
 
   // Xác định tiêu đề dựa trên phần đã làm
   const parts = result.partsSubmitted || [];

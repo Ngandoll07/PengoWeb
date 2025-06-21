@@ -72,11 +72,13 @@ const Header = () => {
                         <FaCog />
                         <span className="sidebar-text">Bài giảng</span>
                     </li>
-                    <li className={location.pathname === "/settings" ? "active" : ""} onClick={() => navigate("/settings")}>
+                    <li className={location.pathname === "/lesson" ? "active" : ""} onClick={() => navigate("/admin/lesson")}>
                         <FaCog />
                         <span className="sidebar-text">Lộ trình học</span>
                     </li>
+
                     <li className={location.pathname === "/settings" ? "active" : ""} onClick={() => navigate("/settings")}>
+
                         <FaCog />
                         <span className="sidebar-text">Điểm trung bình</span>
                     </li> <li className={location.pathname === "/settings" ? "active" : ""} onClick={() => navigate("/settings")}>

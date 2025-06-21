@@ -17,14 +17,26 @@ import ReadingTest from "./models/ReadingTest.js";
 import StudyPlan from "./models/StudyPlan.js";
 import uploadReadingRoutes from "./routes/uploadReading.js";
 import readingRoutes from "./routes/readingRoutes.js";
+
+import uploadDayReadingRoutes from './routes/uploadDayReading.js';
+import dayReadingRoutes from "./routes/dayReadingRoutes.js";
+import uploadLessonRoutes from "./routes/uploadLesson.js";
+import lessonRoutes from "./routes/lessonRoutes.js";
+import recommendRoutes from "./routes/recommend.js";
 import uploadListeningRoutes from "./routes/uploadListening.js";
 import listeningRoutes from "./routes/listeningRoutes.js";
+
 
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use('/api', uploadDayReadingRoutes);
+app.use("/api", dayReadingRoutes);
+app.use("/api", uploadLessonRoutes);
+app.use("/api", lessonRoutes);
+app.use("/api", recommendRoutes);
 
 // MongoDB
 

@@ -9,11 +9,16 @@ import PracticeLisnRead from "../pages/PracticeLisnRead/PracticeLisnRead";
 import PracticeListening from "../pages/PracticeListening/PracticeListening";
 import PracticeRead from "../pages/PracticeRead/PracticeRead";
 import ResultPage from "../pages/ResultPage/ResultPage";
+import DoTestPage from "../pages/DoTestPage/DoTestPage";
+import PracticeLessonPage from "../pages/PracticeLessonPage/PracticeLessonPage";
 
 import Dashboard from "../pages/Admin/AdminDashboard/Dashboard.jsx";
 import AdminUser from "../pages/Admin/AdminUser/User";
 import ReadingTopic from "../pages/Admin/ReadingTopic/ReadingTopic";
+
+import UploadLessonPage from "../pages/Admin/UploadLessonPage/UploadLessonPage.jsx"
 import ListeningTopic from "../pages/Admin/ListeningTopic/ListeningTopic";
+
 
 export const routes = [
     {
@@ -65,7 +70,17 @@ export const routes = [
         path: '/result',
         page: ResultPage,
         isShowHeader: true
-    },
+    },  
+    {
+        path: '/dotest',
+        page: DoTestPage,
+        isShowHeader: true
+    },  
+   {
+        path: '/practicelesson/:id',
+        page: PracticeLessonPage,
+        isShowHeader: true
+        },
 
     //  admin
     {
@@ -79,6 +94,10 @@ export const routes = [
     {
         path: '/admin/readtopic',
         page: ReadingTopic,
+    },
+     {
+        path: '/admin/lesson',
+        page: UploadLessonPage,
     },
     {
         path: '*',
