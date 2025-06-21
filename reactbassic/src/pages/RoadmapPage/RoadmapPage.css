@@ -85,3 +85,26 @@
 .status-label{
     margin-left: 10px;
 }
+.analysis-box {
+  padding: 20px 25px;
+  margin-bottom: 30px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+.analysis-box h3 {
+  margin-top: 0;
+  font-size: 2rem;
+  color: #007BFF;
+  margin-bottom: 10px;
+}
+
+.analysis-box p {
+ background-color: #f4faff;
+  border: 2px solid #b2dfff;
+  padding: 20px;
+  margin: 20px auto;
+  border-radius: 12px;
+  max-width: 800px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}

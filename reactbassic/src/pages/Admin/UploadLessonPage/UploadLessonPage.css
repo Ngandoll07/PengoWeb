@@ -1,0 +1,74 @@
+.upload-container {
+  max-width: 500px;
+  margin-top: 30px ;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-left: 500px;
+}
+
+.upload-container h2 {
+  margin-bottom: 20px;
+}
+
+.upload-container form {
+  display: flex;
+  flex-direction: column;
+}
+
+.upload-container label {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.upload-container input,
+.upload-container select,
+.upload-container button {
+  padding: 8px;
+  margin-top: 5px;
+}
+
+.upload-container button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  margin-top: 15px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.upload-container .message {
+  margin-top: 15px;
+  font-weight: bold;
+}
+/**/
+.lesson-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px ;
+  margin-left: 300px;
+}
+.lesson-card {
+  border: 1px solid #ccc;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 200px;
+}
+.lesson-card.active {
+  border-color: blue;
+  background: #eef;
+}
+.lesson-detail {
+ margin-top: 30px ;
+  margin-left: 300px;
+}
+.reading-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.reading-table th, .reading-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
