@@ -1,4 +1,3 @@
-// src/context/CartContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const CartContext = createContext();
@@ -6,18 +5,26 @@ const CartContext = createContext();
 export const CartProvider = ({ children }) => {
     const [cart, setCart] = useState([]);
 
-    // ✅ Load giỏ hàng từ localStorage khi tải trang
+    // ✅ Load từ localStorage khi mở lại trang
     useEffect(() => {
-        const savedCart = JSON.parse(localStorage.getItem('cart')) || [];
-        setCart(savedCart);
+        try {
+            const savedCart = localStorage.getItem('cart');
+            if (savedCart) {
+                setCart(JSON.parse(savedCart));
+            }
+        } catch (err) {
+            console.error("❌ Lỗi load cart:", err);
+            setCart([]);
+        }
     }, []);
 
-    // ✅ Lưu giỏ hàng vào localStorage mỗi khi thay đổi
+
+    // ✅ Lưu vào localStorage khi cart thay đổi
     useEffect(() => {
         localStorage.setItem('cart', JSON.stringify(cart));
     }, [cart]);
 
-    // ✅ Thêm vào giỏ hàng (nếu đã có thì +1 số lượng)
+    // ✅ Thêm sản phẩm (nếu có rồi thì cộng số lượng)
     const addToCart = (course) => {
         setCart(prev => {
             const existing = prev.find(item => item.id === course.id);
@@ -32,7 +39,7 @@ export const CartProvider = ({ children }) => {
         });
     };
 
-    // ✅ Cập nhật số lượng sản phẩm
+    // ✅ Cập nhật số lượng
     const updateQuantity = (id, quantity) => {
         setCart(prev =>
             prev.map(item =>
@@ -43,13 +50,24 @@ export const CartProvider = ({ children }) => {
         );
     };
 
-    // ✅ Xoá sản phẩm khỏi giỏ
+    // ✅ Xoá 1 sản phẩm khỏi giỏ
     const removeFromCart = (id) => {
         setCart(prev => prev.filter(item => item.id !== id));
     };
 
+    // ✅ Xoá toàn bộ giỏ hàng (dùng khi thanh toán xong)
+    const clearCart = () => {
+        setCart([]);
+    };
+
     return (
-        <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity }}>
+        <CartContext.Provider value={{
+            cart,
+            addToCart,
+            removeFromCart,
+            updateQuantity,
+            clearCart
+        }}>
             {children}
         </CartContext.Provider>
     );

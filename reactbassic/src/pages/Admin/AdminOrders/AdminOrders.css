@@ -1,0 +1,33 @@
+.admin-orders-wrapper {
+    padding: 20px;
+    margin-left: 300px;
+    min-height: 100vh;
+    background: #fdfdfd;
+}
+
+.admin-orders-title {
+    font-size: 26px;
+    color: #E53935;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.orders-table th,
+.orders-table td {
+    border: 1px solid #ddd;
+    padding: 12px 16px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.orders-table th {
+    background-color: #E53935;
+    color: white;
+}

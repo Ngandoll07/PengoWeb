@@ -26,7 +26,7 @@ import recommendRoutes from "./routes/recommend.js";
 import uploadListeningRoutes from "./routes/uploadListening.js";
 import listeningRoutes from "./routes/listeningRoutes.js";
 import courseRoute from "./routes/courseRoute.js";
-
+import purchaseRoutes from "./routes/purchase.js";
 
 
 
@@ -40,6 +40,7 @@ app.use("/api", dayReadingRoutes);
 app.use("/api", uploadLessonRoutes);
 app.use("/api", lessonRoutes);
 app.use("/api", recommendRoutes);
+
 
 // MongoDB
 
@@ -210,5 +211,7 @@ app.use("/api", uploadListeningRoutes);
 app.use("/api", listeningRoutes);
 
 app.use("/api", courseRoute);
+app.use("/api/purchase", purchaseRoutes);
+
 
 

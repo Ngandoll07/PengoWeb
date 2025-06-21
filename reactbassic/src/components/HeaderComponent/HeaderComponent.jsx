@@ -65,6 +65,7 @@ const HeaderComponent = () => {
               <div className="user-dropdown">
                 <a href="/roadmap">🧭 Lộ trình</a>
                 <a href="/profile">👤 Thông tin</a>
+                <a href="/mycourses">🎓 Khoá học của tôi</a>
                 <button onClick={handleLogout} className="logout-btn">
                   <FaSignOutAlt /> Đăng xuất
                 </button>
