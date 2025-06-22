@@ -2,26 +2,26 @@
     {
         "id": "q65",
         "part": 3,
-        "question": "Where is the conversation taking place?",
+        "question": "What type of art will be displayed in an exhibit?",
         "options": {
-            "A": "In a restaurant",
-            "B": "In a classroom",
-            "C": "In a park",
-            "D": "In a library"
+            "A": "Clay sculptures",
+            "B": "Oil paintings",
+            "C": "Black-and-white photographs",
+            "D": "Pencil drawings"
         },
-        "answer": "A",
+        "answer": "D",
         "audio": "/assets/audio/Test1/part3/q65-q67.mp3",
         "image": "/assets/images/Test1/part3/q65-q67.jpg"
     },
     {
         "id": "q66",
         "part": 3,
-        "question": "What does the woman want to know?",
+        "question": "Look at the graphic. Which piece of artwork will no longer be included?",
         "options": {
-            "A": "How to prepare a document",
-            "B": "When a report is due",
-            "C": "Where to find a menu",
-            "D": "Who is in charge"
+            "A": "A Careful Glance",
+            "B": "Promises",
+            "C": "Stormy Sea",
+            "D": "The Moment"
         },
         "answer": "C",
         "audio": "/assets/audio/Test1/part3/q65-q67.mp3",
@@ -30,14 +30,14 @@
     {
         "id": "q67",
         "part": 3,
-        "question": "What does the man say he will do?",
+        "question": "What does the woman say she will do right away?",
         "options": {
-            "A": "Review a document",
-            "B": "Print a form",
-            "C": "Ask for help",
-            "D": "Send a link"
+            "A": "Speak with an artist",
+            "B": "Edit a recording",
+            "C": "Clean a gallery space",
+            "D": "Greet some visitors"
         },
-        "answer": "D",
+        "answer": "B",
         "audio": "/assets/audio/Test1/part3/q65-q67.mp3",
         "image": "/assets/images/Test1/part3/q65-q67.jpg"
     }

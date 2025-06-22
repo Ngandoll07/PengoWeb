@@ -1,16 +1,15 @@
-# analyze_audio.py
 import whisper
 import sys
 import json
 from thefuzz import fuzz
+import io
 
 # ======= Load model =======
 model = whisper.load_model("base")
 
 # ======= Nhận tham số từ dòng lệnh =======
-# audio_path [0], questions_path [1]
-audio_path = sys.argv[1]
-questions_path = sys.argv[2]
+audio_path = sys.argv[1]              # Đường dẫn file .mp3
+questions_path = sys.argv[2]          # Đường dẫn file .json tạm chứa câu hỏi
 
 # ======= Load dữ liệu câu hỏi =======
 with open(questions_path, "r", encoding="utf-8") as f:
@@ -20,7 +19,7 @@ with open(questions_path, "r", encoding="utf-8") as f:
 result = model.transcribe(audio_path)
 transcript = result["text"]
 
-# ======= Hàm đoán đáp án =======
+# ======= Hàm đoán đáp án gần đúng =======
 def guess_answer(transcript, options):
     best_score = 0
     best_choice = "A"
@@ -33,7 +32,7 @@ def guess_answer(transcript, options):
 
 # ======= Chấm điểm từng câu hỏi =======
 output = {
-    "transcript": transcript,
+    "transcript": transcript.strip(),
     "results": []
 }
 
@@ -46,9 +45,10 @@ for q in questions:
         "guess": guess,
         "correct": q["answer"],
         "is_correct": is_correct,
-        "requires_image": q["part"] == 1,
-        "image": q.get("image", None)
+        "requires_image": q.get("part") == 1,
+        "image": q.get("image")
     })
 
-# ======= In kết quả dưới dạng JSON =======
+# ======= Xuất kết quả dưới dạng JSON =======
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 print(json.dumps(output, ensure_ascii=False, indent=2))
