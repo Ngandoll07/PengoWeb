@@ -27,11 +27,12 @@ import uploadListeningRoutes from "./routes/uploadListening.js";
 import listeningRoutes from "./routes/listeningRoutes.js";
 import courseRoute from "./routes/courseRoute.js";
 import purchaseRoutes from "./routes/purchase.js";
-
-
-
+import grammarCheckRoute from './routes/grammarCheck.js';
+import readingCheckRouter from './routes/readingCheck.js';
+import readingCheckRoute from './routes/readingCheck.js';
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
@@ -41,7 +42,9 @@ app.use("/api", uploadLessonRoutes);
 app.use("/api", lessonRoutes);
 app.use("/api", recommendRoutes);
 
-
+app.use('/api/grammar-check', grammarCheckRoute);
+app.use('/api/reading', readingCheckRouter); // ✅ Cho đúng với FE
+app.use('/api', readingCheckRoute); // đúng
 // MongoDB
 
 mongoose.connect("mongodb://127.0.0.1:27017/Pengo", {
@@ -200,6 +203,7 @@ app.use("/api", readingRoutes);
 app.get("/", (req, res) => {
     res.send("✅ Backend Pengo đang hoạt động!");
 });
+
 
 // Start server
 app.listen(5000, () => {
