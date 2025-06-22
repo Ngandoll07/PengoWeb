@@ -1,0 +1,16 @@
+[
+    {
+        "id": "q1",
+        "part": 1,
+        "question": "Nội dung câu hỏi 1",
+        "options": {
+            "A": "Option A for 1",
+            "B": "Option B for 1",
+            "C": "Option C for 1",
+            "D": "Option D for 1"
+        },
+        "answer": "A",
+        "audio": "/assets/audio/Test1/part1/q1.mp3",
+        "image": "/assets/images/Test1/part1/q1.jpg"
+    }
+]

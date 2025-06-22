@@ -1,0 +1,44 @@
+[
+    {
+        "id": "q65",
+        "part": 3,
+        "question": "Where is the conversation taking place?",
+        "options": {
+            "A": "In a restaurant",
+            "B": "In a classroom",
+            "C": "In a park",
+            "D": "In a library"
+        },
+        "answer": "A",
+        "audio": "/assets/audio/Test1/part3/q65-q67.mp3",
+        "image": "/assets/images/Test1/part3/q65-q67.jpg"
+    },
+    {
+        "id": "q66",
+        "part": 3,
+        "question": "What does the woman want to know?",
+        "options": {
+            "A": "How to prepare a document",
+            "B": "When a report is due",
+            "C": "Where to find a menu",
+            "D": "Who is in charge"
+        },
+        "answer": "C",
+        "audio": "/assets/audio/Test1/part3/q65-q67.mp3",
+        "image": "/assets/images/Test1/part3/q65-q67.jpg"
+    },
+    {
+        "id": "q67",
+        "part": 3,
+        "question": "What does the man say he will do?",
+        "options": {
+            "A": "Review a document",
+            "B": "Print a form",
+            "C": "Ask for help",
+            "D": "Send a link"
+        },
+        "answer": "D",
+        "audio": "/assets/audio/Test1/part3/q65-q67.mp3",
+        "image": "/assets/images/Test1/part3/q65-q67.jpg"
+    }
+]
