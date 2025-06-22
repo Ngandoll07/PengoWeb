@@ -7,18 +7,22 @@ const ListeningTopic = () => {
     const [questions, setQuestions] = useState([]);
     const [selectedPart, setSelectedPart] = useState(1);
     const [jsonFile, setJsonFile] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         loadQuestions(selectedPart);
     }, [selectedPart]);
 
     const loadQuestions = async (part) => {
+        setLoading(true);
         try {
             const res = await axios.get(`http://localhost:5000/api/listening-tests/part/${part}`);
             setQuestions(res.data);
         } catch (err) {
             console.error("Lỗi tải dữ liệu:", err);
+            alert("Không thể tải dữ liệu câu hỏi.");
         }
+        setLoading(false);
     };
 
     const handleUpload = async () => {
@@ -30,23 +34,28 @@ const ListeningTopic = () => {
         try {
             const res = await axios.post("http://localhost:5000/api/upload-listening", formData);
             alert(`✅ Đã upload ${res.data.count} câu hỏi`);
-            loadQuestions(selectedPart); // reload
+            loadQuestions(selectedPart);
         } catch (err) {
+            console.error(err);
             alert("❌ Upload thất bại");
         }
     };
 
     return (
-        <div className="listening-admin-wrapper">
+        <div className="listening-admin-wrapper1">
             <AdminHeader />
-            <h2 className="manage-listening-title">🎧 Quản lý đề luyện nghe</h2>
+            <h2 className="manage-listening-title1">🎧 Quản lý đề luyện nghe</h2>
 
-            <div className="upload-listening-json">
-                <input type="file" accept=".json" onChange={(e) => setJsonFile(e.target.files[0])} />
+            <div className="upload-listening-json1">
+                <input
+                    type="file"
+                    accept=".json"
+                    onChange={(e) => setJsonFile(e.target.files[0])}
+                />
                 <button onClick={handleUpload}>📤 Tải lên file JSON</button>
             </div>
 
-            <div className="listening-part-select">
+            <div className="listening-part-select1">
                 {[1, 2, 3, 4].map((p) => (
                     <button
                         key={p}
@@ -58,41 +67,49 @@ const ListeningTopic = () => {
                 ))}
             </div>
 
-            {/* ⚠️ Scrollable table container */}
-            <div className="table-scroll-wrapper">
-                <table className="listening-table">
-
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Câu hỏi</th>
-                            <th>A</th>
-                            <th>B</th>
-                            <th>C</th>
-                            <th>D</th>
-                            <th>Đáp án</th>
-                            <th>Audio</th>
-                            <th>Ảnh</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {questions.map((q, idx) => (
-                            <tr key={q.id}>
-                                <td>{idx + 1}</td>
-                                <td>{q.question}</td>
-                                <td>{q.options?.A}</td>
-                                <td>{q.options?.B}</td>
-                                <td>{q.options?.C}</td>
-                                <td>{q.options?.D}</td>
-                                <td><b>{q.answer}</b></td>
-                                <td>
-                                    <audio controls style={{ width: "160px" }} src={q.audio} />
-                                </td>
-                                <td>{q.image ? <img src={q.image} alt="" width="60" /> : "–"}</td>
+            <div className="table-scroll-wrapper1">
+                {loading ? (
+                    <p>Đang tải dữ liệu...</p>
+                ) : (
+                    <table className="listening-table1">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Câu hỏi</th>
+                                <th>A</th>
+                                <th>B</th>
+                                <th>C</th>
+                                <th>D</th>
+                                <th>Đáp án</th>
+                                <th>Audio</th>
+                                <th>Ảnh</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {questions.map((q, idx) => (
+                                <tr key={q.id || idx}>
+                                    <td>{idx + 1}</td>
+                                    <td>{q.question}</td>
+                                    <td>{q.options?.A}</td>
+                                    <td>{q.options?.B}</td>
+                                    <td>{q.options?.C}</td>
+                                    <td>{q.options?.D}</td>
+                                    <td><b>{q.answer}</b></td>
+                                    <td>
+                                        <audio controls src={q.audio} />
+                                    </td>
+                                    <td>
+                                        {q.image ? (
+                                            <img src={q.image} alt={`Ảnh ${idx + 1}`} width="60" />
+                                        ) : (
+                                            "–"
+                                        )}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
             </div>
         </div>
     );

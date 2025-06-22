@@ -9,13 +9,14 @@ export const scoreReadingPart = async (req, res) => {
     }
 
     const systemMessage = `
-BBạn là trợ lý luyện thi TOEIC phần Đọc hiểu.
+Bạn là trợ lý luyện thi TOEIC phần Đọc hiểu.
 Nhiệm vụ của bạn là:
 - Xác định đáp án đúng cho từng câu hỏi (A, B, C hoặc D).
 - So sánh với đáp án người dùng đã chọn.
 - Cho biết đáp án đúng, sai, và giải thích bằng tiếng Việt **vì sao đáp án đó là chính xác** (ngữ pháp, từ vựng, cấu trúc, ngữ cảnh v.v).
 
-Chỉ trả về kết quả ở định dạng JSON sau, không thêm bất kỳ giải thích, giới thiệu, hoặc văn bản nào khác:
+❗ Chỉ trả về đúng định dạng JSON sau, không được thêm bất kỳ văn bản, chú thích hay tiêu đề nào khác:
+
 {
   "correct": <số câu đúng>,
   "total": <tổng số câu>,
@@ -26,7 +27,7 @@ Chỉ trả về kết quả ở định dạng JSON sau, không thêm bất k�
       "userAnswer": "B",
       "correctAnswer": "A",
       "correct": false,
-      "comment": "Giải thích bằng tiếng Việt tại sao đừng có ký tự đặc biệt"
+      "comment": "Giải thích tại sao đáp án A đúng, và vì sao các đáp án kia sai bằng tiếng Việt "
     }
   ]
 }
@@ -55,32 +56,44 @@ Người học chọn: ${answers[i] || 'Không chọn'}
       temperature: 0.4
     });
 
-   const aiTextRaw = result.choices[0].message.content;
-console.log("🧠 AI trả về:", aiTextRaw);
+    const aiTextRaw = result.choices[0].message.content;
+    console.log("🧠 AI trả về:", aiTextRaw);
 
-// Tìm đoạn JSON hợp lệ
-const jsonMatch = aiTextRaw.match(/\{[\s\S]*\}/); // lấy đoạn {...} đầu tiên
-if (!jsonMatch) {
-  return res.status(500).json({ error: 'Không tìm thấy JSON trong phản hồi AI', raw: aiTextRaw });
-}
-
+    // Trích xuất đoạn JSON
+    const jsonMatch = aiTextRaw.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      return res.status(500).json({ error: 'Không tìm thấy JSON trong phản hồi AI', raw: aiTextRaw });
+    }
 let cleanedJson = jsonMatch[0]
-  .replace(/“|”/g, '"')                      // thay ngoặc kép tiếng Việt
-  .replace(/\\n/g, ' ')                      // bỏ ký tự xuống dòng
-  .replace(/\\'/g, "'")                      // bỏ escape dấu nháy đơn
-  .replace(/(?<!\\)"/g, '\\"')               // escape các dấu " chưa escape
-  .replace(/\\"(\s*[:,}\]])/g, '"$1');        // khôi phục dấu " cuối value
+      .replace(/“|”/g, '"')                      // ngoặc kép tiếng Việt
+      .replace(/[‘’]/g, "'")                     // nháy đơn đặc biệt
+      .replace(/\\n/g, ' ')                      // dòng mới
+      .replace(/\t/g, ' ')
+      .replace(/\r/g, '')
+      .replace(/–/g, '-')
+      .replace(/\.\.\./g, '...')
+      .replace(/•/g, '-')
+      .replace(/\\'/g, "'")                      // escape nháy đơn
+      .replace(/"comment"\s*:\s*"([\s\S]*?)"/g, (_, val) => {
+        const escapedVal = val.replace(/"/g, '\\"');
+        return `"comment": "${escapedVal}"`;
+      });
+    let aiResult;
+    try {
+      aiResult = JSON.parse(cleanedJson);
 
-try {
-  const aiResult = JSON.parse(cleanedJson);
+      if (!Array.isArray(aiResult.feedback)) {
+        aiResult.feedback = [];
+      }
 
-  if (!Array.isArray(aiResult.feedback)) {
-    aiResult.feedback = [];
+      return res.json(aiResult);
+    } catch (err) {
+      console.error("❌ JSON Parse Error:", err.message);
+      return res.status(500).json({ error: 'Phân tích JSON thất bại', raw: cleanedJson });
+    }
+
+  } catch (err) {
+    console.error("❌ Lỗi AI chấm điểm:", err);
+    return res.status(500).json({ error: "AI scoring failed", detail: err.message });
   }
-
-  return res.json(aiResult);
-} catch (err) {
-  console.error("❌ JSON Parse Error:", err.message);
-  return res.status(500).json({ error: 'Phân tích JSON thất bại', raw: cleanedJson });
-}
 };
