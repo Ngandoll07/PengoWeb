@@ -182,3 +182,12 @@
   border-radius: 6px;
   margin: 0 10px;
 }
+.ai-explanation {
+  margin-top: 10px;
+  padding: 12px;
+  background: #f0f9f0;
+  border-left: 4px solid #4caf50;
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
+

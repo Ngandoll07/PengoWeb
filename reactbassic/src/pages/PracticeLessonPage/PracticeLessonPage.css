@@ -103,11 +103,11 @@ tr:hover {
   background-color: #f5faff;
   font-style: italic;
 }
-.option.correct {
+.option1.correct {
   background-color: #d4edda;
   border: 1px solid #28a745;
 }
-.option.incorrect {
+.option1.incorrect {
   background-color: #f8d7da;
   border: 1px solid #dc3545;
 }
@@ -116,4 +116,32 @@ tr:hover {
 }
 .feedback.incorrect {
   color: #dc3545;
+}
+.option1.selected1 {
+  font-weight: bold;
+  color: #007bff;
+}
+.option1 input {
+  accent-color: #007bff;
+}
+.options1 {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.option1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.question-block1 {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
