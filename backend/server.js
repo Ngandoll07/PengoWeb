@@ -27,9 +27,15 @@ import uploadListeningRoutes from "./routes/uploadListening.js";
 import listeningRoutes from "./routes/listeningRoutes.js";
 import courseRoute from "./routes/courseRoute.js";
 import purchaseRoutes from "./routes/purchase.js";
+
+import evaluateRoutes from "./routes/evaluate.js";
+
+
+
 import grammarCheckRoute from './routes/grammarCheck.js';
 import readingCheckRouter from './routes/readingCheck.js';
 import readingCheckRoute from './routes/readingCheck.js';
+
 
 const app = express();
 
@@ -41,6 +47,7 @@ app.use("/api", dayReadingRoutes);
 app.use("/api", uploadLessonRoutes);
 app.use("/api", lessonRoutes);
 app.use("/api", recommendRoutes);
+app.use("/api", evaluateRoutes);
 
 app.use('/api/grammar-check', grammarCheckRoute);
 app.use('/api/reading', readingCheckRouter); // ✅ Cho đúng với FE
