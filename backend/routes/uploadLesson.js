@@ -57,7 +57,7 @@ router.post("/upload-lesson", upload.single("file"), async (req, res) => {
         }));
       } else {
         // Part 5 – câu hỏi rời, bọc vào block
-        const qs = rows.slice(1).map(row => ({
+        const qs = rows.map(row => ({
           question: row["Column B (Question Text)"],
           options: [
             row["Column C (Option A)"],

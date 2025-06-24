@@ -14,7 +14,7 @@ import CartPage from "../pages/CartPage/CartPage.jsx";
 import DoTestPage from "../pages/DoTestPage/DoTestPage";
 import PracticeLessonPage from "../pages/PracticeLessonPage/PracticeLessonPage";
 import MyCourses from "../pages/MyCourses/MyCourses";
-
+import LoadingResultPage from "../pages/LoadingResultPage/LoadingResultPage";
 
 import Dashboard from "../pages/Admin/AdminDashboard/Dashboard.jsx";
 import AdminUser from "../pages/Admin/AdminUser/User";
@@ -102,6 +102,11 @@ export const routes = [
     {
         path: '/mycourses',
         page: MyCourses,
+        isShowHeader: true
+    },
+     {
+        path: '/loading',
+        page: LoadingResultPage,
         isShowHeader: true
     },
 
