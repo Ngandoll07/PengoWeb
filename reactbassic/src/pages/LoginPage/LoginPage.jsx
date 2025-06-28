@@ -25,7 +25,11 @@ export default function LoginPage() {
     localStorage.setItem("token", response.data.token);
     localStorage.setItem("user", JSON.stringify(response.data.user));
       alert("Đăng nhập thành công!");
-      navigate("/"); // 🔁 Chuyển đến trang Home
+     if (response.data.user.role === "admin") {
+  navigate("/admin"); // 👉 Trang quản trị
+} else {
+  navigate("/"); // 👉 Trang người dùng thường (Home)
+}
     } catch (err) {
       alert("Sai email hoặc mật khẩu!");
     }
