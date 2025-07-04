@@ -25,7 +25,7 @@ export default function LoginPage() {
     localStorage.setItem("token", response.data.token);
     localStorage.setItem("user", JSON.stringify(response.data.user));
       alert("Đăng nhập thành công!");
-      navigate("-1"); // 🔁 Chuyển đến trang Home
+      navigate("/"); // 🔁 Chuyển đến trang Home
     } catch (err) {
       alert("Sai email hoặc mật khẩu!");
     }
