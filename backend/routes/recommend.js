@@ -21,25 +21,18 @@ Kết quả đầu vào:
 ⏰ Tôi có khoảng ${studyDuration} để luyện thi.
 
 Hãy:
-1. Phân tích điểm mạnh, điểm yếu của tôi, Đề xuất một lộ trình học phù hợp với mục tiêu và thời gian học và Chia rõ theo từng tuần và từng kỹ năng nếu có thể.
-2. Đề xuất một lộ trình học 10 ngày theo định dạng JSON như sau:
+1. Phân tích điểm mạnh, điểm yếu của tôi, Đề xuất một lộ trình học phù hợp với mục tiêu và thời gian học và Chia rõ theo từng ngày và từng kỹ năng nếu có thể.
+2. Chỉ đề xuất kế hoạch cho **ngày 1**, một kỹ năng duy nhất (nghe, đọc, từ vựng hoặc ngữ pháp).
+3. Trả về JSON theo định dạng:
 
 [
   {
     "day": 1,
-    "title": "Luyện nghe Part 1 & 2",
+    "title": "Luyện đọc Part 1",
     "skill": "listening",
     "status": "pending",
     "progress": 0
-  },
-  {
-    "day": 2,
-    "title": "Luyện từ vựng theo chủ đề Du lịch",
-    "skill": "vocabulary",
-    "status": "pending",
-    "progress": 0
   }
-  ...
 ]
 
 Chỉ trả về phần phân tích và JSON, không thêm mô tả ngoài.

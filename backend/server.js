@@ -31,10 +31,20 @@ import courseRoute from "./routes/courseRoute.js";
 import purchaseRoutes from "./routes/purchase.js";
 
 import evaluateRoutes from "./routes/evaluate.js";
+import analyzeAI from './routes/ai-analyzeread.js';
+import practiceHistoryRoutes from './routes/practiceHistory.js';
 
 import grammarCheckRoute from './routes/grammarCheck.js';
 import readingCheckRouter from './routes/readingCheck.js';
 import readingCheckRoute from './routes/readingCheck.js';
+
+
+import readingTestsRoutes from "./routes/readingTest.js";
+
+import generateLessonRoutes from "./routes/generateLesson.js";
+import lessonResultRouter from "./routes/lessonResult.js";
+import gradeLessonRoute from "./routes/gradeLesson.js";
+
 
 const app = express();
 app.use(cors());
@@ -48,8 +58,24 @@ app.use("/api", lessonRoutes);
 app.use("/api", recommendRoutes);
 app.use("/api", evaluateRoutes);
 
+
 app.use("/api", uploadListeningRoutes); // ✅ Quan trọng!
 app.use("/api", listeningRoutes);
+
+app.use('/api/grammar-check', grammarCheckRoute);
+app.use('/api/reading', readingCheckRouter); // ✅ Cho đúng với FE
+app.use('/api', readingCheckRoute); // đúng
+
+app.use('/api', analyzeAI); // thêm dòng này
+
+app.use('/api/practice-history', practiceHistoryRoutes);
+app.use("/api/reading-tests", readingTestsRoutes);
+
+app.use("/api", generateLessonRoutes);
+app.use("/api", lessonResultRouter); // ✅ Đường dẫn gốc là /api
+app.use("/api", gradeLessonRoute);
+// MongoDB
+
 
 app.use("/api", courseRoute);
 app.use("/api/purchase", purchaseRoutes);

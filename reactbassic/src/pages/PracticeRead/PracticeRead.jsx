@@ -169,7 +169,7 @@ const handleSubmit = async () => {
               body: JSON.stringify({
                 part,
                 questions: [{ question: q.question, options: q.options, answer: q.answer }],
-                answers: [answersByPart[part][q.globalIndex]]
+                answers: [answersByPart[part]?.[globalIndex] ?? "Không chọn"]
               })
             });
 
@@ -201,18 +201,19 @@ const handleSubmit = async () => {
       }
     }
 
-    const result = {
-      correct: totalCorrect,
-      incorrect: totalQuestions - totalCorrect - totalSkipped,
-      skipped: totalSkipped,
-      answered: totalQuestions - totalSkipped,
-      total: totalQuestions,
-      score: totalCorrect * 5,
-      accuracy: Math.round((totalCorrect / totalQuestions) * 100),
-      time: formatTime(elapsedTime),
-      answersByPart,
-      aiFeedback: feedbackTemp
-    };
+const result = {
+  correct: totalCorrect,
+  incorrect: totalQuestions - totalCorrect - totalSkipped,
+  skipped: totalSkipped,
+  answered: totalQuestions - totalSkipped,
+  total: totalQuestions,
+  score: totalCorrect * 5,
+  accuracy: Math.round((totalCorrect / totalQuestions) * 100),
+  time: formatTime(elapsedTime),
+  answersByPart,
+  aiFeedback: feedbackTemp
+};
+
 
     const groupedFeedback = { 5: [], 6: [], 7: [] };
     feedbackTemp.forEach(fb => {

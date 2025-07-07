@@ -47,19 +47,21 @@ const RoadmapPage = () => {
   }, []);
 
   const handleDayClick = async (day, skill) => {
-    try {
-      const res = await axios.get(`http://localhost:5000/api/lessons-by-day?day=${day}&skill=${skill}`);
-      if (res.data.length > 0) {
-        const lessonId = res.data[0]._id;
-        navigate(`/practicelesson/${lessonId}`);
-      } else {
-        alert(`❌ Không có bài học nào cho Ngày ${day}, kỹ năng ${skill}.`);
-      }
-    } catch (err) {
-      console.error("❌ Lỗi khi lấy bài học:", err);
-      alert("⚠️ Có lỗi xảy ra.");
-    }
-  };
+  try {
+    const res = await axios.post("http://localhost:5000/api/generate-lesson", {
+      day,
+      skill,
+    });
+
+    const lesson = res.data.lesson;
+    navigate("/practicelesson/ai", { state: { lesson } }); // truyền dữ liệu sang trang luyện tập
+
+  } catch (err) {
+    console.error("❌ Lỗi khi tạo bài học:", err);
+    alert("⚠️ Không thể tạo bài học từ AI.");
+  }
+};
+
 
   return (
     <div className="learning-path">
@@ -79,7 +81,7 @@ const RoadmapPage = () => {
               <div
                 key={index}
                 className={`day-card ${item.skill}`}
-                onClick={() => handleDayClick(item.day, item.skill)}
+             onClick={() => handleDayClick(item)}
               >
                 <h3>Day {item.day}</h3>
                 <p>{item.title}</p>

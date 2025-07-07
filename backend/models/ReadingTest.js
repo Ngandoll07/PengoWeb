@@ -20,10 +20,13 @@ const ReadingBlockSchema = new mongoose.Schema({
 const ReadingTestSchema = new mongoose.Schema({
   title: String,
   part: Number,
-
+  difficulty: {
+    type: String, // 'Dễ', 'Trung bình', 'Khó'
+    enum: ['Dễ', 'Trung bình', 'Khó'],
+    default: 'Trung bình',
+  },
   questions: [ReadingQuestionSchema], // Part 5 & 7
-  blocks: [ReadingBlockSchema],       // Part 6
-
+  blocks: [ReadingBlockSchema],       // Part 6 & 7
   createdAt: { type: Date, default: Date.now },
 });
 
