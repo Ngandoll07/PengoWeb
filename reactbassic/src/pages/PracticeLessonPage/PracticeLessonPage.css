@@ -145,3 +145,18 @@ tr:hover {
   margin-bottom: 20px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
+.passage-group {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  border: 1px solid #ddd;
+}
+
+.passage {
+  background-color: #fffef5;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-left: 4px solid #f39c12;
+  font-style: italic;
+}

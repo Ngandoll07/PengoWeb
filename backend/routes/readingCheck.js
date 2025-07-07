@@ -21,8 +21,10 @@ Nhiệm vụ của bạn là:
 - Xác định đáp án đúng cho từng câu hỏi (A, B, C hoặc D).
 - So sánh với đáp án người dùng đã chọn.
 - Cho biết đáp án đúng, sai, và giải thích bằng tiếng Việt **vì sao đáp án đó là chính xác** (ngữ pháp, từ vựng, cấu trúc, ngữ cảnh v.v).
+- ❗ Không được dùng dấu ngoặc kép " trong phần comment. Nếu cần trích dẫn, dùng dấu nháy đơn ' thay thế.
 
-Hãy trả kết quả dưới dạng JSON sau:
+❗ Chỉ trả về đúng định dạng JSON sau, không được thêm bất kỳ văn bản, chú thích hay tiêu đề nào khác:
+
 {
   "correct": <số câu đúng>,
   "total": <tổng số câu>,
@@ -33,27 +35,25 @@ Hãy trả kết quả dưới dạng JSON sau:
       "userAnswer": "B",
       "correctAnswer": "A",
       "correct": false,
-      "comment": "Giải thích bằng tiếng Việt tại sao đáp án A đúng, và vì sao B sai."
+      "comment": "Giải thích tại sao đáp án A đúng, và vì sao các đáp án kia sai bằng tiếng Việt"
     }
   ]
-}
-`;
+}`;
 
-  const prompt = `
+  const buildPrompt = (chunk, offset) => `
 Dưới đây là các câu hỏi TOEIC Part ${part}:
 
-${questions.map((q, i) => `
-Câu ${i + 1}:
+${chunk.map((q, i) => `
+Câu ${offset + i + 1}:
 ${q.question}
 A. ${q.options[0]}
 B. ${q.options[1]}
 C. ${q.options[2]}
 D. ${q.options[3]}
-Người học chọn: ${answers[i] || 'Không chọn'}
-`).join('\n')}
-`;
+Người học chọn: ${answers[offset + i] || 'Không chọn'}
+`).join('\n')}`;
 
-  try {
+  const callGroq = async (prompt) => {
     const response = await axios.post(
       'https://api.groq.com/openai/v1/chat/completions',
       {
@@ -71,104 +71,64 @@ Người học chọn: ${answers[i] || 'Không chọn'}
         }
       }
     );
+    return response.data.choices[0].message.content;
+  };
 
-    const aiText = response.data.choices[0].message.content;
-    console.log("🧠 AI trả về:", aiText);
+  try {
+    if (part === 5) {
+      const fullPrompt = buildPrompt(questions, 0);
+      const aiText = await callGroq(fullPrompt);
+      console.log("🧠 AI trả về:", aiText);
 
-    // Tìm đoạn JSON trong response
-    let jsonOnly = aiText.trim();
-    if (!jsonOnly.startsWith('{')) {
-      const first = jsonOnly.indexOf('{');
-      const last = jsonOnly.lastIndexOf('}');
-      jsonOnly = jsonOnly.slice(first, last + 1);
+      let jsonOnly = aiText.trim();
+      if (!jsonOnly.startsWith('{')) {
+        const first = jsonOnly.indexOf('{');
+        const last = jsonOnly.lastIndexOf('}');
+        jsonOnly = jsonOnly.slice(first, last + 1);
+      }
+      const aiResult = JSON.parse(jsonOnly);
+      return res.json({
+        correct: aiResult.correct || 0,
+        total: aiResult.total || questions.length,
+        skipped: aiResult.skipped || 0,
+        feedback: aiResult.feedback || []
+      });
+    } else {
+      const batchSize = 8;
+      const allFeedback = [];
+      let correct = 0, skipped = 0;
+
+      for (let i = 0; i < questions.length; i += batchSize) {
+        const chunk = questions.slice(i, i + batchSize);
+        const prompt = buildPrompt(chunk, i);
+        const aiText = await callGroq(prompt);
+        console.log(`🧠 Batch ${i / batchSize + 1} trả về:`, aiText);
+
+        let jsonOnly = aiText.trim();
+        if (!jsonOnly.startsWith('{')) {
+          const first = jsonOnly.indexOf('{');
+          const last = jsonOnly.lastIndexOf('}');
+          jsonOnly = jsonOnly.slice(first, last + 1);
+        }
+        const aiResult = JSON.parse(jsonOnly);
+        correct += aiResult.correct || 0;
+        skipped += aiResult.skipped || 0;
+        allFeedback.push(...(aiResult.feedback || []));
+      }
+
+      return res.json({
+        correct,
+        total: questions.length,
+        skipped,
+        feedback: allFeedback
+      });
     }
-
-    const aiResult = JSON.parse(jsonOnly);
-
-    // Trả về kết quả an toàn
-    return res.json({
-      correct: aiResult.correct || 0,
-      total: aiResult.total || questions.length,
-      skipped: aiResult.skipped || 0,
-      feedback: aiResult.feedback || []
-    });
-
   } catch (err) {
     console.error("❌ Lỗi AI chấm điểm:", err.response?.data || err.message);
     return res.status(500).json({
       error: 'AI trả về không hợp lệ hoặc lỗi mạng',
       raw: err.response?.data || err.message
     });
-  }
-});
-
-// Endpoint chấm toàn bài (nếu cần)
-router.post('/', async (req, res) => {
-  const { questions, answers } = req.body;
-
-  if (!questions || !answers) {
-    return res.status(400).json({ error: 'Thiếu dữ liệu.' });
-  }
-
-  const tokenEstimate = questions.length * 100 + answers.length * 10;
-  if (tokenEstimate > 5000) {
-    return res.status(400).json({
-      error: 'Quá nhiều câu hỏi. Hãy gửi từng Part để tránh vượt giới hạn token.'
-    });
-  }
-
-  const prompt = `
-Tôi có bài đọc TOEIC gồm các câu hỏi trắc nghiệm A, B, C, D. Bạn hãy:
-- Tự xác định đáp án đúng.
-- So sánh với đáp án người dùng chọn.
-- Giải thích bằng tiếng Việt vì sao đáp án đúng.
-
-Trả về kết quả dạng JSON:
-[
-  {
-    "index": 1,
-    "userAnswer": "B",
-    "correctAnswer": "A",
-    "correct": false,
-    "comment": "Giải thích tiếng Việt..."
-  },
-  ...
-]
-
-Dữ liệu như sau:
-${questions.map((q, i) => `
-Câu ${i + 1}: ${q.question}
-A. ${q.options[0]} | B. ${q.options[1]} | C. ${q.options[2]} | D. ${q.options[3]}
-Người dùng chọn: ${answers[i] || "Không chọn"}
-`).join('\n')}
-`;
-
-  try {
-    const response = await axios.post(
-      'https://api.groq.com/openai/v1/chat/completions',
-      {
-        model: 'llama3-8b-8192',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.4
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${GROQ_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    const content = response.data.choices[0].message.content;
-
-    const first = content.indexOf('[');
-    const last = content.lastIndexOf(']');
-    const json = content.slice(first, last + 1);
-
-    res.json(JSON.parse(json));
-  } catch (err) {
-    console.error('❌ Lỗi AI chấm toàn bài:', err.response?.data || err.message);
-    res.status(500).json({ error: 'Lỗi từ GROQ AI' });
   }
 });
 

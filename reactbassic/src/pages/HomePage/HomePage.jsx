@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FaMapMarkedAlt, FaBookOpen, FaHeadphones, FaFont } from "react-icons/fa";
 import "./HomePage.css";
+import Footer from "../../components/FooterComponents/FooterComponent";
 
 
 
@@ -156,6 +157,7 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+      <Footer/>
     </div>
 
   );

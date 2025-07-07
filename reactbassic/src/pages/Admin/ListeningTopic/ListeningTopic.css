@@ -1,21 +1,11 @@
-/* Toàn bộ wrapper tránh bị đè và có thể scroll ngang khi tràn */
-.body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-left: 300px;
-}
-
-.listening-admin-wrapper {
+.listening-admin-wrapper1 {
     padding: 20px;
-
     overflow-x: auto;
     min-height: 100vh;
     background-color: #fdfdfd;
 }
 
-/* Tiêu đề */
-.manage-listening-title {
+.manage-listening-title1 {
     font-size: 28px;
     color: #E21033;
     margin-bottom: 20px;
@@ -52,14 +42,14 @@
     background-color: #c60b2f;
 }
 
-/* Nút chọn Part */
-.listening-part-select {
+.listening-part-select1 {
     display: flex;
     gap: 12px;
     margin-bottom: 20px;
+    margin-left: 300px;
 }
 
-.listening-part-select button {
+.listening-part-select1 button {
     padding: 8px 16px;
     border-radius: 6px;
     border: 1px solid #ccc;
@@ -69,26 +59,28 @@
     transition: all 0.2s ease;
 }
 
-.listening-part-select button.active {
+.listening-part-select1 button.active {
     background-color: #E21033;
     color: white;
     border: none;
 }
 
-/* Bảng câu hỏi - có scroll ngang */
-.listening-table {
+.table-scroll-wrapper1 {
+    overflow-x: auto;
+    margin-left: 300px;
+}
+
+.listening-table1 {
     width: max-content;
-    /* quan trọng để scroll nếu bảng quá rộng */
     min-width: 100%;
     border-collapse: collapse;
     background-color: white;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
-    overflow-x: auto;
 }
 
-.listening-table th,
-.listening-table td {
+.listening-table1 th,
+.listening-table1 td {
     border: 1px solid #ddd;
     padding: 12px 16px;
     text-align: left;
@@ -96,18 +88,17 @@
     white-space: nowrap;
 }
 
-.listening-table th {
+.listening-table1 th {
     background-color: #f9b5c6;
     color: white;
 }
 
-/* Audio và ảnh */
-.listening-table td audio {
+.listening-table1 td audio {
     width: 160px;
     max-width: 100%;
 }
 
-.listening-table td img {
+.listening-table1 td img {
     max-width: 80px;
     height: auto;
     border-radius: 6px;

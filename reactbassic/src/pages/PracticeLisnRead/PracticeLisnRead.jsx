@@ -263,12 +263,7 @@ export default function PracticeLisnRead() {
             </div>
           ))}
 
-          {studyPlan && (
-            <div className="study-plan-box">
-              <h3>🧠 Lộ trình học cá nhân hóa</h3>
-              <pre className="study-plan-text">{studyPlan}</pre>
-            </div>
-          )}
+         
         </div>
       </div>
 

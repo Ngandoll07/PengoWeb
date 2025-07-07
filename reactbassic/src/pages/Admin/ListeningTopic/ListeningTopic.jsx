@@ -27,7 +27,9 @@ const ListeningTopic = () => {
             setCurrentPage(1);
         } catch (err) {
             console.error("Lỗi tải dữ liệu:", err);
+            alert("Không thể tải dữ liệu câu hỏi.");
         }
+        setLoading(false);
     };
 
     const handleExcelSelect = async (e) => {
@@ -75,9 +77,9 @@ const ListeningTopic = () => {
     );
 
     return (
-        <div className="listening-admin-wrapper">
+        <div className="listening-admin-wrapper1">
             <AdminHeader />
-            <h2 className="manage-listening-title">🎧 Quản lý đề luyện nghe</h2>
+            <h2 className="manage-listening-title1">🎧 Quản lý đề luyện nghe</h2>
 
             <div className="upload-listening-excel">
                 <input type="file" accept=".xlsx,.xls" onChange={handleExcelSelect} />
