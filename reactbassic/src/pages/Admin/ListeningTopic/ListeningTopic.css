@@ -12,7 +12,8 @@
     text-align: center;
 }
 
-.upload-listening-json1 {
+/* Khu vực upload file */
+.upload-listening-excel {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -20,14 +21,14 @@
     margin-left: 300px;
 }
 
-.upload-listening-json1 input[type="file"] {
+.upload-listening-excel input[type="file"] {
     border: 1px solid #ccc;
     padding: 6px;
     border-radius: 5px;
     background-color: #fff;
 }
 
-.upload-listening-json1 button {
+.upload-listening-excel button {
     background-color: #E21033;
     color: white;
     border: none;
@@ -37,7 +38,7 @@
     transition: background-color 0.3s ease;
 }
 
-.upload-listening-json1 button:hover {
+.upload-listening-excel button:hover {
     background-color: #c60b2f;
 }
 
@@ -101,4 +102,12 @@
     max-width: 80px;
     height: auto;
     border-radius: 6px;
+}
+
+/* Transcript không bị tràn */
+.listening-table td.transcript-cell {
+    max-width: 250px;
+    white-space: normal;
+    word-break: break-word;
+    overflow: hidden;
 }
