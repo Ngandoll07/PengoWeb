@@ -1,4 +1,3 @@
-
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -15,6 +14,7 @@ import fetch from "node-fetch";
 
 import ReadingTest from "./models/ReadingTest.js";
 import StudyPlan from "./models/StudyPlan.js";
+
 import uploadReadingRoutes from "./routes/uploadReading.js";
 import readingRoutes from "./routes/readingRoutes.js";
 
@@ -23,37 +23,47 @@ import dayReadingRoutes from "./routes/dayReadingRoutes.js";
 import uploadLessonRoutes from "./routes/uploadLesson.js";
 import lessonRoutes from "./routes/lessonRoutes.js";
 import recommendRoutes from "./routes/recommend.js";
-import uploadListeningRoutes from "./routes/uploadListening.js";
+
+import uploadListeningRoutes from "./routes/uploadListening.js"; // ✅ Đã sửa đúng vị trí
 import listeningRoutes from "./routes/listeningRoutes.js";
+
 import courseRoute from "./routes/courseRoute.js";
 import purchaseRoutes from "./routes/purchase.js";
 
 import evaluateRoutes from "./routes/evaluate.js";
 
-
-
 import grammarCheckRoute from './routes/grammarCheck.js';
 import readingCheckRouter from './routes/readingCheck.js';
 import readingCheckRoute from './routes/readingCheck.js';
 
-
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
-app.use('/api', uploadDayReadingRoutes);
+// ✅ Mount tất cả routes TRƯỚC khi listen
+app.use("/api", uploadDayReadingRoutes);
 app.use("/api", dayReadingRoutes);
 app.use("/api", uploadLessonRoutes);
 app.use("/api", lessonRoutes);
 app.use("/api", recommendRoutes);
 app.use("/api", evaluateRoutes);
 
-app.use('/api/grammar-check', grammarCheckRoute);
-app.use('/api/reading', readingCheckRouter); // ✅ Cho đúng với FE
-app.use('/api', readingCheckRoute); // đúng
-// MongoDB
+app.use("/api", uploadListeningRoutes); // ✅ Quan trọng!
+app.use("/api", listeningRoutes);
 
+app.use("/api", courseRoute);
+app.use("/api/purchase", purchaseRoutes);
+
+app.use('/api/grammar-check', grammarCheckRoute);
+app.use('/api/reading', readingCheckRouter);
+app.use('/api', readingCheckRoute);
+
+// ✅ Route test kết nối backend
+app.get("/api/test", (req, res) => {
+    res.send("✅ Backend đang hoạt động");
+});
+
+// MongoDB
 mongoose.connect("mongodb://127.0.0.1:27017/Pengo", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -135,17 +145,14 @@ app.get("/api/reading-tests", async (req, res) => {
 
 // API đề xuất lộ trình học từ Groq
 app.post("/api/recommend", async (req, res) => {
-
     const { listeningScore, readingScore, targetScore, studyDuration } = req.body;
     const token = req.headers.authorization?.split(" ")[1];
-
 
     const prompt = `
 Tôi là học viên đang luyện thi TOEIC.
 Kết quả đầu vào:
 - Listening: ${listeningScore}/50
 - Reading: ${readingScore}/50
-
 
 🎯 Mục tiêu của tôi là đạt khoảng ${targetScore} điểm TOEIC.
 ⏰ Tôi có khoảng ${studyDuration} để luyện thi.
@@ -158,7 +165,6 @@ Hãy:
 
     try {
         const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
@@ -172,13 +178,10 @@ Hãy:
         });
 
         const data = await response.json();
-        console.log("🧠 Groq response:", JSON.stringify(data, null, 2));
-
         let suggestion = "Không có phản hồi từ Groq.";
         if (Array.isArray(data.choices) && data.choices[0]?.message?.content) {
             suggestion = data.choices[0].message.content;
         }
-
 
         if (token) {
             try {
@@ -202,27 +205,12 @@ Hãy:
     }
 });
 
-// Mount routes
-app.use("/api", uploadReadingRoutes);
-app.use("/api", readingRoutes);
-
 // Trang gốc
 app.get("/", (req, res) => {
     res.send("✅ Backend Pengo đang hoạt động!");
 });
 
-
-// Start server
+// ✅ Start server cuối cùng
 app.listen(5000, () => {
     console.log("🚀 Backend chạy tại http://localhost:5000");
 });
-
-
-app.use("/api", uploadListeningRoutes);
-app.use("/api", listeningRoutes);
-
-app.use("/api", courseRoute);
-app.use("/api/purchase", purchaseRoutes);
-
-
-

@@ -8,7 +8,7 @@
 
 .listening-admin-wrapper {
     padding: 20px;
-    
+
     overflow-x: auto;
     min-height: 100vh;
     background-color: #fdfdfd;
@@ -23,21 +23,22 @@
 }
 
 /* Khu vực upload file */
-.upload-listening-json {
+.upload-listening-excel {
     display: flex;
     align-items: center;
     gap: 10px;
     margin-bottom: 30px;
+    margin-left: 300px;
 }
 
-.upload-listening-json input[type="file"] {
+.upload-listening-excel input[type="file"] {
     border: 1px solid #ccc;
     padding: 6px;
     border-radius: 5px;
     background-color: #fff;
 }
 
-.upload-listening-json button {
+.upload-listening-excel button {
     background-color: #E21033;
     color: white;
     border: none;
@@ -47,7 +48,7 @@
     transition: background-color 0.3s ease;
 }
 
-.upload-listening-json button:hover {
+.upload-listening-excel button:hover {
     background-color: #c60b2f;
 }
 
@@ -110,4 +111,12 @@
     max-width: 80px;
     height: auto;
     border-radius: 6px;
+}
+
+/* Transcript không bị tràn */
+.listening-table td.transcript-cell {
+    max-width: 250px;
+    white-space: normal;
+    word-break: break-word;
+    overflow: hidden;
 }

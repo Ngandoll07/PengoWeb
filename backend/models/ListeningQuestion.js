@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 const ListeningQuestionSchema = new mongoose.Schema({
     id: { type: String, required: true, unique: true },
     part: Number,
+    level: { type: String, enum: ["easy", "medium", "hard"], default: "medium" },
     question: String,
     options: {
         A: String,
@@ -12,7 +13,8 @@ const ListeningQuestionSchema = new mongoose.Schema({
     },
     answer: String,
     audio: String,
-    image: String
+    image: String,
+    transcript: String
 });
 
 export default mongoose.model("ListeningQuestion", ListeningQuestionSchema);
