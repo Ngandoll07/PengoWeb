@@ -97,18 +97,6 @@ const ResultPage = () => {
           </div>
         </div>
       </div>
-
-      <div className="per-part-breakdown">
-        <h3>📖 Kết quả từng phần</h3>
-        {['part5', 'part6', 'part7'].map((key, i) => (
-          <div key={key} className="part-box">
-            <h4>Part {5 + i}</h4>
-            <p>Đúng: {safeValue(result[key]?.correct)} / {safeValue(result[key]?.total)}</p>
-            <p>Bỏ qua: {safeValue(result[key]?.skipped)}</p>
-          </div>
-        ))}
-      </div>
-
       {result.listeningScore && result.readingScore && (
         <div className="score-section">
           <div className="score-box">

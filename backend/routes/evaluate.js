@@ -9,7 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const router = express.Router();
 
 // ✅ Đường dẫn đến Python trong venv (chỉnh lại nếu cần)
-const PYTHON_PATH = "D:/KLTN/PengoWeb/ai/venv/Scripts/python.exe";
+const PYTHON_PATH = "C:/Users/LENOVO/Documents/KLTN/PengoWeb/ai/venv/Scripts/python.exe";
 
 // ✅ Load toàn bộ dữ liệu Listening
 const listeningData = JSON.parse(

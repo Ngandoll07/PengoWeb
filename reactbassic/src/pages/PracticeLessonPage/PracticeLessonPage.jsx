@@ -12,7 +12,7 @@ const PracticeLessonPage = () => {
   const reviewAnswers = useMemo(() => location.state?.answers || [], [location.state]);
 
   const [lesson, setLesson] = useState(null);
-  const [questions, setQuestions] = useState([]);
+  const [questions, setQuestions] = useState([]); // giữ theo nhóm
   const [answers, setAnswers] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -24,26 +24,24 @@ const PracticeLessonPage = () => {
         const res = await axios.get(`http://localhost:5000/api/lessons/${id}`);
         setLesson(res.data);
 
-        const flatQuestions = [];
-        res.data.questions.forEach((block) => {
-          block.questions.forEach((q) => {
-            flatQuestions.push({
-              question: q.question,
-              options: q.options,
-              answer: q.answer,
-              passage: block.passage || "",
-            });
-          });
-        });
+        const grouped = res.data.questions.map((block) => ({
+          passage: block.passage || "",
+          questions: block.questions.map((q) => ({
+            question: q.question,
+            options: q.options,
+            answer: q.answer,
+          })),
+        }));
 
-        setQuestions(flatQuestions);
+        setQuestions(grouped);
 
+        const flatLength = grouped.reduce((sum, g) => sum + g.questions.length, 0);
         if (showAnswers && reviewAnswers.length > 0) {
           const saved = reviewAnswers.map((r) => r.selected);
           setAnswers(saved);
           setSubmitted(true);
         } else {
-          setAnswers(Array(flatQuestions.length).fill(null));
+          setAnswers(Array(flatLength).fill(null));
         }
       } catch (err) {
         console.error("❌ Lỗi khi lấy bài học:", err);
@@ -71,61 +69,61 @@ const PracticeLessonPage = () => {
     setAnswers(updated);
   };
 
- const handleSubmit = async () => {
-  setSubmitted(true);
+  const handleSubmit = async () => {
+    setSubmitted(true);
 
-  const simplifiedQuestions = questions.map((q) => ({
-    question: q.question,
-    options: q.options,
-    passage: q.passage,
-  }));
+    const simplifiedQuestions = questions.flatMap((group) =>
+      group.questions.map((q) => ({
+        question: q.question,
+        options: q.options,
+        passage: group.passage,
+      }))
+    );
 
-  try {
-    const res = await axios.post("http://localhost:5000/api/reading/score-reading-part", {
-  part: lesson?.part,
-  questions: simplifiedQuestions,
-  answers,
-});
+    try {
+      const res = await axios.post("http://localhost:5000/api/reading/score-reading-part", {
+        part: lesson?.part,
+        questions: simplifiedQuestions,
+        answers,
+      });
 
+      const feedback = res.data.feedback || [];
+      const feedbackMap = {};
+      feedback.forEach((item) => {
+        feedbackMap[item.index] = item;
+      });
+      setGrammarFeedback(feedbackMap);
 
-    const feedback = res.data.feedback || [];
+      const correct = feedback.filter((f) => f.correct).length;
 
-    const feedbackMap = {};
-    feedback.forEach((item) => {
-      feedbackMap[item.index] = item;
-    });
-    setGrammarFeedback(feedbackMap);
+      const result = {
+        lessonId: id,
+        total: simplifiedQuestions.length,
+        correct,
+        incorrect: simplifiedQuestions.length - correct,
+        skipped: answers.filter((a) => a === null).length,
+        answered: answers.filter((a) => a !== null).length,
+        score: correct * 5,
+        accuracy: Math.round((correct / simplifiedQuestions.length) * 100),
+        time: formatTime(elapsedTime),
+        answers: feedback,
+        partsSubmitted: [lesson?.part],
+      };
 
-    const correct = feedback.filter((f) => f.correct).length;
-
-    const result = {
-      lessonId: id,
-      total: questions.length,
-      correct,
-      incorrect: questions.length - correct,
-      skipped: answers.filter((a) => a === null).length,
-      answered: answers.filter((a) => a !== null).length,
-      score: correct * 5,
-      accuracy: Math.round((correct / questions.length) * 100),
-      time: formatTime(elapsedTime),
-      answers: feedback,
-      partsSubmitted: [lesson?.part],
-    };
-
-    navigate("/result", {
-      state: {
-        result,
-        sourcePage: `/practicelesson/${lesson._id}`,
-        stateToPassBack: {
-          showAnswers: true,
-          answers: result.answers,
+      navigate("/result", {
+        state: {
+          result,
+          sourcePage: `/practicelesson/${lesson._id}`,
+          stateToPassBack: {
+            showAnswers: true,
+            answers: result.answers,
+          },
         },
-      },
-    });
-  } catch (err) {
-    console.error("❌ Lỗi khi chấm điểm AI:", err);
-  }
-};
+      });
+    } catch (err) {
+      console.error("❌ Lỗi khi chấm điểm AI:", err);
+    }
+  };
 
   return (
     <div className="practice-lesson-page">
@@ -137,72 +135,81 @@ const PracticeLessonPage = () => {
           </p>
           <p>⏱️ Thời gian: {formatTime(elapsedTime)}</p>
 
-        {questions.map((q, i) => {
-  const aiFeedback = grammarFeedback[i];
-  const selected = aiFeedback?.userAnswer || answers[i];
-  const isCorrect = aiFeedback?.correct ?? (selected === q.answer);
-  const correctAnswer = aiFeedback?.correctAnswer || q.answer;
-
-  return (
-    <div className="question-block" key={i}>
-      {q.passage && i === 0 && (
-        <div className="passage">
-          <strong>📄 Đoạn văn:</strong> {q.passage}
-        </div>
-      )}
-      <h4>Câu {i + 1}</h4>
-      <p>{q.question}</p>
-      <div className="options1">
-        {q.options.map((opt, idx) => {
-          const letter = String.fromCharCode(65 + idx);
-          const isSelected = selected === letter;
-          const isCorrectAnswer = correctAnswer === letter;
-
-          return (
-            <label
-              key={idx}
-              className={`option1 
-                ${isSelected ? "selected1" : ""}
-                ${submitted && isCorrectAnswer ? "correct-answer" : ""}
-                ${submitted && isSelected && !isCorrectAnswer ? "wrong-answer" : ""}
-              `}
-            >
-              <input
-                type="radio"
-                name={`q${i}`}
-                value={letter}
-                checked={isSelected}
-                onChange={() => handleSelect(i, letter)}
-                disabled={submitted}
-              />
-              {letter}. {opt}
-            </label>
-          );
-        })}
-      </div>
-
-     {submitted && (
-        <div className={`feedback ${isCorrect ? "correct" : "incorrect"}`}>
-          {selected == null ? (
-            <>⚠️ Chưa chọn – Đáp án đúng là: {correctAnswer}</>
-          ) : isCorrect ? (
-            <>✅ Đúng</>
-          ) : (
-            <>
-              ❌ Sai – Đáp án đúng là: {correctAnswer}
-              {aiFeedback?.comment && (
-                <div className="ai-feedback">
-                  💬 <strong>Giải thích:</strong> {aiFeedback.comment}
+          {questions.map((group, groupIndex) => (
+            <div key={groupIndex} className="passage-group">
+              {group.passage && (
+                <div className="passage">
+                  <strong>📄 Đoạn văn:</strong>
+                  <p>{group.passage}</p>
                 </div>
               )}
-            </>
-          )}
-        </div>
-      )}
-    </div>
-  );
-})}
 
+              {group.questions.map((q, i) => {
+                const index = questions
+                  .slice(0, groupIndex)
+                  .reduce((sum, g) => sum + g.questions.length, 0) + i;
+
+                const aiFeedback = grammarFeedback[index];
+                const selected = aiFeedback?.userAnswer || answers[index];
+                const isCorrect = aiFeedback?.correct ?? (selected === q.answer);
+                const correctAnswer = aiFeedback?.correctAnswer || q.answer;
+
+                return (
+                  <div className="question-block" key={index}>
+                    <h4>Câu {index + 1}</h4>
+                    <p>{q.question}</p>
+                    <div className="options1">
+                      {q.options.map((opt, idx) => {
+                        const letter = String.fromCharCode(65 + idx);
+                        const isSelected = selected === letter;
+                        const isCorrectAnswer = correctAnswer === letter;
+
+                        return (
+                          <label
+                            key={idx}
+                            className={`option1 
+                              ${isSelected ? "selected1" : ""}
+                              ${submitted && isCorrectAnswer ? "correct-answer" : ""}
+                              ${submitted && isSelected && !isCorrectAnswer ? "wrong-answer" : ""}
+                            `}
+                          >
+                            <input
+                              type="radio"
+                              name={`q${index}`}
+                              value={letter}
+                              checked={isSelected}
+                              onChange={() => handleSelect(index, letter)}
+                              disabled={submitted}
+                            />
+                            {letter}. {opt}
+                          </label>
+                        );
+                      })}
+                    </div>
+
+                    {submitted && (
+                      <div className={`feedback ${isCorrect ? "correct" : "incorrect"}`}>
+                        {selected == null ? (
+                          <>⚠️ Chưa chọn – Đáp án đúng là: {correctAnswer}</>
+                        ) : isCorrect ? (
+                          <>✅ Đúng</>
+                        ) : (
+                          <>
+                            ❌ Sai – Đáp án đúng là: {correctAnswer}
+                            {aiFeedback?.comment && (
+                              <div className="ai-feedback">
+                                💬 <strong>Giải thích:</strong> {aiFeedback.comment}
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
 
           {!submitted && (
             <button className="submit-btn" onClick={handleSubmit}>
