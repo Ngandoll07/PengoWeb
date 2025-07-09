@@ -1,12 +1,14 @@
+// routes/recommend.js
 import express from "express";
 import jwt from "jsonwebtoken";
-import StudyPlan from "../models/StudyPlan.js";
 import fetch from "node-fetch";
+import StudyPlan from "../models/StudyPlan.js";
+import RoadmapItem from "../models/RoadmapItem.js";
 
 const router = express.Router();
 const JWT_SECRET = "123";
 
-// POST: Tạo lộ trình học mới từ AI Groq
+// POST: Gọi AI tạo lộ trình và lưu vào DB
 router.post("/recommend", async (req, res) => {
   const { listeningScore, readingScore, targetScore, studyDuration } = req.body;
   const token = req.headers.authorization?.split(" ")[1];
@@ -16,36 +18,27 @@ Tôi là học viên đang luyện thi TOEIC.
 Kết quả đầu vào:
 - Listening: ${listeningScore}/50
 - Reading: ${readingScore}/50
-
-🎯 Mục tiêu của tôi là đạt khoảng ${targetScore} điểm TOEIC.
-⏰ Tôi có khoảng ${studyDuration} để luyện thi.
-
-Hãy:
-1. Phân tích điểm mạnh, điểm yếu của tôi, Đề xuất một lộ trình học phù hợp với mục tiêu và thời gian học và Chia rõ theo từng ngày và từng kỹ năng nếu có thể.
-2. Chỉ đề xuất kế hoạch cho **ngày 1**, một kỹ năng duy nhất (nghe, đọc, từ vựng hoặc ngữ pháp).
-3. Trả về JSON theo định dạng:
-
+🎯 Mục tiêu: ${targetScore} điểm TOEIC.
+⏰ Thời gian ôn: ${studyDuration}.
+1. Phân tích điểm mạnh/yếu và đề xuất lộ trình học phù hợp từng ngày.
+2. Chỉ đề xuất kế hoạch cho **ngày 1**, một kỹ năng duy nhất.
+3. Trả về JSON như sau:
 [
   {
     "day": 1,
-    "title": "Luyện đọc Part 1",
+    "title": "Luyện nghe Part 1",
     "skill": "listening",
     "status": "pending",
     "progress": 0
   }
 ]
-
-Chỉ trả về phần phân tích và JSON, không thêm mô tả ngoài.
-`;
-
-  let roadmapJson = [];
-  let planText = "";
+Chỉ trả về phân tích và JSON.`;
 
   try {
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    const aiRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -55,73 +48,80 @@ Chỉ trả về phần phân tích và JSON, không thêm mô tả ngoài.
       }),
     });
 
-    const data = await response.json();
+    const data = await aiRes.json();
     const content = data.choices?.[0]?.message?.content || "";
 
-    // Phân tách phần JSON và phân tích
     const first = content.indexOf("[");
     const last = content.lastIndexOf("]");
     const jsonText = content.substring(first, last + 1);
-    planText = content.substring(0, first).trim();
+    const analysisText = content.substring(0, first).trim();
 
+    let roadmapJson;
     try {
       roadmapJson = JSON.parse(jsonText);
     } catch (err) {
-      console.error("❌ Lỗi khi parse JSON:", err);
-      return res.status(500).json({ error: "Lỗi parse JSON từ Groq." });
+      console.error("❌ Lỗi khi parse JSON từ AI:", err);
+      return res.status(500).json({ error: "Không đọc được JSON từ AI." });
     }
 
-    // Lưu vào DB nếu có token
-    if (token) {
-      try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        const plan = new StudyPlan({
-          userId: decoded.userId,
-          listeningScore,
-          readingScore,
-          suggestion: JSON.stringify(roadmapJson),
-          analysis: planText,
-        });
-        await plan.save();
-      } catch (err) {
-        console.warn("⚠️ Token không hợp lệ hoặc hết hạn:", err.message);
-      }
-    }
+    if (!token) return res.status(401).json({ error: "Thiếu token!" });
 
-    // Gửi về client
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const userId = decoded.userId;
+
+    // Xoá roadmap cũ nếu có
+    await RoadmapItem.deleteMany({ userId });
+
+    // Lưu StudyPlan
+    await new StudyPlan({
+      userId,
+      listeningScore,
+      readingScore,
+      suggestion: JSON.stringify(roadmapJson),
+      analysis: analysisText,
+    }).save();
+
+    // Tạo mới RoadmapItem
+    const itemsToInsert = roadmapJson.map((item) => ({
+      ...item,
+      userId,
+      progress: item.progress || 0,
+      status: item.status || "pending",
+    }));
+
+    const savedItems = await RoadmapItem.insertMany(itemsToInsert);
+
     res.json({
-      suggestion: roadmapJson,
-      analysis: planText,
+      suggestion: savedItems, // có _id đầy đủ
+      analysis: analysisText,
     });
   } catch (err) {
-    console.error("❌ Lỗi khi gọi Groq:", err);
-    res.status(500).json({ error: "Không thể tạo lộ trình học từ Groq." });
+    console.error("❌ Lỗi khi tạo lộ trình:", err);
+    res.status(500).json({ error: "Không thể tạo lộ trình học." });
   }
 });
 
-// GET: Lấy lộ trình học mới nhất từ DB
+// GET: Lấy lộ trình từ DB
 router.get("/recommend", async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "Thiếu token!" });
+  if (!token) return res.status(401).json({ error: "Thiếu token!" });
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    const plans = await StudyPlan.find({ userId: decoded.userId })
-      .sort({ createdAt: -1 })
-      .limit(1);
+    const userId = decoded.userId;
 
-    if (!plans.length) {
-      return res.status(404).json({ message: "Chưa có lộ trình!" });
-    }
+    const items = await RoadmapItem.find({ userId }).sort({ day: 1 });
+    const plan = await StudyPlan.findOne({ userId }).sort({ createdAt: -1 });
 
-    const plan = plans[0];
+    if (!items.length && !plan) return res.status(404).json({ message: "Chưa có lộ trình!" });
+
     res.json({
-      suggestion: JSON.parse(plan.suggestion),
-      analysis: plan.analysis || "",
+      suggestion: items,
+      analysis: plan?.analysis || "",
     });
   } catch (err) {
     console.error("❌ Lỗi khi lấy lộ trình:", err);
-    res.status(500).json({ message: "Lỗi server khi lấy lộ trình." });
+    res.status(500).json({ error: "Lỗi server khi lấy lộ trình." });
   }
 });
 
