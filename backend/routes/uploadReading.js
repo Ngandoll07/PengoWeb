@@ -1,6 +1,7 @@
 import express from "express";
 import multer from "multer";
 import xlsx from "xlsx";
+import axios from "axios";
 import ReadingTest from "../models/ReadingTest.js";
 
 const router = express.Router();
@@ -61,20 +62,44 @@ router.post("/upload-reading", upload.single("file"), async (req, res) => {
 
             const blocks = Array.from(blockMap.entries()).map(([passage, questions]) => ({ passage, questions }));
             payload.blocks = blocks;
+            try {
+  const aiRes = await axios.post("http://localhost:5000/api/analyze-difficulty", {
+    part: partNumber,
+    questions: payload.questions || [],
+    blocks: payload.blocks || [],
+  });
+  payload.difficulty = aiRes.data.difficulty || "Trung bình"; // fallback
+} catch (err) {
+  console.warn("⚠️ Không thể phân tích độ khó bằng AI:", err.message);
+  payload.difficulty = "Trung bình"; // fallback nếu AI lỗi
+}
         } else {
-            const questions = rows.map(row => ({
-                question: row["Column B (Question Text)"],
-                options: {
-                    A: row["Column C (Option A)"],
-                    B: row["Column D (Option B)"],
-                    C: row["Column E (Option C)"],
-                    D: row["Column F (Option D)"]
-                },
-                answer: row["Answer"],
-                part: partNumber
-            }));
-            payload.questions = questions;
-        }
+  const questions = rows.map(row => ({
+    question: row["Column B (Question Text)"],
+    options: {
+      A: row["Column C (Option A)"],
+      B: row["Column D (Option B)"],
+      C: row["Column E (Option C)"],
+      D: row["Column F (Option D)"]
+    },
+    answer: row["Answer"],
+    part: partNumber
+  }));
+  payload.questions = questions;
+
+  // 🔍 Gọi AI để phân tích độ khó đề Part 5
+  try {
+    const aiRes = await axios.post("http://localhost:5000/api/analyze-difficulty", {
+      part: partNumber,
+      questions: questions,
+      blocks: [],
+    });
+    payload.difficulty = aiRes.data.difficulty || "Trung bình";
+  } catch (err) {
+    console.warn("⚠️ AI lỗi khi phân tích độ khó Part 5:", err.message);
+    payload.difficulty = "Trung bình"; // fallback
+  }
+}
 
         const test = new ReadingTest(payload);
         const saved = await test.save();

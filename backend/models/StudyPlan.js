@@ -11,4 +11,3 @@ const StudyPlanSchema = new mongoose.Schema({
 
 const StudyPlan = mongoose.model("StudyPlan", StudyPlanSchema);
 export default StudyPlan;
-

@@ -70,21 +70,25 @@ const ReadingTopic = () => {
       </div>
 
       {/* Danh sách đề */}
-      <div className="reading-test-list">
-        {tests.map((test) => {
-          const totalQuestions = test.questions?.length || test.blocks?.reduce((sum, b) => sum + b.questions.length, 0) || 0;
-          return (
-            <div
-              key={test._id}
-              className={`reading-test-card ${selectedTest?._id === test._id ? "active" : ""}`}
-              onClick={() => setSelectedTest(test)}
-            >
-              <h4>{test.title}</h4>
-              <p>{totalQuestions} câu hỏi</p>
-            </div>
-          );
-        })}
+     <div className="reading-test-list">
+  {tests.map((test) => {
+    const totalQuestions = test.questions?.length || test.blocks?.reduce((sum, b) => sum + b.questions.length, 0) || 0;
+    return (
+      <div
+        key={test._id}
+        className={`reading-test-card ${selectedTest?._id === test._id ? "active" : ""}`}
+        onClick={() => setSelectedTest(test)}
+      >
+        <h4>{test.title}</h4>
+        <p>{totalQuestions} câu hỏi</p>
+        <p className="difficulty-tag">
+          📊 Mức độ: <b>{test.difficulty || "Đang phân tích..."}</b>
+        </p>
       </div>
+    );
+  })}
+</div>
+
 
       {/* Chi tiết đề đã chọn */}
       {selectedTest && (
