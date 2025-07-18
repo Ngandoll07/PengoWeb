@@ -23,6 +23,7 @@ export default function LoginPage() {
       });
        // 👉 Lưu token và thông tin user vào localStorage
     localStorage.setItem("token", response.data.token);
+      localStorage.setItem("userId", response.data.user._id); // ✅ Cần dòng này!
     localStorage.setItem("user", JSON.stringify(response.data.user));
       alert("Đăng nhập thành công!");
 

@@ -71,9 +71,10 @@ app.use('/api', readingCheckRoute); // đúng
 
 app.use('/api', analyzeAI); // thêm dòng này
 app.use("/api", uploadReadingRoutes); // 👈 đảm bảo dòng này có
+app.use('/api', readingRoutes);
 
 app.use('/api/practice-history', practiceHistoryRoutes);
-app.use("/api/reading-tests", readingTestsRoutes);
+app.use("/api", readingTestsRoutes);
 
 app.use("/api", generateLessonRoutes);
 app.use("/api", lessonResultRouter); // ✅ Đường dẫn gốc là /api

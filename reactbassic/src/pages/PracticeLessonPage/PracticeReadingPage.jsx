@@ -1,18 +1,32 @@
+// PracticeReadingPage.jsx
 import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom"; // ✅ Thêm useNavigate
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./PracticeLessonPage.css";
 
-const PracticeLessonPage = () => {
+const PracticeReadingPage = () => {
   const { state } = useLocation();
   const { lesson, day, roadmapItemId } = state || {};
-  const navigate = useNavigate(); // ✅ Hook điều hướng
+  const navigate = useNavigate();
 
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState(null);
 
   if (!lesson) return <p>Không có bài học</p>;
+
+  const isBlockBased = lesson.part === 6 || lesson.part === 7;
+
+  const getAllQuestions = () => {
+    if (isBlockBased) {
+      return lesson.blocks.flatMap((block, blockIdx) =>
+        block.questions.map((q) => ({ ...q, block: block }))
+      );
+    }
+    return lesson.questions;
+  };
+
+  const allQuestions = getAllQuestions();
 
   const handleSelect = (qIndex, choice) => {
     if (submitted) return;
@@ -21,11 +35,11 @@ const PracticeLessonPage = () => {
 
   const handleSubmit = async () => {
     let correct = 0;
-    lesson.questions.forEach((q, index) => {
+    allQuestions.forEach((q, index) => {
       if (answers[index] === q.answer) correct++;
     });
 
-    const percent = Math.round((correct / lesson.questions.length) * 100);
+    const percent = Math.round((correct / allQuestions.length) * 100);
     setScore(percent);
     setSubmitted(true);
 
@@ -35,11 +49,11 @@ const PracticeLessonPage = () => {
       await axios.post("http://localhost:5000/api/lesson-result", {
         userId,
         roadmapItemId,
-          day: Number(day), // 🛠 Sửa ở đây
+        day,
         skill: lesson.skill,
         part: lesson.part,
         score: percent,
-        answers: lesson.questions.map((q, index) => ({
+        answers: allQuestions.map((q, index) => ({
           questionId: q.id || null,
           userAnswer: answers[index],
           correctAnswer: q.answer,
@@ -47,29 +61,16 @@ const PracticeLessonPage = () => {
         })),
       });
 
-      const status = percent >= 50 ? "done" : "learning";
-
       await axios.put(
         `http://localhost:5000/api/roadmap/${roadmapItemId}/progress`,
-        {
-          progress: percent,
-          status: status,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
+        { progress: percent, status: percent >= 50 ? "done" : "learning" },
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
 
       await axios.post(
         "http://localhost:5000/api/roadmap/next-day",
-         { currentDay: Number(day) },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
+        { currentDay: day },
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       );
 
       alert("✅ Nộp bài thành công!");
@@ -86,27 +87,22 @@ const PracticeLessonPage = () => {
         Phần: Part {lesson.part} | Độ khó: <b>{lesson.level}</b>
       </p>
 
-      {lesson.questions.map((q, index) => (
+      {allQuestions.map((q, index) => (
         <div key={q.id || index} className="question-card">
-          <p>
-            <strong>Câu {index + 1}:</strong> {q.question}
-          </p>
-          {q.image && <img src={q.image} alt="Visual" />}
-          {q.audio && <audio controls src={q.audio}></audio>}
+          {q.block?.passage && (
+            <div className="reading-passage">
+              <strong>Đoạn văn:</strong> {q.block.passage}
+            </div>
+          )}
+          <p><strong>Câu {index + 1}:</strong> {q.question}</p>
 
           <div className="options">
             {["A", "B", "C", "D"].map((opt) => (
               <button
                 key={opt}
-                className={`option-btn ${
-                  answers[index] === opt ? "selected" : ""
-                } ${submitted && q.answer === opt ? "correct" : ""} ${
-                  submitted &&
-                  answers[index] === opt &&
-                  answers[index] !== q.answer
-                    ? "wrong"
-                    : ""
-                }`}
+                className={`option-btn ${answers[index] === opt ? "selected" : ""}
+                  ${submitted && q.answer === opt ? "correct" : ""}
+                  ${submitted && answers[index] === opt && answers[index] !== q.answer ? "wrong" : ""}`}
                 onClick={() => handleSelect(index, opt)}
               >
                 {opt}. {q.options?.[opt]}
@@ -124,7 +120,6 @@ const PracticeLessonPage = () => {
         <p className="score-msg">🎉 Bạn đã làm đúng {score}% câu hỏi!</p>
       )}
 
-      {/* ✅ Nút quay lại lộ trình */}
       <button
         className="back-btn"
         onClick={() => navigate("/roadmap")}
@@ -136,4 +131,4 @@ const PracticeLessonPage = () => {
   );
 };
 
-export default PracticeLessonPage;
+export default PracticeReadingPage;

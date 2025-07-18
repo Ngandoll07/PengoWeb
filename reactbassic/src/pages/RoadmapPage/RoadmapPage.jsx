@@ -24,7 +24,6 @@ useEffect(() => {
       });
 
       const data = await res.json();
-      console.log("📦 Lộ trình từ API:", data);
 
       if (Array.isArray(data.suggestion)) {
         setLearningData(data.suggestion);
@@ -33,6 +32,13 @@ useEffect(() => {
       }
 
       setAnalysis(data.analysis || "");
+
+      // ✅ Lưu bài học ngày 1 và level
+      if (data.lesson) {
+        localStorage.setItem("lesson_day1", JSON.stringify(data.lesson));
+        localStorage.setItem("level", data.level);
+      }
+
     } catch (err) {
       console.error("❌ Lỗi khi fetch lộ trình:", err);
     } finally {
@@ -40,44 +46,80 @@ useEffect(() => {
     }
   };
 
-  fetchPlan(); // gọi mỗi lần component mount
-
-  // Nếu có flag updated từ PracticeLessonPage ➝ reset state để không lặp
-  if (location.state?.updated) {
-    navigate("/roadmap", { replace: true }); // reset state
-  }
-}, [location.state]);
-
-
-
-
+  fetchPlan();
+}, []);
 
 const handleDayClick = async (item) => {
+  console.log("🔍 Bạn đã click vào:", item);
+  console.log("➡️ part:", item.part, "level:", item.level, "skill:", item.skill);
+
   try {
-    const res = await axios.post("http://localhost:5000/api/generate-lesson", {
-      day: item.day,
-      skill: item.skill,
-    });
+    let questions = [];
 
-    const lesson = res.data.lesson;
+    if (item.skill === "listening") {
+      // Gọi API Listening
+      const res = await axios.get(`http://localhost:5000/api/listening-tests/part/${item.part}`, {
+        params: {
+          level: item.level,
+        },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
-    if (!item._id) {
-      console.warn("❌ Không có _id trong roadmap item!", item);
+      questions = res.data;
+
+      if (!questions.length) {
+        alert("Không có câu hỏi listening phù hợp.");
+        return;
+      }
+
+    } else if (item.skill === "reading") {
+      // Gọi API Reading
+      const res = await axios.get(`http://localhost:5000/api/reading-tests/part/${item.part}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      const data = res.data;
+
+      // Với part 6 hoặc 7 sẽ là blocks, còn lại là questions
+      if ((item.part === 6 || item.part === 7) && Array.isArray(data)) {
+        questions = data;
+      } else if (Array.isArray(data)) {
+        questions = data;
+      }
+
+      if (!questions.length) {
+        alert("Không có câu hỏi reading phù hợp.");
+        return;
+      }
+    } else {
+      alert("Kỹ năng không hợp lệ.");
+      return;
     }
+
+    const lesson = {
+      title: item.title,
+      skill: item.skill,
+      part: item.part,
+      level: item.level,
+      questions,
+    };
 
     navigate("/practicelesson/ai", {
       state: {
         lesson,
         day: item.day,
-        roadmapItemId: item._id || null, // đảm bảo không undefined
+        roadmapItemId: item._id || null,
       },
     });
   } catch (err) {
-    console.error("❌ Lỗi khi tạo bài học:", err);
-    alert("⚠️ Không thể tạo bài học từ AI.");
+    console.error("❌ Không lấy được câu hỏi:", err);
+    alert("Không thể tải bài luyện tập.");
   }
 };
-
 
 
 
@@ -100,7 +142,7 @@ const handleDayClick = async (item) => {
               <div
                 key={index}
                 className={`day-card ${item.skill}`}
-             onClick={() => handleDayClick(item)}
+    onClick={() => handleDayClick(item)}   // ✅ ĐÚNG CÁCH
               >
                 <h3>Day {item.day}</h3>
                 <p>{item.title}</p>

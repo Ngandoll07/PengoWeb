@@ -1,4 +1,4 @@
-// routes/recommend.js
+// ✅ File: routes/recommend.js
 import express from "express";
 import jwt from "jsonwebtoken";
 import fetch from "node-fetch";
@@ -8,31 +8,47 @@ import RoadmapItem from "../models/RoadmapItem.js";
 const router = express.Router();
 const JWT_SECRET = "123";
 
-// POST: Gọi AI tạo lộ trình và lưu vào DB
+// ✅ POST: Phân tích từ AI ➝ sinh roadmap ngày 1
 router.post("/recommend", async (req, res) => {
   const { listeningScore, readingScore, targetScore, studyDuration } = req.body;
   const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ error: "Thiếu token!" });
 
-  const prompt = `
-Tôi là học viên đang luyện thi TOEIC.
-Kết quả đầu vào:
+const prompt = `
+Tôi là một học viên đang luyện thi TOEIC.
+
+🧪 Kết quả đầu vào của tôi:
 - Listening: ${listeningScore}/50
 - Reading: ${readingScore}/50
-🎯 Mục tiêu: ${targetScore} điểm TOEIC.
-⏰ Thời gian ôn: ${studyDuration}.
-1. Phân tích điểm mạnh/yếu và đề xuất lộ trình học phù hợp từng ngày.
-2. Chỉ đề xuất kế hoạch cho **ngày 1**, một kỹ năng duy nhất.
-3. Trả về JSON như sau:
-[
-  {
-    "day": 1,
-    "title": "Luyện nghe Part 1",
-    "skill": "listening",
-    "status": "pending",
-    "progress": 0
-  }
-]
-Chỉ trả về phân tích và JSON.`;
+
+🎯 Mục tiêu của tôi là đạt khoảng ${targetScore} điểm TOEIC.
+⏰ Tôi có khoảng ${studyDuration} để luyện thi.
+
+🎓 Hãy giúp tôi:
+1. Phân tích điểm mạnh, điểm yếu của tôi
+2. **Đề xuất kế hoạch ôn luyện cho ngày 1** với 1 kỹ năng duy nhất (listening hoặc reading), tập trung vào phần (Part) phù hợp nhất với năng lực hiện tại.
+3. Gợi ý **mức độ phù hợp** (level: easy / medium / hard) để bắt đầu ôn luyện ngày đầu sao cho hiệu quả nhất.
+
+📋 Trả về JSON đúng định dạng sau:
+
+{
+  "analysis": "Phân tích điểm mạnh và điểm yếu**",
+  "plan": [
+    {
+      "day": 1,
+      "title": "Tên bài học gợi ý cho ngày 1",
+      "skill": "listening hoặc reading",
+      "part": Số, // part phù hợp như 1, 2, 5, v.v.
+      "level": "easy hoặc medium hoặc hard",
+      "status": "pending",
+      "progress": 0
+    }
+  ]
+}
+
+⚠️ Chỉ trả về đúng định dạng JSON trên. Không viết bất kỳ lời giải thích nào bên ngoài JSON.
+`;
+
 
   try {
     const aiRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -51,20 +67,8 @@ Chỉ trả về phân tích và JSON.`;
     const data = await aiRes.json();
     const content = data.choices?.[0]?.message?.content || "";
 
-    const first = content.indexOf("[");
-    const last = content.lastIndexOf("]");
-    const jsonText = content.substring(first, last + 1);
-    const analysisText = content.substring(0, first).trim();
-
-    let roadmapJson;
-    try {
-      roadmapJson = JSON.parse(jsonText);
-    } catch (err) {
-      console.error("❌ Lỗi khi parse JSON từ AI:", err);
-      return res.status(500).json({ error: "Không đọc được JSON từ AI." });
-    }
-
-    if (!token) return res.status(401).json({ error: "Thiếu token!" });
+    const parsed = JSON.parse(content);
+    const { analysis, plan } = parsed;
 
     const decoded = jwt.verify(token, JWT_SECRET);
     const userId = decoded.userId;
@@ -77,31 +81,23 @@ Chỉ trả về phân tích và JSON.`;
       userId,
       listeningScore,
       readingScore,
-      suggestion: JSON.stringify(roadmapJson),
-      analysis: analysisText,
+      suggestion: plan,
+      analysis
     }).save();
 
-    // Tạo mới RoadmapItem
-    const itemsToInsert = roadmapJson.map((item) => ({
-      ...item,
-      userId,
-      progress: item.progress || 0,
-      status: item.status || "pending",
-    }));
+    // Tạo RoadmapItem
+    const roadmapItems = plan.map(item => ({ ...item, userId }));
+    const saved = await RoadmapItem.insertMany(roadmapItems);
 
-    const savedItems = await RoadmapItem.insertMany(itemsToInsert);
-
-    res.json({
-      suggestion: savedItems, // có _id đầy đủ
-      analysis: analysisText,
-    });
+    res.json({ suggestion: saved, analysis });
   } catch (err) {
     console.error("❌ Lỗi khi tạo lộ trình:", err);
-    res.status(500).json({ error: "Không thể tạo lộ trình học." });
+    res.status(500).json({ error: "Không thể tạo lộ trình." });
   }
 });
 
-// GET: Lấy lộ trình từ DB
+// ✅ GET: Lấy roadmap
+// ✅ GET: Lấy roadmap kèm cập nhật tiến trình nếu có kết quả
 router.get("/recommend", async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(401).json({ error: "Thiếu token!" });
@@ -110,13 +106,43 @@ router.get("/recommend", async (req, res) => {
     const decoded = jwt.verify(token, JWT_SECRET);
     const userId = decoded.userId;
 
-    const items = await RoadmapItem.find({ userId }).sort({ day: 1 });
+    // 🔍 Tìm roadmap của user
+    const roadmapItems = await RoadmapItem.find({ userId }).sort({ day: 1 });
+
+    // 🔍 Tìm kết quả làm bài
+    const results = await import("../models/UserLessonResult.js").then(m => m.default.find({ userId }));
+
+    // 🧠 Tạo map từ roadmapItemId -> score
+    const scoreMap = {};
+    results.forEach(result => {
+      if (result.roadmapItemId) {
+        scoreMap[result.roadmapItemId.toString()] = result.score;
+      }
+    });
+
+    // ✅ Cập nhật trạng thái dựa vào score
+    const updatedItems = await Promise.all(
+      roadmapItems.map(async (item) => {
+        const score = scoreMap[item._id.toString()];
+        if (score !== undefined) {
+          const newStatus = score >= 50 ? "done" : "pending";
+          const newProgress = score;
+
+          // Chỉ update nếu khác
+          if (item.status !== newStatus || item.progress !== newProgress) {
+            item.status = newStatus;
+            item.progress = newProgress;
+            await item.save();
+          }
+        }
+        return item;
+      })
+    );
+
     const plan = await StudyPlan.findOne({ userId }).sort({ createdAt: -1 });
 
-    if (!items.length && !plan) return res.status(404).json({ message: "Chưa có lộ trình!" });
-
     res.json({
-      suggestion: items,
+      suggestion: updatedItems,
       analysis: plan?.analysis || "",
     });
   } catch (err) {
@@ -124,5 +150,6 @@ router.get("/recommend", async (req, res) => {
     res.status(500).json({ error: "Lỗi server khi lấy lộ trình." });
   }
 });
+
 
 export default router;

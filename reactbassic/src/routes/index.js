@@ -13,6 +13,7 @@ import CoursesPage from "../pages/CoursesPage/CoursesPage.jsx";
 import CartPage from "../pages/CartPage/CartPage.jsx";
 import DoTestPage from "../pages/DoTestPage/DoTestPage";
 import PracticeLessonPage from "../pages/PracticeLessonPage/PracticeLessonPage";
+import PracticeReadingPage from "../pages/PracticeLessonPage/PracticeReadingPage.jsx";
 import MyCourses from "../pages/MyCourses/MyCourses";
 import LoadingResultPage from "../pages/LoadingResultPage/LoadingResultPage";
 
@@ -109,7 +110,11 @@ export const routes = [
         page: LoadingResultPage,
         isShowHeader: true
     },
-
+   {
+        path: '/practice-reading',
+        page: PracticeReadingPage,
+        isShowHeader: true
+    },
     //  admin
     {
         path: '/admin',

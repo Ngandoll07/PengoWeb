@@ -8,12 +8,13 @@ const ITEMS_PER_PAGE = 10;
 const ListeningTopic = () => {
     const [questions, setQuestions] = useState([]);
     const [selectedPart, setSelectedPart] = useState(1);
-    const [selectedLevel, setSelectedLevel] = useState(""); // NEW
+    const [selectedLevel, setSelectedLevel] = useState("");
     const [excelFile, setExcelFile] = useState(null);
     const [sheetName, setSheetName] = useState("");
     const [sheetOptions, setSheetOptions] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [loading, setLoading] = useState(false);
+
+    const [loading, setLoading] = useState(false); // ✅ Sửa lỗi: thêm dòng này
 
 
     useEffect(() => {
@@ -21,6 +22,7 @@ const ListeningTopic = () => {
     }, [selectedPart, selectedLevel]);
 
     const loadQuestions = async (part, level) => {
+        setLoading(true); // ✅ Bắt đầu tải
         try {
             let url = `http://localhost:5000/api/listening-tests/part/${part}`;
             if (level) url += `?level=${level}`;
@@ -31,7 +33,7 @@ const ListeningTopic = () => {
             console.error("Lỗi tải dữ liệu:", err);
             alert("Không thể tải dữ liệu câu hỏi.");
         }
-        setLoading(false);
+        setLoading(false); // ✅ Kết thúc tải
     };
 
     const handleExcelSelect = async (e) => {
@@ -94,11 +96,11 @@ const ListeningTopic = () => {
                 <button onClick={handleUploadExcel}>📤 Tải lên file Excel và phân tích</button>
             </div>
 
-            <button onClick={handleClear} style={{ backgroundColor: "crimson", color: "white" , marginLeft:300}}>
+            <button onClick={handleClear} style={{ backgroundColor: "crimson", color: "white", marginLeft: 300 }}>
                 🗑 Xoá toàn bộ
             </button>
 
-            <div className="listening-part-select">
+            <div className="listening-part-select1">
                 {[1, 2, 3, 4].map((p) => (
                     <button
                         key={p}
@@ -110,7 +112,7 @@ const ListeningTopic = () => {
                 ))}
             </div>
 
-            <div className="level-filter">
+            <div className="level-filter1">
                 <label>Độ khó:</label>
                 <select value={selectedLevel} onChange={(e) => setSelectedLevel(e.target.value)}>
                     <option value="">Tất cả</option>
@@ -120,54 +122,58 @@ const ListeningTopic = () => {
                 </select>
             </div>
 
-            <div className="table-scroll-wrapper">
-                <table className="listening-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Câu hỏi</th>
-                            <th>A</th>
-                            <th>B</th>
-                            <th>C</th>
-                            <th>D</th>
-                            <th>Đáp án</th>
-                            <th>Audio</th>
-                            <th>Ảnh</th>
-                            <th>Transcript</th>
-                            <th>Level</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {paginatedQuestions.map((q, idx) => (
-                            <tr key={q.id}>
-                                <td>{(currentPage - 1) * ITEMS_PER_PAGE + idx + 1}</td>
-                                <td>{q.question}</td>
-                                <td>{q.options?.A}</td>
-                                <td>{q.options?.B}</td>
-                                <td>{q.options?.C}</td>
-                                <td>{q.options?.D}</td>
-                                <td><b>{q.answer}</b></td>
-                                <td><audio controls style={{ width: "160px" }} src={q.audio} /></td>
-                                <td>{q.image ? <img src={q.image} alt="" width="60" /> : "–"}</td>
-                                <td className="transcript-cell">{q.transcript || "–"}</td>
-                                <td>{q.level || "–"}</td>
+            {loading ? (
+                <p>⏳ Đang tải dữ liệu...</p>
+            ) : (
+                <div className="table-scroll-wrapper1">
+                    <table className="listening-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Câu hỏi</th>
+                                <th>A</th>
+                                <th>B</th>
+                                <th>C</th>
+                                <th>D</th>
+                                <th>Đáp án</th>
+                                <th>Audio</th>
+                                <th>Ảnh</th>
+                                <th>Transcript</th>
+                                <th>Level</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {paginatedQuestions.map((q, idx) => (
+                                <tr key={q.id}>
+                                    <td>{(currentPage - 1) * ITEMS_PER_PAGE + idx + 1}</td>
+                                    <td>{q.question}</td>
+                                    <td>{q.options?.A}</td>
+                                    <td>{q.options?.B}</td>
+                                    <td>{q.options?.C}</td>
+                                    <td>{q.options?.D}</td>
+                                    <td><b>{q.answer}</b></td>
+                                    <td><audio controls style={{ width: "160px" }} src={q.audio} /></td>
+                                    <td>{q.image ? <img src={q.image} alt="" width="60" /> : "–"}</td>
+                                    <td className="transcript-cell">{q.transcript || "–"}</td>
+                                    <td>{q.level || "–"}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
 
-                <div className="pagination">
-                    {Array.from({ length: totalPages }, (_, i) => (
-                        <button
-                            key={i + 1}
-                            className={currentPage === i + 1 ? "active" : ""}
-                            onClick={() => setCurrentPage(i + 1)}
-                        >
-                            {i + 1}
-                        </button>
-                    ))}
+                    <div className="pagination">
+                        {Array.from({ length: totalPages }, (_, i) => (
+                            <button
+                                key={i + 1}
+                                className={currentPage === i + 1 ? "active" : ""}
+                                onClick={() => setCurrentPage(i + 1)}
+                            >
+                                {i + 1}
+                            </button>
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };
