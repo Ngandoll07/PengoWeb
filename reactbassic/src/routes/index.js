@@ -16,10 +16,12 @@ import PracticeLessonPage from "../pages/PracticeLessonPage/PracticeLessonPage";
 import PracticeReadingPage from "../pages/PracticeLessonPage/PracticeReadingPage.jsx";
 import MyCourses from "../pages/MyCourses/MyCourses";
 import LoadingResultPage from "../pages/LoadingResultPage/LoadingResultPage";
+import PracticeWriting from "../pages/PracticeWriting/PracticeWriting";
 
 import Dashboard from "../pages/Admin/AdminDashboard/Dashboard.jsx";
 import AdminUser from "../pages/Admin/AdminUser/User";
 import ReadingTopic from "../pages/Admin/ReadingTopic/ReadingTopic";
+import WritingTopic from "../pages/Admin/WritingTopic/WritingTopic"
 
 import UploadLessonPage from "../pages/Admin/UploadLessonPage/UploadLessonPage.jsx"
 import ListeningTopic from "../pages/Admin/ListeningTopic/ListeningTopic";
@@ -115,6 +117,11 @@ export const routes = [
         page: PracticeReadingPage,
         isShowHeader: true
     },
+       {
+        path: '/practicewrite',
+        page: PracticeWriting,
+        isShowHeader: true
+    },
     //  admin
     {
         path: '/admin',
@@ -127,6 +134,10 @@ export const routes = [
     {
         path: '/admin/readtopic',
         page: ReadingTopic,
+    },  
+    {
+        path:'/admin/writingtopic',
+        page: WritingTopic,
     },
     {
         path: '/admin/lesson',

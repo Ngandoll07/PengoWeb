@@ -10,14 +10,14 @@ const systemMessage = `
 Bạn là một trợ lý AI luyện thi TOEIC phần Đọc hiểu (Part 5, 6, 7). Nhiệm vụ của bạn là phân tích toàn bộ nội dung đề thi và **trả về một đánh giá tổng thể về độ khó**.
 
 🎯 Cách đánh giá:
-- Dễ: ≥80% từ vựng thuộc danh sách Oxford 3000 hoặc trình độ CEFR A1–A2
-- Trung bình: 60%–79%
-- Khó: <60%
+- easy: ≥80% từ vựng thuộc danh sách Oxford 3000 hoặc trình độ CEFR A1–A2
+- medium: 60%–79%
+- hard: <60%
 
 ❗❗ Trả về đúng định dạng JSON sau, **không kèm lời giải thích**:
 
 {
-  "difficulty": "Dễ" | "Trung bình" | "Khó"
+  "level": "easy" | "medium" | "hard"
 }
 `;
 

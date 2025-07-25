@@ -5,7 +5,7 @@ import "./PracticeLessonPage.css";
 
 const PracticeLessonPage = () => {
   const { state } = useLocation();
-  const { lesson, day, roadmapItemId } = state || {};
+  const { lesson, day, roadmapItemId,status  } = state || {};
   const navigate = useNavigate(); // ✅ Hook điều hướng
 
   const [answers, setAnswers] = useState({});
@@ -32,10 +32,11 @@ const PracticeLessonPage = () => {
     const userId = localStorage.getItem("userId");
 
     try {
+      // ✅ Lưu kết quả
       await axios.post("http://localhost:5000/api/lesson-result", {
         userId,
         roadmapItemId,
-          day: Number(day), // 🛠 Sửa ở đây
+        day: Number(day),
         skill: lesson.skill,
         part: lesson.part,
         score: percent,
@@ -47,13 +48,14 @@ const PracticeLessonPage = () => {
         })),
       });
 
-      const status = percent >= 50 ? "done" : "learning";
+      const statusAfterSubmit = percent >= 50 ? "done" : "learning";
 
+      // ✅ Cập nhật tiến độ
       await axios.put(
         `http://localhost:5000/api/roadmap/${roadmapItemId}/progress`,
         {
           progress: percent,
-          status: status,
+          status: statusAfterSubmit,
         },
         {
           headers: {
@@ -62,21 +64,25 @@ const PracticeLessonPage = () => {
         }
       );
 
-      await axios.post(
-        "http://localhost:5000/api/roadmap/next-day",
-         { currentDay: Number(day) },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      // ✅ Chỉ tạo bài tiếp theo nếu trước đó chưa done và giờ đạt điểm đủ
+      if (status !== "done" && percent >= 50) {
+        await axios.post(
+          "http://localhost:5000/api/roadmap/next-day",
+          { currentDay: Number(day) },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+      }
 
       alert("✅ Nộp bài thành công!");
     } catch (err) {
       console.error("❌ Không thể lưu kết quả hoặc cập nhật tiến trình:", err);
     }
   };
+
 
   return (
     <div className="practice-lesson">

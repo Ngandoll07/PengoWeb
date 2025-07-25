@@ -68,10 +68,10 @@ router.post("/upload-reading", upload.single("file"), async (req, res) => {
     questions: payload.questions || [],
     blocks: payload.blocks || [],
   });
-  payload.difficulty = aiRes.data.difficulty || "Trung bình"; // fallback
+  payload.level = aiRes.data.level || "medium"; // fallback
 } catch (err) {
   console.warn("⚠️ Không thể phân tích độ khó bằng AI:", err.message);
-  payload.difficulty = "Trung bình"; // fallback nếu AI lỗi
+  payload.level = "medium"; // fallback nếu AI lỗi
 }
         } else {
   const questions = rows.map(row => ({
@@ -94,10 +94,10 @@ router.post("/upload-reading", upload.single("file"), async (req, res) => {
       questions: questions,
       blocks: [],
     });
-    payload.difficulty = aiRes.data.difficulty || "Trung bình";
+    payload.level = aiRes.data.level || "medium";
   } catch (err) {
     console.warn("⚠️ AI lỗi khi phân tích độ khó Part 5:", err.message);
-    payload.difficulty = "Trung bình"; // fallback
+    payload.level = "medium"; // fallback
   }
 }
 

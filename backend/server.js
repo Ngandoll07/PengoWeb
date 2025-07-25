@@ -41,6 +41,9 @@ import grammarCheckRoute from './routes/grammarCheck.js';
 import readingCheckRouter from './routes/readingCheck.js';
 import readingCheckRoute from './routes/readingCheck.js';
 
+import uploadWritingRouter from "./routes/uploadWriting.js";
+import writingRoutes from "./routes/writing.js";
+import groqWritingRoute from './routes/writingscore23.js';
 
 import readingTestsRoutes from "./routes/readingTest.js";
 
@@ -64,6 +67,11 @@ app.use("/api", evaluateRoutes);
 
 app.use("/api", uploadListeningRoutes); // ✅ Quan trọng!
 app.use("/api", listeningRoutes);
+
+app.use("/api", uploadWritingRouter);
+app.use("/api", writingRoutes);
+app.use('/api/writing', groqWritingRoute);
+
 
 app.use('/api/grammar-check', grammarCheckRoute);
 app.use('/api/reading', readingCheckRouter); // ✅ Cho đúng với FE

@@ -76,7 +76,7 @@ const handleDayClick = async (item) => {
 
     } else if (item.skill === "reading") {
       // Gọi API Reading
-      const res = await axios.get(`http://localhost:5000/api/reading-tests/part/${item.part}`, {
+      const res = await axios.get(  `http://localhost:5000/api/reading-tests/part/${item.part}?level=${item.level}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -113,6 +113,7 @@ const handleDayClick = async (item) => {
         lesson,
         day: item.day,
         roadmapItemId: item._id || null,
+            status: item.status, // ✅ thêm dòng này
       },
     });
   } catch (err) {
