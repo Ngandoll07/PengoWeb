@@ -1,0 +1,48 @@
+.choose-part-container {
+    max-width: 600px;
+    margin: 60px auto;
+    padding: 30px;
+    text-align: center;
+    background: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+}
+
+.choose-part-container h2 {
+    margin-bottom: 30px;
+    font-size: 26px;
+    color: #333;
+}
+
+.part-button-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.part-button-group button {
+    background-color: #4caf50;
+    color: white;
+    font-size: 18px;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    min-width: 100px;
+}
+
+.part-button-group button:hover {
+    background-color: #388e3c;
+}
+
+@media (max-width: 500px) {
+    .part-button-group {
+        flex-direction: column;
+    }
+
+    .part-button-group button {
+        width: 100%;
+    }
+}

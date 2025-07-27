@@ -15,6 +15,7 @@ import DoTestPage from "../pages/DoTestPage/DoTestPage";
 import PracticeLessonPage from "../pages/PracticeLessonPage/PracticeLessonPage";
 import MyCourses from "../pages/MyCourses/MyCourses";
 import LoadingResultPage from "../pages/LoadingResultPage/LoadingResultPage";
+import SpeakingPractice from "../pages/SpeakingPractice/SpeakingPractice"
 
 import Dashboard from "../pages/Admin/AdminDashboard/Dashboard.jsx";
 import AdminUser from "../pages/Admin/AdminUser/User";
@@ -24,6 +25,7 @@ import UploadLessonPage from "../pages/Admin/UploadLessonPage/UploadLessonPage.j
 import ListeningTopic from "../pages/Admin/ListeningTopic/ListeningTopic";
 import CourseAdmin from "../pages/Admin/CourseAdmin/CourseAdmin";
 import AdminOrders from "../pages/Admin/AdminOrders/AdminOrders";
+import SpeakingTopic from "../pages/Admin/SpeakingTopic/SpeakingTopic";
 
 
 
@@ -104,7 +106,12 @@ export const routes = [
         page: MyCourses,
         isShowHeader: true
     },
-     {
+    {
+        path: '/speakingpractice',
+        page: SpeakingPractice,
+        isShowHeader: true
+    },
+    {
         path: '/loading',
         page: LoadingResultPage,
         isShowHeader: true
@@ -142,5 +149,9 @@ export const routes = [
     {
         path: "/admin/orders",
         page: AdminOrders,
+    },
+    {
+        path: "/admin/speakingtopic",
+        page: SpeakingTopic,
     }
 ]

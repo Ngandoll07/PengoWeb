@@ -36,7 +36,7 @@ const HeaderComponent = () => {
           <div className="dropdown-content">
             <a href="/practicelistening">Luyện nghe</a>
             <a href="/practiceread">Luyện đọc</a>
-            <a href="/practicespeak">Luyện nói</a>
+            <a href="/speakingpractice">Luyện nói</a>
             <a href="/practicewrite">Luyện viết</a>
           </div>
         </div>
