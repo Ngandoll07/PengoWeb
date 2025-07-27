@@ -32,11 +32,11 @@ const Header = () => {
                         <IoPerson />
                         <span className="sidebar-text">Users</span>
                     </li>
-                    <li className={location.pathname === "/products" ? "active" : ""} onClick={() => navigate("/admin/manage_product")}>
+                    <li className={location.pathname === "/examresult" ? "active" : ""} onClick={() => navigate("/admin/examresult")}>
                         <BiCategoryAlt />
-                        <span className="sidebar-text">Kết quả thi</span>
+                        <span className="sidebar-text">Kết quả thi LR</span>
                     </li>
-                    <li className={location.pathname === "/orders" ? "active" : ""} onClick={() => navigate("/admin/manage_order")}>
+                    <li className={location.pathname === "/roadmap" ? "active" : ""} onClick={() => navigate("/admin/roadmap")}>
                         <FaShoppingBasket />
                         <span className="sidebar-text">Lộ trình học cá nhân</span>
                     </li>
@@ -75,23 +75,6 @@ const Header = () => {
                     <li className={location.pathname === "/reviews" ? "active" : ""} onClick={() => navigate("/admin/manage_review")}>
                         <FaRocketchat />
                         <span className="sidebar-text">Đề thi TOEIC 4 kỹ năng</span>
-                    </li>
-                    <li className={location.pathname === "/settings" ? "active" : ""} onClick={() => navigate("/settings")}>
-                        <FaCog />
-                        <span className="sidebar-text">Bài giảng</span>
-                    </li>
-                    <li className={location.pathname === "/lesson" ? "active" : ""} onClick={() => navigate("/admin/lesson")}>
-                        <FaCog />
-                        <span className="sidebar-text">Lộ trình học</span>
-                    </li>
-
-                    <li className={location.pathname === "/settings" ? "active" : ""} onClick={() => navigate("/settings")}>
-
-                        <FaCog />
-                        <span className="sidebar-text">Điểm trung bình</span>
-                    </li> <li className={location.pathname === "/settings" ? "active" : ""} onClick={() => navigate("/settings")}>
-                        <FaCog />
-                        <span className="sidebar-text">Tài khoản Admin</span>
                     </li>
                     <li onClick={() => console.log("Logging out...")}>
                         <FaSignOutAlt />

@@ -1,19 +1,17 @@
-const express = require("express");
-const jwt = require("jsonwebtoken");
-const TestResult = require("../models/TestResult");
+// routes/testResult.js
+import express from "express";
+import TestResult from "../models/TestResult.js"; // Đảm bảo đường dẫn chính xác
+
 const router = express.Router();
 
-const JWT_SECRET = "123"; // Nếu bạn muốn dùng chung, nên import từ file config
+// Nên import từ file config nếu dùng chung
+const JWT_SECRET = "123";
 
-// Lưu kết quả làm bài
-router.post("/save-result", async (req, res) => {
-  const token = req.headers.authorization?.split(" ")[1];
-
-  if (!token) return res.status(401).json({ message: "Không có token!" });
-
+// POST /api/test-results
+router.post("/", async (req, res) => {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
     const {
+      userId,
       correct,
       incorrect,
       skipped,
@@ -26,8 +24,8 @@ router.post("/save-result", async (req, res) => {
       time
     } = req.body;
 
-    const result = new TestResult({
-      userId: decoded.userId,
+    const newResult = new TestResult({
+      userId,
       correct,
       incorrect,
       skipped,
@@ -40,12 +38,33 @@ router.post("/save-result", async (req, res) => {
       time
     });
 
-    await result.save();
-    res.json({ message: "Lưu kết quả thành công!" });
-  } catch (err) {
-    console.error("❌ Lỗi khi lưu kết quả:", err);
-    res.status(500).json({ message: "Lỗi khi lưu kết quả!" });
+    await newResult.save();
+    res.status(201).json({ message: "Kết quả thi đã được lưu", result: newResult });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi khi lưu kết quả thi", error: error.message });
   }
 });
 
-module.exports = router;
+router.get("/", async (req, res) => {
+  try {
+    const results = await TestResult.find()
+      .populate("userId", "email") // chỉ lấy name và email nếu cần
+      .sort({ createdAt: -1 });
+
+    res.json(results);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi khi lấy kết quả", error });
+  }
+});
+// DELETE /api/test-results/:id
+router.delete('/:id', async (req, res) => {
+  try {
+    const deleted = await TestResult.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: 'Không tìm thấy kết quả' });
+    res.json({ message: 'Đã xoá thành công' });
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi server' });
+  }
+});
+
+export default router;

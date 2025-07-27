@@ -186,6 +186,27 @@ try {
     res.status(500).json({ error: "Không thể tạo lộ trình mới." });
   }
 });
+// ✅ GET: Lấy lộ trình
+router.get("/", async (req, res) => {
+  const { userId } = req.query;
+
+  try {
+    let items;
+
+    if (userId) {
+      // 👤 Người học chỉ lấy roadmap của họ
+      items = await RoadmapItem.find({ userId }).sort({ day: 1 });
+    } else {
+      // 👨‍💼 Admin lấy toàn bộ roadmap
+      items = await RoadmapItem.find().sort({ day: 1 }).populate("userId", "name email");
+    }
+
+    res.json(items);
+  } catch (err) {
+    console.error("❌ Lỗi khi lấy roadmap:", err);
+    res.status(500).json({ error: "Không thể lấy dữ liệu lộ trình." });
+  }
+});
 
 
 export default router;

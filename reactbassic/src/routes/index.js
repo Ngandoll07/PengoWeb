@@ -17,11 +17,14 @@ import PracticeReadingPage from "../pages/PracticeLessonPage/PracticeReadingPage
 import MyCourses from "../pages/MyCourses/MyCourses";
 import LoadingResultPage from "../pages/LoadingResultPage/LoadingResultPage";
 import PracticeWriting from "../pages/PracticeWriting/PracticeWriting";
-
+ 
 import Dashboard from "../pages/Admin/AdminDashboard/Dashboard.jsx";
 import AdminUser from "../pages/Admin/AdminUser/User";
 import ReadingTopic from "../pages/Admin/ReadingTopic/ReadingTopic";
 import WritingTopic from "../pages/Admin/WritingTopic/WritingTopic"
+import RoadmapAdminPage from "../pages/Admin/RoadmapAdminPage/RoadmapAdminPage";
+import AdminUserRoadmap from "../pages/Admin/RoadmapAdminPage/AdminUserRoadmap.jsx";
+import ExamResultPage from "../pages/Admin/ExamResultPage/ExamResultPage";
 
 import UploadLessonPage from "../pages/Admin/UploadLessonPage/UploadLessonPage.jsx"
 import ListeningTopic from "../pages/Admin/ListeningTopic/ListeningTopic";
@@ -158,5 +161,18 @@ export const routes = [
     {
         path: "/admin/orders",
         page: AdminOrders,
+    },
+    {
+        path: "/admin/roadmap",
+        page: RoadmapAdminPage,
+    },
+     {
+        path: "/admin/examresult",
+        page: ExamResultPage,
+    },
+    {
+        path: "/admin/roadmaps/:userId",
+        page: AdminUserRoadmap,
     }
+
 ]

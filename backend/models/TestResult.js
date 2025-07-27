@@ -1,4 +1,6 @@
-const mongoose = require("mongoose");
+// models/TestResult.js (ES module chuẩn)
+
+import mongoose from "mongoose";
 
 const TestResultSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -15,4 +17,6 @@ const TestResultSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model("TestResult", TestResultSchema);
+const TestResult = mongoose.model("TestResult", TestResultSchema);
+
+export default TestResult;

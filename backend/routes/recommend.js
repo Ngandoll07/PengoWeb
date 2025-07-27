@@ -25,14 +25,14 @@ Tôi là một học viên đang luyện thi TOEIC.
 ⏰ Tôi có khoảng ${studyDuration} để luyện thi.
 
 🎓 Hãy giúp tôi:
-1. Phân tích điểm mạnh, điểm yếu của tôi
+1.  Phân tích điểm mạnh, điểm yếu của tôi
 2. **Đề xuất kế hoạch ôn luyện cho ngày 1** với 1 kỹ năng duy nhất (listening hoặc reading), tập trung vào phần (Part) phù hợp nhất với năng lực hiện tại.
 3. Gợi ý **mức độ phù hợp** (level: easy / medium / hard) để bắt đầu ôn luyện ngày đầu sao cho hiệu quả nhất.
 
 📋 Trả về JSON đúng định dạng sau:
 
 {
-  "analysis": "Phân tích điểm mạnh và điểm yếu**",
+  "analysis": "**Phân tích điểm mạnh, điểm yếu của bạn:**",
   "plan": [
     {
       "day": 1,

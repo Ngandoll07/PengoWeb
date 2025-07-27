@@ -15,6 +15,14 @@ router.get("/writing-topics", async (req, res) => {
   }
 });
 
+router.delete('/writing-topics/:id', async (req, res) => {
+  try {
+    await WritingTopic.findByIdAndDelete(req.params.id);
+    res.status(200).json({ message: 'Deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Error deleting topic' });
+  }
+});
 
 
 export default router;

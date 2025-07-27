@@ -156,3 +156,20 @@
 
     }
 }
+.lock-btn {
+  margin-left: 8px;
+  padding: 4px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.lock-btn.lock {
+  background-color: #ff4d4f;
+  color: white;
+}
+
+.lock-btn.unlock {
+  background-color: #4caf50;
+  color: white;
+}
