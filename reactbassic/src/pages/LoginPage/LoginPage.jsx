@@ -15,26 +15,36 @@ export default function LoginPage() {
     setShowPassword(!showPassword);
   };
 
-  const handleLogin = async () => {
-    try {
-      const response = await axios.post("http://localhost:5000/api/login", {
-        email,
-        password,
-      });
-       // 👉 Lưu token và thông tin user vào localStorage
-    localStorage.setItem("token", response.data.token);
-    localStorage.setItem("user", JSON.stringify(response.data.user));
-      alert("Đăng nhập thành công!");
+const handleLogin = async () => {
+  try {
+    const response = await axios.post("http://localhost:5000/api/login", {
+      email,
+      password,
+    });
 
-     if (response.data.user.role === "admin") {
-  navigate("/admin"); // 👉 Trang quản trị
-} else {
-  navigate("/"); // 👉 Trang người dùng thường (Home)
-}
-    } catch (err) {
-      alert("Sai email hoặc mật khẩu!");
+    const user = response.data.user;
+
+    localStorage.setItem("token", response.data.token);
+    localStorage.setItem("userId", user._id);
+    localStorage.setItem("user", JSON.stringify(user));
+    alert("Đăng nhập thành công!");
+
+    if (user.role === "admin") {
+      navigate("/admin");
+    } else {
+      navigate("/");
     }
-  };
+  } catch (err) {
+    if (err.response && err.response.status === 403) {
+      alert(err.response.data.message); // Tài khoản bị khóa
+    } else if (err.response && err.response.data.message) {
+      alert(err.response.data.message); // Các lỗi khác như sai mật khẩu
+    } else {
+      alert("Đăng nhập thất bại. Vui lòng thử lại.");
+    }
+  }
+};
+
 
   return (
     <div className="login-page">

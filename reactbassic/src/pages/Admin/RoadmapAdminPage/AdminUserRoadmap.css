@@ -1,0 +1,113 @@
+.roadmap-admin-container {
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.roadmap-container{
+    margin-left: 300px;
+      padding: 20px;
+}
+
+.breadcrumb {
+  font-size: 14px;
+  color: #6c757d;
+  margin-bottom: 10px;
+}
+
+.current-page {
+  font-weight: bold;
+  color: #007bff;
+}
+.progress{
+     font-weight: bold;
+  color: #E21033;
+}
+
+.back-button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.back-button:hover {
+  background-color: #0056b3;
+}
+
+.breadcrumb-text {
+  font-size: 14px;
+  color: #666;
+}
+
+.roadmap-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.roadmap-list {
+  list-style: none;
+  padding: 0;
+}
+
+.roadmap-item {
+  background: #f9f9f9;
+  margin-bottom: 12px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 16px;
+}
+
+.skill {
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 5px;
+}
+
+.skill-reading {
+  background-color: #e6f4ff;
+  color: #007acc;
+}
+
+.skill-listening {
+  background-color: #e0ffe6;
+  color: #00a35c;
+}
+
+.skill-writing {
+  background-color: #fff4e6;
+  color: #ff6600;
+}
+
+.status {
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 5px;
+  text-transform: capitalize;
+}
+
+.status-completed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-inprogress {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-notstarted {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.progress {
+  font-style: italic;
+  margin-left: auto;
+}

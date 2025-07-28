@@ -43,14 +43,19 @@ import grammarCheckRoute from './routes/grammarCheck.js';
 import readingCheckRouter from './routes/readingCheck.js';
 import readingCheckRoute from './routes/readingCheck.js';
 
+import uploadWritingRouter from "./routes/uploadWriting.js";
+import writingRoutes from "./routes/writing.js";
+import groqWritingRoute from './routes/writingscore23.js';
 
 import readingTestsRoutes from "./routes/readingTest.js";
+import testResultRoutes from "./routes/testResult.js";
 
 import generateLessonRoutes from "./routes/generateLesson.js";
 import lessonResultRouter from "./routes/lessonResult.js";
 import gradeLessonRoute from "./routes/gradeLesson.js";
 import roadmapRoutes from "./routes/roadmap.js";
 import speakingEvaluateRoutes from "./routes/speaking.js";
+
 
 const app = express();
 app.use(cors());
@@ -68,15 +73,22 @@ app.use("/api", evaluateRoutes);
 app.use("/api", uploadListeningRoutes); // ✅ Quan trọng!
 app.use("/api", listeningRoutes);
 
+app.use("/api", uploadWritingRouter);
+app.use("/api", writingRoutes);
+app.use('/api/writing', groqWritingRoute);
+
+app.use("/api/test-results", testResultRoutes);
+
 app.use('/api/grammar-check', grammarCheckRoute);
 app.use('/api/reading', readingCheckRouter); // ✅ Cho đúng với FE
 app.use('/api', readingCheckRoute); // đúng
 
 app.use('/api', analyzeAI); // thêm dòng này
 app.use("/api", uploadReadingRoutes); // 👈 đảm bảo dòng này có
+app.use('/api', readingRoutes);
 
 app.use('/api/practice-history', practiceHistoryRoutes);
-app.use("/api/reading-tests", readingTestsRoutes);
+app.use("/api", readingTestsRoutes);
 
 app.use("/api", generateLessonRoutes);
 app.use("/api", lessonResultRouter); // ✅ Đường dẫn gốc là /api
@@ -112,10 +124,11 @@ const JWT_SECRET = "123";
 
 // User model
 const userSchema = new mongoose.Schema({
-    email: { type: String, required: true, unique: true },
-    password: String,
-    role: { type: String, default: "user" },
-    createdAt: { type: Date, default: Date.now }
+  email: { type: String, required: true, unique: true },
+  password: String,
+  role: { type: String, default: "user" },
+  createdAt: { type: Date, default: Date.now },
+  isLocked: { type: Boolean, default: false }, // thêm dòng này
 });
 const User = mongoose.model("User", userSchema);
 
@@ -141,10 +154,19 @@ app.post("/api/login", async (req, res) => {
     const { email, password } = req.body;
     try {
         const user = await User.findOne({ email });
-        if (!user) return res.status(400).json({ message: "Tài khoản không tồn tại!" });
+        if (!user) {
+            return res.status(400).json({ message: "Tài khoản không tồn tại!" });
+        }
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ message: "Mật khẩu không đúng!" });
+        if (!isMatch) {
+            return res.status(400).json({ message: "Mật khẩu không đúng!" });
+        }
+
+        // ✅ Chặn nếu tài khoản bị khóa
+        if (user.isLocked === true) {
+            return res.status(403).json({ message: "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên." });
+        }
 
         const token = jwt.sign(
             { userId: user._id, email: user.email, role: user.role },
@@ -154,9 +176,11 @@ app.post("/api/login", async (req, res) => {
 
         res.json({ message: "Đăng nhập thành công!", token, user });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ message: "Đăng nhập thất bại!" });
     }
 });
+
 
 // Lấy danh sách user
 app.get("/api/users", async (req, res) => {
@@ -166,6 +190,21 @@ app.get("/api/users", async (req, res) => {
     } catch (err) {
         res.status(500).json({ message: "Lỗi server khi lấy danh sách user!" });
     }
+});
+app.put("/api/users/:id/lock", async (req, res) => {
+  try {
+    const { isLocked } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { isLocked },
+      { new: true }
+    );
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json(user);
+  } catch (err) {
+    console.error("Error locking user:", err);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 // Lấy đề đọc

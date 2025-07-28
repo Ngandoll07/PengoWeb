@@ -13,13 +13,20 @@ import CoursesPage from "../pages/CoursesPage/CoursesPage.jsx";
 import CartPage from "../pages/CartPage/CartPage.jsx";
 import DoTestPage from "../pages/DoTestPage/DoTestPage";
 import PracticeLessonPage from "../pages/PracticeLessonPage/PracticeLessonPage";
+import PracticeReadingPage from "../pages/PracticeLessonPage/PracticeReadingPage.jsx";
 import MyCourses from "../pages/MyCourses/MyCourses";
 import LoadingResultPage from "../pages/LoadingResultPage/LoadingResultPage";
 import SpeakingPractice from "../pages/SpeakingPractice/SpeakingPractice"
 
+import PracticeWriting from "../pages/PracticeWriting/PracticeWriting";
+ 
 import Dashboard from "../pages/Admin/AdminDashboard/Dashboard.jsx";
 import AdminUser from "../pages/Admin/AdminUser/User";
 import ReadingTopic from "../pages/Admin/ReadingTopic/ReadingTopic";
+import WritingTopic from "../pages/Admin/WritingTopic/WritingTopic"
+import RoadmapAdminPage from "../pages/Admin/RoadmapAdminPage/RoadmapAdminPage";
+import AdminUserRoadmap from "../pages/Admin/RoadmapAdminPage/AdminUserRoadmap.jsx";
+import ExamResultPage from "../pages/Admin/ExamResultPage/ExamResultPage";
 
 import UploadLessonPage from "../pages/Admin/UploadLessonPage/UploadLessonPage.jsx"
 import ListeningTopic from "../pages/Admin/ListeningTopic/ListeningTopic";
@@ -116,7 +123,16 @@ export const routes = [
         page: LoadingResultPage,
         isShowHeader: true
     },
-
+   {
+        path: '/practice-reading',
+        page: PracticeReadingPage,
+        isShowHeader: true
+    },
+       {
+        path: '/practicewrite',
+        page: PracticeWriting,
+        isShowHeader: true
+    },
     //  admin
     {
         path: '/admin',
@@ -129,6 +145,10 @@ export const routes = [
     {
         path: '/admin/readtopic',
         page: ReadingTopic,
+    },  
+    {
+        path:'/admin/writingtopic',
+        page: WritingTopic,
     },
     {
         path: '/admin/lesson',
@@ -153,5 +173,18 @@ export const routes = [
     {
         path: "/admin/speakingtopic",
         page: SpeakingTopic,
+    },
+    {
+        path: "/admin/roadmap",
+        page: RoadmapAdminPage,
+    },
+     {
+        path: "/admin/examresult",
+        page: ExamResultPage,
+    },
+    {
+        path: "/admin/roadmaps/:userId",
+        page: AdminUserRoadmap,
     }
+
 ]

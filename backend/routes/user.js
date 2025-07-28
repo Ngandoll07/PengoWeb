@@ -36,5 +36,8 @@ router.put("/change-password", auth, async (req, res) => {
 
   res.json({ msg: "Đổi mật khẩu thành công" });
 });
+// PUT /api/users/:id/lock
+
+
 
 module.exports = router;

@@ -16,8 +16,14 @@ const router = express.Router();
 const upload = multer({ dest: "uploads/" });
 
 // ===== Cấu hình đường dẫn Whisper =====
-const PYTHON_PATH = "D:/KLTN/PengoWeb/backend/ai/venv/Scripts/python.exe";
-const SCRIPT_PATH = path.join(__dirname, "../ai/analyze_audio.py");
+
+//const PYTHON_PATH = "D:/KLTN/PengoWeb/backend/ai/venv/Scripts/python.exe";
+//const SCRIPT_PATH = path.join(__dirname, "../ai/analyze_audio.py");
+
+// ✅ Đúng theo máy của bạn:
+const PYTHON_PATH = "C:/Users/LENOVO/Documents/KLTN/PengoWeb/ai/venv/Scripts/python.exe";
+const SCRIPT_PATH = path.join(__dirname, "../../ai/analyze_audio.py");
+
 
 // ===== Tạo file tạm cho Whisper =====
 function createTempQuestionFile(questions) {

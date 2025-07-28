@@ -82,7 +82,7 @@ const ReadingTopic = () => {
         <h4>{test.title}</h4>
         <p>{totalQuestions} câu hỏi</p>
         <p className="difficulty-tag">
-          📊 Mức độ: <b>{test.difficulty || "Đang phân tích..."}</b>
+          📊 Mức độ: <b>{test.level || "Đang phân tích..."}</b>
         </p>
       </div>
     );

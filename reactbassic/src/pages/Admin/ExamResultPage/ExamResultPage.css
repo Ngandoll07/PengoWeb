@@ -1,0 +1,52 @@
+.result-admin-wrapper {
+  padding: 20px;
+  margin-left: 300px;
+}
+
+.manage-result-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.result-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  overflow-x: auto;
+}
+
+.result-table {
+  width: 100%;
+  border-collapse: collapse;
+  
+}
+
+.result-table th,
+.result-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.result-table th {
+  background: #E21033;
+    color: #FFD6E4;
+  font-weight: bold;
+}
+.delete-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #e74c3c;
+  font-size: 18px;
+  transition: transform 0.2s ease;
+}
+
+.delete-icon-btn:hover {
+  transform: scale(1.2);
+  color: #c0392b;
+}
+
+

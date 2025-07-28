@@ -146,6 +146,43 @@ export default function PracticeLisnRead() {
           studyDuration
         })
       });
+          // Gửi kết quả lên test-results nếu đã đăng nhập
+    const userId = localStorage.getItem("userId"); // hoặc decode từ token nếu bạn dùng JWT
+
+    const testResult = {
+      userId,
+      correct,
+      incorrect: total - correct,
+      skipped: total - Object.keys(selectedAnswers).length,
+      score: listeningCorrect + readingCorrect, // hoặc theo thang điểm TOEIC nếu có
+      listeningCorrect,
+      readingCorrect,
+      listeningScore: listeningCorrect,
+      readingScore: readingCorrect,
+      partsSubmitted: [...new Set(allQuestions.map((q) => parseInt(q.part)))],
+      time: new Date((60 * 60 - timeLeft) * 1000).toISOString().substr(11, 8),
+    };
+
+    try {
+      const saveRes = await fetch("http://localhost:5000/api/test-results", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: JSON.stringify(testResult),
+      });
+
+      const saveData = await saveRes.json();
+      if (!saveRes.ok) {
+        console.error("❌ Lỗi lưu kết quả:", saveData.message);
+      } else {
+        console.log("✅ Kết quả đã được lưu:", saveData.result);
+      }
+    } catch (err) {
+      console.error("❌ Lỗi kết nối khi lưu kết quả:", err);
+    }
+
 
       const data = await res.json();
       if (res.status === 401) {

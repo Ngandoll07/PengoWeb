@@ -1,11 +1,22 @@
+// ✅ File: models/StudyPlan.js
 import mongoose from "mongoose";
 
 const StudyPlanSchema = new mongoose.Schema({
-  userId: String,
+  userId: { type: String, required: true },
   listeningScore: Number,
   readingScore: Number,
-  suggestion: String, // JSON.stringify([...])
-  analysis: String, // 🆕 phần phân tích
+  suggestion: [
+    {
+      day: Number,
+      title: String,
+      skill: String,
+      part: Number,
+      level: String,
+      status: String,
+      progress: Number
+    }
+  ], // Giờ là mảng object thay vì chuỗi JSON
+  analysis: String,
   createdAt: { type: Date, default: Date.now }
 });
 

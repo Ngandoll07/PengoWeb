@@ -100,7 +100,7 @@ const ListeningTopic = () => {
                 🗑 Xoá toàn bộ
             </button>
 
-            <div className="listening-part-select">
+            <div className="listening-part-select1">
                 {[1, 2, 3, 4].map((p) => (
                     <button
                         key={p}
@@ -112,7 +112,7 @@ const ListeningTopic = () => {
                 ))}
             </div>
 
-            <div className="level-filter">
+            <div className="level-filter1">
                 <label>Độ khó:</label>
                 <select value={selectedLevel} onChange={(e) => setSelectedLevel(e.target.value)}>
                     <option value="">Tất cả</option>
@@ -125,7 +125,7 @@ const ListeningTopic = () => {
             {loading ? (
                 <p>⏳ Đang tải dữ liệu...</p>
             ) : (
-                <div className="table-scroll-wrapper">
+                <div className="table-scroll-wrapper1">
                     <table className="listening-table">
                         <thead>
                             <tr>

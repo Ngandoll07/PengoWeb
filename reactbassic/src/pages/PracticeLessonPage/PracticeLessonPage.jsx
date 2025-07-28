@@ -1,137 +1,143 @@
 import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom"; // ✅ Thêm useNavigate
 import axios from "axios";
 import "./PracticeLessonPage.css";
 
-// ... (giữ nguyên import)
-
 const PracticeLessonPage = () => {
   const { state } = useLocation();
-  const { lesson, day, roadmapItemId } = state || {};
-  const navigate = useNavigate();
+  const { lesson, day, roadmapItemId,status  } = state || {};
+  const navigate = useNavigate(); // ✅ Hook điều hướng
 
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
-  const [result, setResult] = useState(null);
+  const [score, setScore] = useState(null);
 
-  const handleSelect = (questionIndex, selectedOption) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [questionIndex]: selectedOption,
-    }));
+  if (!lesson) return <p>Không có bài học</p>;
+
+  const handleSelect = (qIndex, choice) => {
+    if (submitted) return;
+    setAnswers({ ...answers, [qIndex]: choice });
   };
 
   const handleSubmit = async () => {
-    const processedQuestions = lesson.questions.map((q, i) => ({
-      questionId: q._id || `q${i + 1}`, // fallback nếu không có id
-      question: q.question,
-      options: q.options,
-      correctAnswer: q.answer,
-      userAnswer: answers[i] || null,
-    }));
+    let correct = 0;
+    lesson.questions.forEach((q, index) => {
+      if (answers[index] === q.answer) correct++;
+    });
 
-    const payload = {
-      day: day || 1,
-      skill: lesson.skill || "listening",
-      part: lesson.part || 1,
-      level: lesson.level || "easy",
-      questions: processedQuestions,
-    };
+    const percent = Math.round((correct / lesson.questions.length) * 100);
+    setScore(percent);
+    setSubmitted(true);
+
+    const userId = localStorage.getItem("userId");
 
     try {
-      const res = await axios.post("http://localhost:5000/api/grade-lesson", payload, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      const { correct, total, feedback } = res.data;
-      const progress = Math.round((correct / total) * 100);
-
-      await axios.post("http://localhost:5000/api/submit-day-result", {
-        day: day || 1,
+      // ✅ Lưu kết quả
+      await axios.post("http://localhost:5000/api/lesson-result", {
+        userId,
+        roadmapItemId,
+        day: Number(day),
         skill: lesson.skill,
         part: lesson.part,
-        level: lesson.level,
-        totalQuestions: total,
-        correct,
-        averageTime: 1,
-        mistakes: feedback.filter(f => !f.isCorrect).map(f => f.mistakeType || "unknown"),
-        answers: feedback,
-      }, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+        score: percent,
+        answers: lesson.questions.map((q, index) => ({
+          questionId: q.id || null,
+          userAnswer: answers[index],
+          correctAnswer: q.answer,
+          isCorrect: answers[index] === q.answer,
+        })),
       });
 
-      // ✅ Cập nhật roadmapItem nếu có
-      if (roadmapItemId) {
-        console.log("🚀 Cập nhật roadmap item:", roadmapItemId, "Tiến độ:", progress);
-        await axios.put(`http://localhost:5000/api/roadmap/${roadmapItemId}`, {
-          progress,
-          status: "done",
-        }, {
+      const statusAfterSubmit = percent >= 50 ? "done" : "learning";
+
+      // ✅ Cập nhật tiến độ
+      await axios.put(
+        `http://localhost:5000/api/roadmap/${roadmapItemId}/progress`,
+        {
+          progress: percent,
+          status: statusAfterSubmit,
+        },
+        {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-        });
-      } else {
-        console.warn("⚠️ Không có roadmapItemId — không thể cập nhật roadmap");
+        }
+      );
+
+      // ✅ Chỉ tạo bài tiếp theo nếu trước đó chưa done và giờ đạt điểm đủ
+      if (status !== "done" && percent >= 50) {
+        await axios.post(
+          "http://localhost:5000/api/roadmap/next-day",
+          { currentDay: Number(day) },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
       }
 
-      setSubmitted(true);
-      setResult({ correct, total, feedback });
+      alert("✅ Nộp bài thành công!");
     } catch (err) {
-      alert("❌ Lỗi khi nộp bài hoặc lưu kết quả.");
-      console.error(err);
+      console.error("❌ Không thể lưu kết quả hoặc cập nhật tiến trình:", err);
     }
   };
 
+
   return (
-    <div className="lesson-container">
+    <div className="practice-lesson">
       <h2>{lesson.title}</h2>
-      <p>{lesson.description}</p>
+      <p>Kỹ năng: {lesson.skill}</p>
+      <p>
+        Phần: Part {lesson.part} | Độ khó: <b>{lesson.level}</b>
+      </p>
 
       {lesson.questions.map((q, index) => (
-        <div key={index} className="question-block">
-          <p><strong>Câu {index + 1}:</strong> {q.question}</p>
-          {q.options.map((opt, i) => (
-            <label key={i} className="option-label">
-              <input
-                type="radio"
-                name={`question-${index}`}
-                value={opt}
-                checked={answers[index] === opt}
-                onChange={() => handleSelect(index, opt)}
-                disabled={submitted}
-              />
-              {opt}
-            </label>
-          ))}
+        <div key={q.id || index} className="question-card">
+          <p>
+            <strong>Câu {index + 1}:</strong> {q.question}
+          </p>
+          {q.image && <img src={q.image} alt="Visual" />}
+          {q.audio && <audio controls src={q.audio}></audio>}
+
+          <div className="options">
+            {["A", "B", "C", "D"].map((opt) => (
+              <button
+                key={opt}
+                className={`option-btn ${
+                  answers[index] === opt ? "selected" : ""
+                } ${submitted && q.answer === opt ? "correct" : ""} ${
+                  submitted &&
+                  answers[index] === opt &&
+                  answers[index] !== q.answer
+                    ? "wrong"
+                    : ""
+                }`}
+                onClick={() => handleSelect(index, opt)}
+              >
+                {opt}. {q.options?.[opt]}
+              </button>
+            ))}
+          </div>
         </div>
       ))}
 
-      {!submitted && (
-        <button onClick={handleSubmit} className="submit-button">
-          ✅ Nộp bài
+      {!submitted ? (
+        <button className="submit-btn" onClick={handleSubmit}>
+          📤 Nộp bài
         </button>
+      ) : (
+        <p className="score-msg">🎉 Bạn đã làm đúng {score}% câu hỏi!</p>
       )}
 
-      {submitted && result && (
-        <div className="result-summary">
-          <h4>Kết quả: {result.correct}/{result.total} đúng</h4>
-          <ul>
-            {result.feedback?.map((item, i) => (
-              <li key={i}>
-                Câu {item.index}: {item.isCorrect ? "✅ Đúng" : `❌ Sai`} — {item.mistakeType || "unknown"}
-              </li>
-            ))}
-          </ul>
-          <button onClick={() => navigate("/roadmap", { state: { updated: true } })}>
-            ➡️ Quay về lộ trình
-          </button>
-        </div>
-      )}
+      {/* ✅ Nút quay lại lộ trình */}
+      <button
+        className="back-btn"
+        onClick={() => navigate("/roadmap")}
+        style={{ marginTop: "20px" }}
+      >
+        🔙 Quay lại lộ trình
+      </button>
     </div>
   );
 };

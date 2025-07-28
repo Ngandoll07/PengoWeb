@@ -79,7 +79,7 @@
 /*chart*/
 .bar-chart-container {
     width: 50%;
-    max-width: 600px;
+    max-width: 100%;
     min-width: 300px;
     background: #fff;
     padding: 20px;
@@ -164,3 +164,44 @@
     color: #E21033 !important;
 }
 
+.stat-cards {
+  display: flex;
+  gap: 20px;
+  justify-content: space-around;
+  margin-bottom: 40px;
+}
+.stat-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  padding: 20px;
+  text-align: center;
+  flex: 1;
+  transition: transform 0.3s ease;
+}
+.stat-card h4 {
+  font-size: 2rem;
+  margin: 0;
+}
+.stat-card p {
+  margin: 10px 0 5px;
+  font-weight: bold;
+}
+.stat-card strong {
+  font-size: 1.5rem;
+  color: #fd6d6d;
+}
+.chart-wrapper-large {
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  flex: 1;
+  margin-left: 100px;
+}
+.chart-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #333;
+}

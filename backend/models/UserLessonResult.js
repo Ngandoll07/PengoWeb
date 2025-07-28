@@ -1,3 +1,4 @@
+// models/UserLessonResult.js
 import mongoose from "mongoose";
 
 const QuestionResultSchema = new mongoose.Schema({
@@ -5,20 +6,15 @@ const QuestionResultSchema = new mongoose.Schema({
   userAnswer: String,
   correctAnswer: String,
   isCorrect: Boolean,
-  timeTaken: Number,         // ✅ thêm dòng này
-  mistakeType: String        // ✅ thêm dòng này
 });
 
 const UserLessonResultSchema = new mongoose.Schema({
   userId: { type: String, required: true },
-  day: { type: Number, required: true },
+  roadmapItemId: String,
+  day: Number,
   skill: String,
   part: Number,
-  level: String,
-  totalQuestions: Number,
-  correct: Number,
-  averageTime: Number,
-  mistakes: [String], // e.g. ["inference", "grammar"]
+  score: Number,
   answers: [QuestionResultSchema],
   createdAt: { type: Date, default: Date.now },
 });
