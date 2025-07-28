@@ -15,6 +15,8 @@ import fetch from "node-fetch";
 import ReadingTest from "./models/ReadingTest.js";
 import StudyPlan from "./models/StudyPlan.js";
 import RoadmapItem from "./models/RoadmapItem.js";
+import SpeakingQuestion from "./models/SpeakingQuestion.js";
+import { parseSpeakingExcel } from "./utils/excelToQuestions.js";
 
 
 import uploadReadingRoutes from "./routes/uploadReading.js";
@@ -52,6 +54,7 @@ import generateLessonRoutes from "./routes/generateLesson.js";
 import lessonResultRouter from "./routes/lessonResult.js";
 import gradeLessonRoute from "./routes/gradeLesson.js";
 import roadmapRoutes from "./routes/roadmap.js";
+import speakingEvaluateRoutes from "./routes/speaking.js";
 
 
 const app = express();
@@ -91,6 +94,7 @@ app.use("/api", generateLessonRoutes);
 app.use("/api", lessonResultRouter); // ✅ Đường dẫn gốc là /api
 app.use("/api", gradeLessonRoute);
 app.use("/api/roadmap", roadmapRoutes);
+app.use("/api/speaking", speakingEvaluateRoutes);
 // MongoDB
 
 
@@ -274,6 +278,92 @@ Hãy:
         res.status(500).json({ error: "Không thể tạo lộ trình học từ Groq." });
     }
 });
+
+// ✅ Upload đề Speaking từ Excel
+app.post("/api/speaking/upload", multer({ dest: "uploads/" }).single("file"), async (req, res) => {
+    try {
+        const questions = await parseSpeakingExcel(req.file.path);
+        fs.unlinkSync(req.file.path);
+
+        // Lọc ra các câu hỏi chưa tồn tại (ID chưa có)
+        const ids = questions.map(q => q.id);
+        const existing = await SpeakingQuestion.find({ id: { $in: ids } }).select("id");
+        const existingIds = new Set(existing.map(e => e.id));
+
+        const newQuestions = questions.filter(q => !existingIds.has(q.id));
+
+        if (newQuestions.length === 0) {
+            return res.status(200).json({ message: "❗Tất cả ID trong file đã tồn tại.", count: 0 });
+        }
+
+        await SpeakingQuestion.insertMany(newQuestions);
+        res.json({
+            message: `✅ Đã thêm ${newQuestions.length} câu mới. (${questions.length - newQuestions.length} bị bỏ qua do trùng ID)`,
+            count: newQuestions.length,
+        });
+    } catch (err) {
+        console.error("❌ Lỗi upload:", err);
+        res.status(500).json({ message: "Lỗi xử lý file Excel" });
+    }
+});
+
+
+// ✅ Lấy toàn bộ đề Speaking
+app.get("/api/speaking/all", async (req, res) => {
+    try {
+        const questions = await SpeakingQuestion.find().sort({ part: 1 });
+        res.json(questions);
+    } catch (err) {
+        console.error("❌ Lỗi lấy đề Speaking:", err);
+        res.status(500).json({ message: "Không thể lấy danh sách đề Speaking" });
+    }
+});
+// ✅ Xoá toàn bộ câu hỏi Speaking
+app.delete("/api/speaking/clear", async (req, res) => {
+    try {
+        await SpeakingQuestion.deleteMany({});
+        res.json({ message: "🧹 Đã xoá toàn bộ câu hỏi Speaking" });
+    } catch (err) {
+        console.error("❌ Lỗi xoá toàn bộ:", err);
+        res.status(500).json({ message: "Không thể xoá toàn bộ dữ liệu" });
+    }
+});
+
+// ✅ Xoá một câu hỏi Speaking theo _id
+app.delete("/api/speaking/:id", async (req, res) => {
+    try {
+        const result = await SpeakingQuestion.findByIdAndDelete(req.params.id);
+        if (!result) {
+            return res.status(404).json({ message: "❌ Không tìm thấy câu hỏi để xoá" });
+        }
+        res.json({ message: "🗑️ Đã xoá thành công" });
+    } catch (err) {
+        console.error("❌ Lỗi xoá câu hỏi:", err);
+        res.status(500).json({ message: "Lỗi server khi xoá câu hỏi" });
+    }
+});
+
+// ✅ Lấy 1 câu hỏi ngẫu nhiên theo Part (1–5)
+app.get("/api/speaking/random/:part", async (req, res) => {
+    const part = parseInt(req.params.part);
+    if (![1, 2, 3, 4, 5].includes(part)) {
+        return res.status(400).json({ message: "Part không hợp lệ (chỉ 1–5)" });
+    }
+
+    try {
+        const count = await SpeakingQuestion.countDocuments({ part });
+        const randomIndex = Math.floor(Math.random() * count);
+        const randomQuestion = await SpeakingQuestion.findOne({ part }).skip(randomIndex);
+        if (!randomQuestion) {
+            return res.status(404).json({ message: "Không tìm thấy câu hỏi nào" });
+        }
+        res.json(randomQuestion);
+    } catch (err) {
+        console.error("❌ Lỗi lấy câu hỏi ngẫu nhiên:", err);
+        res.status(500).json({ message: "Lỗi server" });
+    }
+});
+
 
 // Trang gốc
 app.get("/", (req, res) => {
