@@ -126,7 +126,8 @@ const handleDayClick = async (item) => {
 
 
   return (
-    <div className="learning-path">
+    <div className="learning-container">
+  <div className="learning-path">
       <h2>Lộ trình học của bạn</h2>
 
       {loading ? (
@@ -158,10 +159,13 @@ const handleDayClick = async (item) => {
               </div>
             ))}
           </div>
-          <Footer />
+       
         </>
       )}
     </div>
+       <Footer />
+    </div>
+  
   );
 };
 

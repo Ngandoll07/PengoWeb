@@ -19,7 +19,7 @@ const ReadingTopic = () => {
           setSelectedTest(res.data[0]);
         }
       })
-      .catch((err) => console.error("Lỗi lấy danh sách đề:", err));
+      .catch((err) => console.error("❌ Lỗi lấy danh sách đề:", err));
   }, []);
 
   const handleFileChange = (e) => {
@@ -28,7 +28,7 @@ const ReadingTopic = () => {
 
   const handleUpload = async () => {
     if (!file || !title || !part) {
-      alert("Vui lòng nhập đầy đủ thông tin!");
+      alert("⚠️ Vui lòng nhập đầy đủ thông tin!");
       return;
     }
 
@@ -39,11 +39,11 @@ const ReadingTopic = () => {
 
     try {
       const res = await axios.post("http://localhost:5000/api/upload-reading", formData);
-      alert("Tải lên thành công!");
-      setTests((prev) => [...prev, res.data]);
+      alert("✅ Tải lên thành công!");
+      setTests((prev) => [...prev, res.data]); // append test mới
     } catch (err) {
-      console.error(err);
-      alert("Upload thất bại!");
+      console.error("❌ Upload thất bại:", err);
+      alert("❌ Upload thất bại!");
     }
   };
 
@@ -52,11 +52,11 @@ const ReadingTopic = () => {
       <AdminHeader />
       <h2 className="manage-reading-title">📚 Quản lý đề luyện đọc (Reading)</h2>
 
-      {/* Upload */}
+      {/* 📤 Upload Section */}
       <div className="reading-upload-section">
         <input
           type="text"
-          placeholder="Nhập tiêu đề đề đọc (VD: Reading Part 5 - Đề A)"
+          placeholder="Nhập tiêu đề đề đọc (VD: Reading Part 6 - Đề A)"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
@@ -69,28 +69,27 @@ const ReadingTopic = () => {
         <button onClick={handleUpload}>📤 Tải lên</button>
       </div>
 
-      {/* Danh sách đề */}
-     <div className="reading-test-list">
-  {tests.map((test) => {
-    const totalQuestions = test.questions?.length || test.blocks?.reduce((sum, b) => sum + b.questions.length, 0) || 0;
-    return (
-      <div
-        key={test._id}
-        className={`reading-test-card ${selectedTest?._id === test._id ? "active" : ""}`}
-        onClick={() => setSelectedTest(test)}
-      >
-        <h4>{test.title}</h4>
-        <p>{totalQuestions} câu hỏi</p>
-        <p className="difficulty-tag">
-          📊 Mức độ: <b>{test.level || "Đang phân tích..."}</b>
-        </p>
+      {/* 📑 Danh sách đề đã tải */}
+      <div className="reading-test-list">
+        {tests.map((test) => {
+          const totalQuestions =
+            test.questions?.length || test.blocks?.reduce((sum, b) => sum + b.questions.length, 0) || 0;
+
+          return (
+            <div
+              key={test._id}
+              className={`reading-test-card ${selectedTest?._id === test._id ? "active" : ""}`}
+              onClick={() => setSelectedTest(test)}
+            >
+              <h4>{test.title}</h4>
+              <p>{totalQuestions} câu hỏi</p>
+              <p className="difficulty-tag">📊 Đã phân tích độ khó</p>
+            </div>
+          );
+        })}
       </div>
-    );
-  })}
-</div>
 
-
-      {/* Chi tiết đề đã chọn */}
+      {/* 📘 Chi tiết đề đã chọn */}
       {selectedTest && (
         <div className="reading-detail">
           <h3>📖 {selectedTest.title}</h3>
@@ -105,45 +104,44 @@ const ReadingTopic = () => {
                 <th>D</th>
                 <th>Đáp án</th>
                 <th>Part</th>
+                <th>Level</th>
               </tr>
             </thead>
             <tbody>
-              {/* Part 5 & 7 */}
-              {selectedTest.part !== 6 &&
-                selectedTest.questions?.map((q, idx) => (
-                  <tr key={idx}>
+              {/* 📌 Part 5 - dạng câu rời */}
+              {selectedTest.questions?.map((q, idx) => (
+                <tr key={`q-${idx}`}>
+                  <td>{idx + 1}</td>
+                  <td>{q.question}</td>
+                  <td>{q.options?.A}</td>
+                  <td>{q.options?.B}</td>
+                  <td>{q.options?.C}</td>
+                  <td>{q.options?.D}</td>
+                  <td><b>{q.answer}</b></td>
+                  <td>{selectedTest.part}</td>
+                  <td>{q.level || "?"}</td>
+                </tr>
+              ))}
+
+              {/* 📌 Part 6 & 7 - block with passage */}
+              {selectedTest.blocks?.map((block, blockIdx) =>
+                block.questions.map((q, idx) => (
+                  <tr key={`b-${blockIdx}-${idx}`}>
                     <td>{idx + 1}</td>
-                    <td>{q.question}</td>
+                    <td>
+                      <div><b>Đoạn văn:</b> {block.passage || "Không có đoạn văn"}</div>
+                      <div><b>Câu hỏi:</b> {q.question}</div>
+                    </td>
                     <td>{q.options?.A}</td>
                     <td>{q.options?.B}</td>
                     <td>{q.options?.C}</td>
                     <td>{q.options?.D}</td>
                     <td><b>{q.answer}</b></td>
                     <td>{selectedTest.part}</td>
+                    <td>{q.level || "?"}</td>
                   </tr>
-                ))}
-
-              {/* Part 6 - với block */}
-              {(selectedTest.part === 6 || selectedTest.part === 7) &&
-                selectedTest.blocks?.flatMap((block, blockIdx) =>
-                  block.questions.map((q, idx) => (
-                    <tr key={`${blockIdx}-${idx}`}>
-                      <td>{idx + 1}</td>
-                      <td>
-                        <b>Đoạn văn:</b> {block.passage || block.paragraph}
-                        <br />
-                        <b>Câu hỏi:</b> {q.question}
-                      </td>
-                      <td>{q.options?.A}</td>
-                      <td>{q.options?.B}</td>
-                      <td>{q.options?.C}</td>
-                      <td>{q.options?.D}</td>
-                      <td><b>{q.answer}</b></td>
-                      <td>{q.part}</td>
-                    </tr>
-                  ))
-                )}
-
+                ))
+              )}
             </tbody>
           </table>
         </div>

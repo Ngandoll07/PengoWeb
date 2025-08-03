@@ -1,81 +1,97 @@
 import React, { useEffect, useState } from 'react';
 import './style.css';
-import { FaBell, FaUser, FaSignOutAlt, FaShoppingCart } from 'react-icons/fa';
+import { FaChevronDown } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
 
 const HeaderComponent = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [userName, setUserName] = useState('');
   const navigate = useNavigate();
-  const { cart } = useCart(); // 🧠 Lấy giỏ hàng từ Context
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
+    // Giả sử bạn lưu tên user trong localStorage sau login
+    const name = localStorage.getItem("userName") || '';
+    setUserName(name);
   }, []);
+useEffect(() => {
+  const onScroll = () => {
+    const header = document.querySelector('.header-edtech');
+    if (window.scrollY > 60) header.classList.add('shrink');
+    else header.classList.remove('shrink');
+  };
+  window.addEventListener('scroll', onScroll);
+  return () => window.removeEventListener('scroll', onScroll);
+}, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("userName");
     setIsLoggedIn(false);
     alert("Bạn đã đăng xuất");
     navigate("/");
   };
 
   return (
-    <header className="header">
-      <div className="logo-area">
-        <img src="/assets/user/logo.png" alt="Logo" className="logo" />
+    <header className="header-edtech">
+      <div className="logo-edtech" onClick={() => navigate("/")}>
+        <img src="/assets/user/logo.png" alt="Logo" className="logo-image" />
       </div>
 
-      <nav className="nav">
-        <a href="/">TRANG CHỦ</a>
-        <a href="/coursespage">KHÓA HỌC</a>
-        <div className="dropdown">
-          <span className="dropbtn">LUYỆN TẬP</span>
-          <div className="dropdown-content">
-            <a href="/practicelistening">Luyện nghe</a>
-            <a href="/practiceread">Luyện đọc</a>
-            <a href="/speakingpractice">Luyện nói</a>
-            <a href="/practicewrite">Luyện viết</a>
-          </div>
-        </div>
-        <a href="#">GIỚI THIỆU</a>
-      </nav>
+     <nav className="nav-edtech">
+  <a href="/" className="nav-item">Trang chủ</a>
+  <a href="/coursespage" className="nav-item">Khóa học</a>
 
-      <div className="icon-area">
-        {/* 🛒 Giỏ hàng */}
-        <div className="cart-icon" onClick={() => navigate("/cartpage")}>
-          <FaShoppingCart className="icon" />
-          {cart.length > 0 && <span className="cart-count">{cart.length}</span>}
-        </div>
+  <div className="nav-dropdown">
+    <button
+      className="nav-item dropdown-toggle"
+      aria-haspopup="true"
+      aria-expanded="false"
+      type="button"
+    >
+      Luyện tập
+      <span className="arrow">▾</span>
+    </button>
+    <div className="dropdown-menu">
+      <a href="/practicelistening" className="dropdown-link">Luyện nghe</a>
+      <a href="/practiceread" className="dropdown-link">Luyện đọc</a>
+      <a href="/speakingpractice" className="dropdown-link">Luyện nói</a>
+      <a href="/practicewrite" className="dropdown-link">Luyện viết</a>
+    </div>
+  </div>
 
-        {/* 🔔 Thông báo */}
-        <FaBell className="icon" />
+  <a href="#" className="nav-item">Giới thiệu</a>
+  <a href="#" className="nav-item">Liên hệ</a>
+</nav>
 
-        {/* 👤 Tài khoản */}
+      <div className="auth-edtech">
         {isLoggedIn ? (
           <div
-            className="user-menu-container"
+            className="user-dropdown-wrapper"
             onMouseEnter={() => setDropdownOpen(true)}
             onMouseLeave={() => setDropdownOpen(false)}
           >
-            <FaUser className="icon" />
+            <div className="user-button">
+              <span className="user-name">{userName || 'Tài khoản'}</span>
+              <FaChevronDown className="chevron" />
+            </div>
             {dropdownOpen && (
-              <div className="user-dropdown">
+              <div className="user-menu">
                 <a href="/roadmap">🧭 Lộ trình</a>
                 <a href="/profile">👤 Thông tin</a>
                 <a href="/mycourses">🎓 Khoá học của tôi</a>
                 <button onClick={handleLogout} className="logout-btn">
-                  <FaSignOutAlt /> Đăng xuất
+                  Đăng xuất
                 </button>
               </div>
             )}
           </div>
         ) : (
           <>
-            <span className="login"><a href="/login">ĐĂNG NHẬP</a></span>
-            <span className="signup"><a href="/signup">ĐĂNG KÝ</a></span>
+            <button className="btn-outline" onClick={() => navigate("/signup")}>Đăng ký</button>
+            <button className="btn-primary" onClick={() => navigate("/login")}>Đăng nhập</button>
           </>
         )}
       </div>
@@ -84,3 +100,7 @@ const HeaderComponent = () => {
 };
 
 export default HeaderComponent;
+
+
+
+

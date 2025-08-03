@@ -4,13 +4,7 @@
   min-height: 100vh;
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(to right, #bfdbfe, #60a5fa);
-  padding: 1rem;
-}
+
 
 .header-left {
   display: flex;
@@ -163,7 +157,7 @@
   border-radius: 0.5rem;
   cursor: pointer;
 }
-
+/* 
 .footer {
   background: linear-gradient(to right, #d1fae5, #bfdbfe);
   display: grid;
@@ -198,4 +192,4 @@
   height: 100px;
   background-color: #d1d5db;
   border-radius: 0.5rem;
-}
+} */

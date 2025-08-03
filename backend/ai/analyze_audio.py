@@ -4,13 +4,14 @@ import sys
 import json
 from thefuzz import fuzz
 import io
+import os
 
 # Load Whisper model
 model = whisper.load_model("base")
 
 # Nhận tham số từ dòng lệnh
 audio_path = sys.argv[1]
-expected_text = sys.argv[2] if len(sys.argv) > 2 else None
+question_file = sys.argv[2] if len(sys.argv) > 2 else None
 
 # Phân tích bằng Whisper
 result = model.transcribe(audio_path)
@@ -40,12 +41,28 @@ elif score == 3:
 else:
     level = "hard"
 
-# So sánh độ khớp nếu có text mẫu
-similarity = None
-if expected_text:
-    similarity = fuzz.partial_ratio(transcript.lower(), expected_text.lower())
+# Nếu có file JSON câu hỏi → xử lý từng câu
+results = []
+if question_file and os.path.exists(question_file):
+    try:
+        with open(question_file, "r", encoding="utf-8") as f:
+            questions = json.load(f)
 
-# Trả kết quả
+        for q in questions:
+            if "id" in q and "question" in q:
+                results.append({
+                    "id": q["id"],
+                    "question": q["question"],
+                    "correct": q.get("correctAnswer", q.get("answer")),
+                    "requires_image": "image" in q,
+                    "image": q.get("image", "")
+                })
+            # Nếu thiếu id hoặc question thì bỏ qua không lỗi
+    except Exception as e:
+        # Nếu có lỗi đọc file thì không thêm results
+        pass
+
+# Kết quả trả về
 output = {
     "transcript": transcript,
     "duration_sec": round(duration_sec, 2),
@@ -55,8 +72,9 @@ output = {
     "level": level,
 }
 
-if similarity is not None:
-    output["similarity"] = similarity
+if results:
+    output["results"] = results
 
+# Đảm bảo UTF-8 output cho Node.js
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
 print(json.dumps(output, ensure_ascii=False, indent=2))

@@ -6,52 +6,68 @@ dotenv.config();
 const router = express.Router();
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
-const systemMessage = `
-Bạn là một trợ lý AI luyện thi TOEIC phần Đọc hiểu (Part 5, 6, 7). Nhiệm vụ của bạn là phân tích toàn bộ nội dung đề thi và **trả về một đánh giá tổng thể về độ khó**.
-
-🎯 Cách đánh giá:
-- easy: ≥80% từ vựng thuộc danh sách Oxford 3000 hoặc trình độ CEFR A1–A2
+// Hệ thống message rút gọn, rõ ràng, chỉ yêu cầu trả về mảng per-question
+const systemMessageBatch = `
+Bạn là trợ lý AI TOEIC phần Đọc hiểu (Part 5/6/7).
+Nhiệm vụ: Phân tích từng câu và trả về độ khó của mỗi câu theo quy tắc:
+- easy: ≥80% từ vựng thuộc Oxford 3000 hoặc trình độ CEFR A1–A2
 - medium: 60%–79%
 - hard: <60%
 
-❗❗ Trả về đúng định dạng JSON sau, **không kèm lời giải thích**:
-
+Chỉ trả về đúng JSON duy nhất dạng mảng, không lời giải thích. Mỗi phần tử:
 {
+  "questionIndex": "<ví dụ: '1' hoặc '2.3'>",
   "level": "easy" | "medium" | "hard"
 }
 `;
 
-
-
-
-
 router.post("/analyze-difficulty", async (req, res) => {
-  const { part, questions, blocks } = req.body;
+  const { part, questions = [], blocks = [] } = req.body;
 
-  let prompt = `Dưới đây là đề TOEIC Part ${part}:\n\n`;
-
+  // Chuẩn bị danh sách câu để gửi AI
+  const listCau = [];
   if (part === 5 || part === 7) {
     questions.forEach((q, i) => {
-      prompt += `Câu ${i + 1}:\n${q.question}\nA. ${q.options.A}\nB. ${q.options.B}\nC. ${q.options.C}\nD. ${q.options.D}\n\n`;
-    });
-  } else if (part === 6 || part === 7) {
-    blocks.forEach((block, idx) => {
-      prompt += `Đoạn ${idx + 1}:\n${block.passage}\n`;
-      block.questions.forEach((q, i) => {
-        prompt += `Câu ${i + 1}: ${q.question}\nA. ${q.options.A}\nB. ${q.options.B}\nC. ${q.options.C}\nD. ${q.options.D}\n`;
+      listCau.push({
+        index: `${i + 1}`,
+        question: q.question,
+        options: q.options,
       });
-      prompt += '\n';
+    });
+  }
+  if (part === 6 || part === 7) {
+    blocks.forEach((block, bi) => {
+      block.questions.forEach((q, qi) => {
+        listCau.push({
+          index: `${bi + 1}.${qi + 1}`,
+          passage: block.passage,
+          question: q.question,
+          options: q.options,
+        });
+      });
     });
   }
 
+  if (listCau.length === 0) {
+    return res.status(400).json({ message: "Không có câu để phân tích" });
+  }
+
+  // Xây prompt chi tiết
+  let prompt = "Dưới đây là các câu cần đánh giá độ khó:\n\n";
+  listCau.forEach(item => {
+    prompt += `Câu ${item.index}:\n`;
+    if (item.passage) prompt += `Đoạn: ${item.passage}\n`;
+    prompt += `${item.question}\nA. ${item.options.A}\nB. ${item.options.B}\nC. ${item.options.C}\nD. ${item.options.D}\n\n`;
+  });
+
   try {
-     console.log("📝 Nội dung gửi AI:", prompt); // ✅ Thêm dòng này để debug
+    console.log("📝 Prompt gửi AI (per-question):", prompt);
     const response = await axios.post(
       "https://api.groq.com/openai/v1/chat/completions",
       {
         model: "llama3-8b-8192",
         messages: [
-          { role: "system", content: systemMessage  },
+          { role: "system", content: systemMessageBatch },
           { role: "user", content: prompt },
         ],
         temperature: 0.4,
@@ -64,23 +80,48 @@ router.post("/analyze-difficulty", async (req, res) => {
       }
     );
 
-  let aiText = response.data.choices[0].message.content.trim();
+    console.log("📬 Raw response.data từ AI:", response.data);
 
-// 👉 Lọc phần JSON từ chuỗi trả về (nếu có chữ như "Here is ..." thì loại bỏ)
-if (!aiText.startsWith("{")) {
-  const firstBrace = aiText.indexOf("{");
-  const lastBrace = aiText.lastIndexOf("}");
-  aiText = aiText.slice(firstBrace, lastBrace + 1);
-}
+    let aiText = response.data.choices?.[0]?.message?.content?.trim() || "";
 
-console.log("📦 Phản hồi từ AI (đã xử lý):", aiText);
+    if (!aiText) {
+      console.warn("⚠️ AI không trả nội dung, fallback toàn bộ câu medium");
+      const fallback = listCau.map(c => ({ questionIndex: c.index, level: "medium" }));
+      return res.json({ perQuestion: fallback });
+    }
 
-const result = JSON.parse(aiText); // Lúc này mới parse an toàn
+    if (!aiText.startsWith("[")) {
+      const first = aiText.indexOf("[");
+      const last = aiText.lastIndexOf("]");
+      if (first !== -1 && last !== -1) {
+        aiText = aiText.slice(first, last + 1);
+      }
+    }
 
-    return res.json(result);
+    let resultArray;
+    try {
+      resultArray = JSON.parse(aiText);
+    } catch (parseErr) {
+      console.warn("⚠️ Không parse được JSON từ AI, fallback medium:", parseErr.message);
+      resultArray = listCau.map(c => ({ questionIndex: c.index, level: "medium" }));
+    }
+
+    return res.json({ perQuestion: resultArray });
   } catch (err) {
     console.error("❌ Lỗi đánh giá độ khó:", err.response?.data || err.message);
-    return res.status(500).json({ message: "Lỗi AI", raw: err.response?.data || err.message });
+    // fallback medium cho tất cả
+    const fallback = [];
+    if (part === 5 || part === 7) {
+      questions.forEach((q, i) => fallback.push({ questionIndex: `${i + 1}`, level: "medium" }));
+    }
+    if (part === 6 || part === 7) {
+      blocks.forEach((block, bi) => {
+        block.questions.forEach((q, qi) => {
+          fallback.push({ questionIndex: `${bi + 1}.${qi + 1}`, level: "medium" });
+        });
+      });
+    }
+    return res.status(500).json({ message: "Lỗi AI", perQuestion: fallback, raw: err.response?.data || err.message });
   }
 });
 

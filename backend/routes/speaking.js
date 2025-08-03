@@ -64,10 +64,12 @@ router.post("/evaluate", upload.single("audio"), async (req, res) => {
     const questionId = req.body.questionId;
 
     try {
-        // 👉 Convert file .webm → .wav
+        console.log("📥 Nhận được file:", inputPath);
+
+        // Convert .webm → .wav
         execSync(`ffmpeg -i ${inputPath} -ar 16000 -ac 1 -c:a pcm_s16le ${wavPath}`);
 
-        // 📘 Nếu có questionId thì lấy nội dung câu hỏi từ DB
+        // Lấy expectedText từ DB nếu có
         let expectedText = "";
         if (questionId) {
             const question = await SpeakingQuestion.findById(questionId);
@@ -78,10 +80,9 @@ router.post("/evaluate", upload.single("audio"), async (req, res) => {
             }
         }
 
-        // 🔈 Whisper nhận file .wav và nội dung câu hỏi (nếu có)
-        const result = await transcribeAudio(req.file.path, expectedText);
+        // Transcribe .wav (không phải .webm)
+        const result = await transcribeAudio(wavPath, expectedText);
         const evaluation = await evaluateSpeaking(result.transcript);
-
 
         res.json({ transcript: result.transcript, evaluation });
     } catch (err) {
@@ -96,6 +97,7 @@ router.post("/evaluate", upload.single("audio"), async (req, res) => {
         }
     }
 });
+
 
 
 export default router;

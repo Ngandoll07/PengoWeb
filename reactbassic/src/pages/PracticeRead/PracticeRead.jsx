@@ -24,7 +24,7 @@ const level = location.state?.level || "medium"; // 👈 Lấy level từ state
   useEffect(() => {
   const fetchData = async () => {
     try {
-      const res5 = await fetch(`http://localhost:5000/api/reading-tests/part/5?level=${level}`);
+      const res5 = await fetch(`http://localhost:5000/api/reading-tests/part/5`);
       const data5 = await res5.json();
       const formatted5 = data5.map(q => ({
         question: q.question,
@@ -32,10 +32,10 @@ const level = location.state?.level || "medium"; // 👈 Lấy level từ state
         answer: q.answer
       }));
 
-      const res6 = await fetch(`http://localhost:5000/api/reading-tests/part/6?level=${level}`);
+      const res6 = await fetch(`http://localhost:5000/api/reading-tests/part/6`);
       const blocks6 = await res6.json();
 
-      const res7 = await fetch(`http://localhost:5000/api/reading-tests/part/7?level=${level}`);
+      const res7 = await fetch(`http://localhost:5000/api/reading-tests/part/7`);
       const blocks7 = await res7.json();
 
       const countQuestions = arr => arr.reduce?.((acc, block) => acc + block.questions.length, 0) || arr.length;

@@ -2,7 +2,7 @@
     {
         "id": 1,
         "title": "Khóa học TOEIC online 4 kỹ năng",
-        "image": "/assets/courses/combo4.png",
+        "image": "/assets/courses/4skill.jpg",
         "price": 2500000,
         "originalPrice": 2900000,
         "tag": "GIẢM GIÁ!",
@@ -18,7 +18,7 @@
     {
         "id": 2,
         "title": "Khóa học TOEIC Vocabulary online",
-        "image": "/assets/courses/vocab.png",
+        "image": "/assets/courses/vocab.jpg",
         "price": 600000,
         "description": "Từ vựng theo chủ đề",
         "details": [
@@ -32,7 +32,7 @@
     {
         "id": 3,
         "title": "Khóa học TOEIC Lisening & Reading 450+",
-        "image": "/assets/courses/lr450.png",
+        "image": "/assets/courses/lr450.jpg",
         "price": 1200000,
         "description": "Học theo dạng bài",
         "details": [
@@ -46,7 +46,7 @@
     {
         "id": 4,
         "title": "Khóa học TOEIC Listening online",
-        "image": "/assets/courses/listening.png",
+        "image": "/assets/courses/listening.jpg",
         "price": 500000,
         "description": "Luyện nghe Part 1-4 theo cấp độ",
         "details": [
@@ -60,7 +60,7 @@
     {
         "id": 5,
         "title": "Khóa học TOEIC Reading online",
-        "image": "/assets/courses/reading.png",
+        "image": "/assets/courses/reading.jpg",
         "price": 500000,
         "description": "Luyện đọc Part 5-7 có giải thích",
         "details": [
@@ -74,7 +74,7 @@
     {
         "id": 6,
         "title": "Khóa học TOEIC Lisening & Reading 650+",
-        "image": "/assets/courses/lr650.png",
+        "image": "/assets/courses/lr650.jpg",
         "price": 1500000,
         "description": "700 từ vựng trọng tâm theo chủ đề thi thật",
         "details": [

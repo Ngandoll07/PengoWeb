@@ -155,3 +155,23 @@ audio {
   margin-top: 10px;
   width: 100%;
 }
+.question-result {
+  margin-top: 6px;
+  font-weight: bold;
+}
+.question-result.correct {
+  color: green;
+}
+.question-result.wrong {
+  color: red;
+}
+.transcript-line {
+  margin-top: 4px;
+  font-size: 0.9rem;
+  color: #555;
+  background: #f9f9f9;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+
