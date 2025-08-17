@@ -7,46 +7,57 @@ const router = express.Router();
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
-// 🧠 Strict, English-language system prompt
 const systemMessage = `
 You are an assistant for grading TOEIC Reading comprehension questions.
 
 🎯 Your task:
-- Compare the learner's selected answer with the correct answer (already provided).
-- Judge whether each answer is correct or incorrect.
-- Provide a short explanation in **Vietnamese** explaining:
-  • Why the correct answer is right (based on grammar, vocabulary, or reading context).
-  • Why the other options are incorrect.
-- ❗ You must NOT change the correct answer. Just evaluate based on the provided correct answer.
+- Compare the learner's selected answer with the correct answer (provided below).
+- Mark whether each answer is correct.
+- If incorrect or skipped, explain in **Vietnamese**:
+  • Why the learner's answer is incorrect.
+  • Why the correct answer is correct.
+  • Optionally mention why other choices are wrong.
+  • Assign a detailed error label based on the TOEIC reading criteria.
 
-📌 JSON format requirements:
-- Your response must be a **valid JSON object only** — no comments, no explanations outside of the JSON.
-- Each \`comment\` must be **on a single line** (no line breaks).
-- Do not use double quotes \`"\` inside the \`comment\`. Use single quotes \`'\` or none at all.
-- If the learner did not choose an answer, use \`"Không chọn"\` as \`userAnswer\`.
-- If you cannot provide an explanation, write \`"Chưa có giải thích"\` as the comment.
+🏷️ Use one of the following labels:
+- "vocabulary": từ vựng
+- "grammar": ngữ pháp
+- "main_idea": không hiểu ý chính
+- "detail": không nắm chi tiết
+- "inference": suy luận sai
+- "scanning": tìm thông tin sai
+- "context": hiểu sai ngữ cảnh thực tế
+- "not_answered": học viên không chọn
+- "other": không rõ nguyên nhân
 
-🛑 Output strictly in the following JSON format — nothing more, nothing less:
+📌 Formatting rules:
+- Response must be a valid JSON object — no extra explanations.
+- Each 'comment' must be one line in Vietnamese (no line breaks).
+- Do NOT use double quotes inside comment — use single quotes or none.
+- If skipped, set "userAnswer": "Không chọn", label: "not_answered", comment: "Không chọn đáp án"
+- If explanation is unclear, set label: "other", comment: "Chưa có giải thích"
+
+🛑 Output format:
 
 {
-  "correct": <number of correct answers>,
-  "total": <total number of questions>,
-  "skipped": <number of skipped answers>,
+  "correct": <number>,
+  "total": <number>,
+  "skipped": <number>,
   "feedback": [
     {
-      "index": <question number>,
+      "index": <number>,
       "userAnswer": "B",
       "correctAnswer": "A",
       "correct": false,
-      "comment": "Explanation in Vietnamese on a single line, no double quotes, no line breaks"
+      "label": "grammar",
+      "comment": "Giải thích vì sao ngắn gọn bằng tiếng Việt, một dòng duy nhất"
     }
   ]
 }
 `;
 
-// 🧱 Tạo prompt cho mỗi batch
 const buildPrompt = (chunk, offset, part, answers) => `
-Below are TOEIC Reading Part ${part} questions. For each question, judge the learner's answer and explain the result.
+Below are TOEIC Reading Part ${part} questions. For each, compare learner's answer with the correct one, then evaluate and label the type of error based on reading skill criteria.
 
 ${chunk.map((q, i) => `
 Question ${offset + i + 1}:
@@ -82,6 +93,32 @@ const callGroq = async (prompt) => {
   return response.data.choices[0].message.content;
 };
 
+// Retry logic when hitting rate limits or temporary failures
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+const callGroqWithRetry = async (prompt, retries = 2, delayMs = 3000) => {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await callGroq(prompt);
+    } catch (err) {
+      const status = err.response?.status;
+      const code = err.code;
+      const message = err.response?.data || err.message;
+
+      if (status === 429 || code === 'ECONNABORTED' || code === 'ETIMEDOUT') {
+        console.warn(`⚠️ Attempt ${attempt + 1} failed: ${status || code}. Retrying after ${delayMs}ms...`);
+        if (attempt < retries) {
+          await delay(delayMs);
+        } else {
+          throw err;
+        }
+      } else {
+        throw err;
+      }
+    }
+  }
+};
+
 router.post('/score-reading-part', async (req, res) => {
   const { part, questions, answers } = req.body;
 
@@ -90,27 +127,51 @@ router.post('/score-reading-part', async (req, res) => {
   }
 
   try {
-    if (part === 5) {
-      const prompt = buildPrompt(questions, 0, part, answers);
-      const aiText = await callGroq(prompt);
-      console.log("🧠 AI Response (Part 5):", aiText);
+      if (part === 5) {
+        const batchSize = 5; // hoặc 10 tùy dung lượng
+        const allFeedback = [];
+        let correct = 0, skipped = 0;
 
-      let jsonOnly = aiText.trim();
-      if (!jsonOnly.startsWith('{')) {
-        const first = jsonOnly.indexOf('{');
-        const last = jsonOnly.lastIndexOf('}');
-        jsonOnly = jsonOnly.slice(first, last + 1);
-      }
+        for (let i = 0; i < questions.length; i += batchSize) {
+          const chunk = questions.slice(i, i + batchSize);
+          const prompt = buildPrompt(chunk, i, part, answers);
 
-      const aiResult = JSON.parse(jsonOnly);
-      return res.json({
-        correct: aiResult.correct || 0,
-        total: aiResult.total || questions.length,
-        skipped: aiResult.skipped || 0,
-        feedback: aiResult.feedback || []
-      });
+          try {
+            const aiText = await callGroqWithRetry(prompt);
+            console.log(`🧠 AI Response (Part 5, Batch ${i / batchSize + 1}):`, aiText);
 
-    } else {
+            let jsonOnly = aiText.trim();
+            if (!jsonOnly.startsWith('{')) {
+              const first = jsonOnly.indexOf('{');
+              const last = jsonOnly.lastIndexOf('}');
+              jsonOnly = jsonOnly.slice(first, last + 1);
+            }
+
+            const aiResult = JSON.parse(jsonOnly);
+            correct += aiResult.correct || 0;
+            skipped += aiResult.skipped || 0;
+            allFeedback.push(...(aiResult.feedback || []));
+          } catch (parseErr) {
+            console.error(`❌ JSON parse error in batch ${i / batchSize + 1}:`, parseErr.message);
+            allFeedback.push(
+              ...chunk.map((q, j) => ({
+                index: i + j + 1,
+                userAnswer: answers[i + j] || 'Không chọn',
+                correctAnswer: q.answer,
+                correct: false,
+                comment: 'Lỗi định dạng phản hồi từ AI hoặc vượt giới hạn request.'
+              }))
+            );
+          }
+        }
+
+        return res.json({
+          correct,
+          total: questions.length,
+          skipped,
+          feedback: allFeedback
+        });
+      }else {
       const batchSize = 5;
       const allFeedback = [];
       let correct = 0, skipped = 0;
@@ -120,7 +181,7 @@ router.post('/score-reading-part', async (req, res) => {
         const prompt = buildPrompt(chunk, i, part, answers);
 
         try {
-          const aiText = await callGroq(prompt);
+          const aiText = await callGroqWithRetry(prompt);
           console.log(`🧠 AI Response (Part ${part}, Batch ${i / batchSize + 1}):`, aiText);
 
           let jsonOnly = aiText.trim();
@@ -138,12 +199,12 @@ router.post('/score-reading-part', async (req, res) => {
         } catch (parseErr) {
           console.error(`❌ JSON parse error in batch ${i / batchSize + 1}:`, parseErr.message);
           allFeedback.push(
-            ...chunk.map((_, j) => ({
+            ...chunk.map((q, j) => ({
               index: i + j + 1,
               userAnswer: answers[i + j] || 'Không chọn',
-              correctAnswer: questions[j].answer,
+              correctAnswer: q.answer,
               correct: false,
-              comment: 'Lỗi định dạng phản hồi từ AI. Không thể chấm.'
+              comment: 'Lỗi định dạng phản hồi từ AI hoặc vượt giới hạn request.'
             }))
           );
         }

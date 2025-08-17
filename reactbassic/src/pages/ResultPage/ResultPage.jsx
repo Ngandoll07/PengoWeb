@@ -17,54 +17,52 @@ const ResultPage = () => {
   }
 
   const handleViewAnswers = () => {
-    if (!sourcePage || !stateToPassBack) {
+    if (!sourcePage) {
       alert("Không thể xem lại bài làm.");
       return;
     }
 
+    // ✅ Truyền luôn aiFeedback + isReviewMode
     navigate(sourcePage, {
       state: {
         ...stateToPassBack,
-        result: {
-          ...stateToPassBack.result,
-          aiFeedback: result.aiFeedback
-        }
+        isReviewMode: true,
+        aiFeedback: result.aiFeedback || [],
+        result
       }
     });
   };
 
   const safeValue = (value) => (isNaN(value) || value === undefined ? 0 : value);
 
-  // 👉 Tính toán lại số liệu từ aiFeedback
-const computeStats = (feedback) => {
-  const total = feedback?.length || 0;
-  let correct = 0;
-  let incorrect = 0;
-  let skipped = 0;
+  const computeStats = (feedback) => {
+    const total = feedback?.length || 0;
+    let correct = 0;
+    let incorrect = 0;
+    let skipped = 0;
 
-  feedback?.forEach((f) => {
-    const ua = f.userAnswer?.toLowerCase()?.trim();
-    const isSkipped = !ua || ua === "không chọn" || ua === "none" || ua === "not chosen";
+    feedback?.forEach((f) => {
+      const ua = f.userAnswer?.toLowerCase()?.trim();
+      const isSkipped =
+        !ua || ua === "không chọn" || ua === "none" || ua === "not chosen";
 
-    if (isSkipped) {
-      skipped++;
-    } else if (f.correct) {
-      correct++;
-    } else {
-      incorrect++;
-    }
-  });
+      if (isSkipped) {
+        skipped++;
+      } else if (f.correct) {
+        correct++;
+      } else {
+        incorrect++;
+      }
+    });
 
-  const answered = correct + incorrect;
-  const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
-  const score = correct * 5; // bạn có thể tùy chỉnh cách tính điểm
+    const answered = correct + incorrect;
+    const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
+    const score = correct * 5;
 
-  return { total, correct, incorrect, skipped, answered, accuracy, score };
-};
-
+    return { total, correct, incorrect, skipped, answered, accuracy, score };
+  };
 
   const stats = computeStats(result.aiFeedback);
-
   const partTitle = "TOEIC Reading";
 
   return (

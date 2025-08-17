@@ -7,9 +7,7 @@ const PracticeRead = () => {
   const location = useLocation();
   const showAnswers = location.state?.showAnswers || false;
   const storedAnswers = location.state?.result?.answersByPart;
-  const storedFeedback =
-    location.state?.result?.aiFeedback ||
-    location.state?.stateToPassBack?.aiFeedback || [];
+  const storedFeedback = location.state?.result?.aiFeedback || location.state?.stateToPassBack?.aiFeedback || [];
 
   const [aiFeedback, setAiFeedback] = useState(storedFeedback);
   const [questionsByPart, setQuestionsByPart] = useState({ 5: [], 6: [], 7: [] });
@@ -18,27 +16,26 @@ const PracticeRead = () => {
   const [activePart, setActivePart] = useState(5);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [feedbackByPart, setFeedbackByPart] = useState({ 5: [], 6: [], 7: [] });
-const level = location.state?.level || "medium"; // 👈 Lấy level từ state
-  
 
-  useEffect(() => {
   const fetchData = async () => {
     try {
-      const res5 = await fetch(`http://localhost:5000/api/reading-tests/part/5`);
+      const [res5, res6, res7] = await Promise.all([
+        fetch('http://localhost:5000/api/reading-tests/part/5'),
+        fetch('http://localhost:5000/api/reading-tests/part/6'),
+        fetch('http://localhost:5000/api/reading-tests/part/7')
+      ]);
+
       const data5 = await res5.json();
+      const blocks6 = await res6.json();
+      const blocks7 = await res7.json();
+
       const formatted5 = data5.map(q => ({
         question: q.question,
         options: [q.options.A, q.options.B, q.options.C, q.options.D],
         answer: q.answer
       }));
 
-      const res6 = await fetch(`http://localhost:5000/api/reading-tests/part/6`);
-      const blocks6 = await res6.json();
-
-      const res7 = await fetch(`http://localhost:5000/api/reading-tests/part/7`);
-      const blocks7 = await res7.json();
-
-      const countQuestions = arr => arr.reduce?.((acc, block) => acc + block.questions.length, 0) || arr.length;
+      const countQuestions = arr => arr.reduce((acc, block) => acc + block.questions.length, 0);
 
       setQuestionsByPart({ 5: formatted5, 6: blocks6, 7: blocks7 });
       setAnswersByPart({
@@ -47,52 +44,51 @@ const level = location.state?.level || "medium"; // 👈 Lấy level từ state
         7: storedAnswers?.[7] || Array(countQuestions(blocks7)).fill(null)
       });
     } catch (err) {
-      console.error("❌ Lỗi tải dữ liệu:", err);
+      console.error('❌ Lỗi tải dữ liệu:', err);
     }
   };
-  fetchData();
-}, [storedAnswers]);
 
-useEffect(() => {
-  const timer = setInterval(() => setElapsedTime(prev => prev + 1), 1000);
-  return () => clearInterval(timer);
-}, []);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-const formatTime = (seconds) => {
-  const hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
-  const mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-  const secs = String(seconds % 60).padStart(2, '0');
-  return `${hrs}:${mins}:${secs}`;
-};
+  useEffect(() => {
+    const timer = setInterval(() => setElapsedTime(prev => prev + 1), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
-const handleSelect = (index, option) => {
-  if (submitted) return;
-  const updated = [...answersByPart[activePart]];
-  updated[index] = option;
-  setAnswersByPart(prev => ({ ...prev, [activePart]: updated }));
-};
+  const formatTime = (seconds) => {
+    const hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
+    const mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+    const secs = String(seconds % 60).padStart(2, '0');
+    return `${hrs}:${mins}:${secs}`;
+  };
 
-const handleReset = () => {
-  const length = activePart === 5
-    ? questionsByPart[5].length
-    : questionsByPart[activePart]?.reduce((acc, block) => acc + block.questions.length, 0);
-  setAnswersByPart(prev => ({ ...prev, [activePart]: Array(length).fill(null) }));
-  setSubmitted(false);
-  setElapsedTime(0);
-};
+  const handleSelect = (index, option) => {
+    if (submitted) return;
+    const updated = [...answersByPart[activePart]];
+    updated[index] = option;
+    setAnswersByPart(prev => ({ ...prev, [activePart]: updated }));
+  };
 
-const getGlobalIndexOffset = (part) => {
-  if (part === 5) return 0;
-  if (part === 6) return questionsByPart[5]?.length || 0;
-  if (part === 7) {
-    const countPart5 = questionsByPart[5]?.length || 0;
-    const countPart6 = questionsByPart[6]?.reduce((acc, block) => acc + block.questions.length, 0) || 0;
-    return countPart5 + countPart6;
-  }
-  return 0;
-};
+  const handleReset = () => {
+    const length = activePart === 5
+      ? questionsByPart[5].length
+      : questionsByPart[activePart]?.reduce((acc, block) => acc + block.questions.length, 0);
+    setAnswersByPart(prev => ({ ...prev, [activePart]: Array(length).fill(null) }));
+    setSubmitted(false);
+    setElapsedTime(0);
+  };
 
-const handleSubmit = async () => {
+  const getGlobalIndexOffset = (part) => {
+    const count5 = questionsByPart[5]?.length || 0;
+    const count6 = questionsByPart[6]?.reduce((acc, block) => acc + block.questions.length, 0) || 0;
+    if (part === 6) return count5;
+    if (part === 7) return count5 + count6;
+    return 0;
+  };
+
+ const handleSubmit = async () => {
   setSubmitted(true);
   const resultByPart = {};
   let totalCorrect = 0;
@@ -102,133 +98,124 @@ const handleSubmit = async () => {
 
   try {
     for (const part of [5, 6, 7]) {
+      const partKey = `part${part}`;
+      resultByPart[partKey] = { correct: 0, skipped: 0, total: 0, feedback: [] };
+
       if (part === 5) {
-  const questions = questionsByPart[5].map((q, i) => ({
-    question: q.question,
-    options: q.options, // hoặc chuyển về { A, B, C, D } nếu backend cần
-    answer: q.answer // nếu cần
-  }));
+        // Gửi toàn bộ câu hỏi Part 5 trong 1 request
+        const formattedQuestions = questionsByPart[5].map(q => ({
+          question: q.question.trim(),
+          options: [q.options.A, q.options.B, q.options.C, q.options.D],
+          answer: q.answer
+        }));
 
-  const answers = questionsByPart[5].map((_, i) =>
-    answersByPart[5]?.[i] ?? "Không chọn"
-  );
+        const response = await fetch('http://localhost:5000/api/reading/score-reading-part', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            part: 5,
+            questions: formattedQuestions,
+            answers: answersByPart[5] ?? []
+          })
+        });
 
-  const res = await fetch("http://localhost:5000/api/reading/score-reading-part", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      part,
-      questions,
-      answers
-    })
-  });
+        const result = await response.json();
+        resultByPart[partKey].correct += result.correct;
+        resultByPart[partKey].skipped += result.skipped;
+        resultByPart[partKey].total += result.total;
 
-  const result = await res.json();
-  resultByPart.part5 = result;
-  totalCorrect += result.correct;
-  totalSkipped += result.skipped;
-  totalQuestions += result.total;
+        if (result.feedback) {
+          const enriched = result.feedback.map((fb, idx) => ({
+            ...fb,
+            part,
+            globalIndex: getGlobalIndexOffset(part) + idx
+          }));
+          resultByPart[partKey].feedback.push(...enriched);
+          feedbackTemp.push(...enriched);
+        }
 
-  if (result.feedback) {
-    const enriched = result.feedback.map((fb, i) => ({
-      ...fb,
-      part,
-      globalIndex: i
-    }));
-    feedbackTemp.push(...enriched);
-  }
-
-  await new Promise(res => setTimeout(res, 1000));
-}
-
-
-      if (part === 6 || part === 7) {
+        totalCorrect += result.correct;
+        totalSkipped += result.skipped;
+        totalQuestions += result.total;
+      } 
+      else {
+        // Giữ nguyên logic Part 6 & 7
         const blocks = questionsByPart[part];
-        const partKey = `part${part}`;
-        resultByPart[partKey] = { correct: 0, skipped: 0, total: 0, feedback: [] };
-
         let globalIndex = 0;
 
         for (const block of blocks) {
-          const questions = block.questions.map((q, i) => {
-            const globalIdx = getGlobalIndexOffset(part) + globalIndex + i;
-            return {
-              globalIndex: globalIdx,
-              question: `${block.passage}\n${q.question}`,
-              options: [q.options.A, q.options.B, q.options.C, q.options.D],
-              answer: q.answer
-            };
-          });
+          const passage = block.passage || '';
 
-          for (let i = 0; i < questions.length; i++) {
-            const q = questions[i];
+          for (let i = 0; i < block.questions.length; i++) {
+            const q = block.questions[i];
+            const globalIdx = getGlobalIndexOffset(part) + globalIndex;
 
-            const res = await fetch("http://localhost:5000/api/reading/score-reading-part", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
+            const response = await fetch('http://localhost:5000/api/reading/score-reading-part', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 part,
-                questions: [{ question: q.question, options: q.options, answer: q.answer }],
-                answers: [answersByPart[part]?.[globalIndex] ?? "Không chọn"]
+                questions: [{
+                  question: `${passage}\n${q.question}`.trim(),
+                  options: [q.options.A, q.options.B, q.options.C, q.options.D],
+                  answer: q.answer
+                }],
+                answers: [answersByPart[part]?.[globalIndex] ?? 'Không chọn']
               })
             });
 
-            const result = await res.json();
-
+            const result = await response.json();
             resultByPart[partKey].correct += result.correct;
             resultByPart[partKey].skipped += result.skipped;
             resultByPart[partKey].total += result.total;
-            resultByPart[partKey].feedback.push(...(result.feedback || []));
 
             if (result.feedback) {
               const enriched = result.feedback.map(fb => ({
                 ...fb,
                 part,
-                globalIndex: q.globalIndex
+                globalIndex: globalIdx
               }));
+              resultByPart[partKey].feedback.push(...enriched);
               feedbackTemp.push(...enriched);
             }
 
             totalCorrect += result.correct;
             totalSkipped += result.skipped;
             totalQuestions += result.total;
+            globalIndex++;
 
+            // Delay giữa mỗi câu
             await new Promise(res => setTimeout(res, part === 6 ? 8000 : 15000));
           }
-
-          globalIndex += block.questions.length;
         }
       }
     }
 
-const result = {
-  correct: totalCorrect,
-  incorrect: totalQuestions - totalCorrect - totalSkipped,
-  skipped: totalSkipped,
-  answered: totalQuestions - totalSkipped,
-  total: totalQuestions,
-  score: totalCorrect * 5,
-  accuracy: Math.round((totalCorrect / totalQuestions) * 100),
-  time: formatTime(elapsedTime),
-  answersByPart,
-  aiFeedback: feedbackTemp
-};
-
+    const result = {
+      correct: totalCorrect,
+      incorrect: totalQuestions - totalCorrect - totalSkipped,
+      skipped: totalSkipped,
+      answered: totalQuestions - totalSkipped,
+      total: totalQuestions,
+      score: totalCorrect * 5,
+      accuracy: Math.round((totalCorrect / totalQuestions) * 100),
+      time: formatTime(elapsedTime),
+      answersByPart,
+      aiFeedback: feedbackTemp
+    };
 
     const groupedFeedback = { 5: [], 6: [], 7: [] };
     feedbackTemp.forEach(fb => {
-      if ([5, 6, 7].includes(fb.part)) {
-        groupedFeedback[fb.part].push(fb);
-      }
+      if ([5, 6, 7].includes(fb.part)) groupedFeedback[fb.part].push(fb);
     });
 
     setAiFeedback(feedbackTemp);
     setFeedbackByPart(groupedFeedback);
 
-    navigate("/result", {
+    navigate('/result', {
       state: {
         result,
-        sourcePage: "/practiceread",
+        sourcePage: '/practiceread',
         scoreResult: resultByPart,
         stateToPassBack: {
           showAnswers: true,
@@ -238,12 +225,13 @@ const result = {
       }
     });
   } catch (err) {
-    console.error("❌ Lỗi khi gọi AI chấm điểm:", err);
+    console.error('❌ Lỗi khi gọi AI chấm điểm:', err);
   }
 };
 
 const currentAnswers = answersByPart[activePart] || [];
-    return (
+
+  return (
       <div className="toeic-container">
         <h1 className="page-title">Luyện đọc TOEIC - Part {activePart}</h1>
         <div className="test-panel">
@@ -301,6 +289,7 @@ const currentAnswers = answersByPart[activePart] || [];
   <div className="ai-explanation">
     ✅ <strong>Đáp án đúng:</strong> {aiFeedback.find(f => f.index === i + 1)?.correctAnswer || "?"} <br />
     🧠 <strong>Giải thích:</strong> {aiFeedback.find(f => f.index === i + 1)?.comment || "Không có giải thích."}
+      🏷️ <strong>Nhóm lỗi:</strong> {aiFeedback.find(f => f.index === i + 1)?.label || "Không xác định"}
   </div>
 )}
 
@@ -316,14 +305,16 @@ const currentAnswers = answersByPart[activePart] || [];
         .slice(0, blockIndex)
         .reduce((acc, b) => acc + b.questions.length, 0) + i;
 
-      const partStartIndex = {
-        5: 0,
-        6: 30, // số câu Part 5
-        7: 46, // số câu Part 5 + Part 6
-      };
+   const partStartIndex = {
+  5: 0,
+  6: questionsByPart[5]?.length || 0,
+  7: (questionsByPart[5]?.length || 0) + 
+     (questionsByPart[6]?.reduce((acc, block) => acc + block.questions.length, 0) || 0)
+};
+
 
    const feedback = aiFeedback.find(
-  f => f.globalIndex === partStartIndex[6] + globalIndex
+ f => f.globalIndex === partStartIndex[activePart] + globalIndex
 );
 
 
@@ -355,6 +346,7 @@ const currentAnswers = answersByPart[activePart] || [];
                 <p><strong>Đáp án đúng:</strong> {feedback?.correctAnswer || "Chưa chấm"}</p>
     <p><strong>Đáp án của bạn:</strong> {feedback?.userAnswer || "Chưa chọn"}</p>
     <p><strong>Giải thích:</strong> {feedback?.comment || "Đang chờ AI chấm"}</p>
+        <p><strong>Nhóm lỗi:</strong> {feedback?.label || "Không xác định"}</p>
             </div>
           )}
         </div>
@@ -371,11 +363,12 @@ const currentAnswers = answersByPart[activePart] || [];
           .slice(0, blockIndex)
           .reduce((acc, b) => acc + b.questions.length, 0) + i;
            // 🔧 Thêm đoạn này vào:
-      const partStartIndex = {
-        5: 0,
-        6: 30, // số câu của Part 5
-        7: 47, // số câu của Part 5 + Part 6
-      };
+     const partStartIndex = {
+  5: 0,
+  6: questionsByPart[5]?.length || 0,
+  7: (questionsByPart[5]?.length || 0) + 
+     (questionsByPart[6]?.reduce((acc, block) => acc + block.questions.length, 0) || 0)
+};
 
        const feedback = aiFeedback.find(
   f => f.globalIndex === partStartIndex[7] + globalIndex
@@ -403,6 +396,7 @@ const currentAnswers = answersByPart[activePart] || [];
                 <p><strong>Đáp án đúng:</strong> {feedback?.correctAnswer || "Chưa chấm"}</p>
     <p><strong>Đáp án của bạn:</strong> {feedback?.userAnswer || "Chưa chọn"}</p>
     <p><strong>Giải thích:</strong> {feedback?.comment || "Đang chờ AI chấm"}</p>
+    <p><strong>Nhóm lỗi:</strong> {feedback?.label || "Không xác định"}</p>
             </div>
           )}
 
@@ -419,6 +413,6 @@ const currentAnswers = answersByPart[activePart] || [];
         </div>
       </div>
     );
-  };
+};
 
-  export default PracticeRead;
+export default PracticeRead;
