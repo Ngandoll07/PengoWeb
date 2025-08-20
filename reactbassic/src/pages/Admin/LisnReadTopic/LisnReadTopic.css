@@ -1,0 +1,137 @@
+.listening-admin-wrapper {
+  padding: 20px;
+  background: #f9fafb;
+  min-height: 100vh;
+}
+
+.manage-listening-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.upload-section {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.file-input {
+  border: 1px solid #ddd;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.upload-btn {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.upload-btn:hover {
+  background: #1d4ed8;
+}
+
+.questions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 15px;
+}
+
+.question-card {
+  background: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+}
+
+.q-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
+
+.q-text {
+  margin: 10px 0;
+}
+
+.q-options {
+  list-style: none;
+  padding-left: 0;
+  margin: 10px 0;
+}
+
+.q-option {
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+.q-option.correct {
+  background: #dcfce7;
+  color: #15803d;
+  font-weight: bold;
+}
+
+.q-passage {
+  font-style: italic;
+  margin-top: 10px;
+  color: #555;
+}
+
+.q-audio {
+  color: #2563eb;
+  margin-top: 5px;
+}
+
+.q-image {
+  margin-top: 10px;
+  max-width: 100%;
+  border-radius: 8px;
+}
+
+.pagination {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.page-btn {
+  margin: 0 4px;
+  padding: 6px 12px;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+}
+.page-btn.active {
+  background: #2563eb;
+  color: white;
+  border: none;
+}
+.part-select{
+    margin-left: 300px;
+}
+.part-title{
+        margin-left: 300px;
+}
+.alert {
+  padding: 10px 15px;
+  margin: 10px 0;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.alert.success {
+  background-color: #e6ffed;
+  color: #0f5132;
+  border: 1px solid #badbcc;
+  margin-left: 300px
+}
+
+.alert.error {
+  background-color: #fdecea;
+  color: #842029;
+  border: 1px solid #f5c2c7;
+}

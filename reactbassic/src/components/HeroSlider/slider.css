@@ -1,0 +1,110 @@
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 60px 250px;
+  background-color: white;
+  font-family: 'Poppins', sans-serif;
+}
+
+.hero-left {
+  max-width: 500px;
+}
+
+.hero-left h1 {
+  font-size: 48px;
+  font-weight: 700;
+  color: #0f172a; /* gần đen */
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+
+.hero-left .highlight {
+  color: #44c1ef; /* đỏ cam */
+}
+
+.subtitle1 {
+  font-size: 18px;
+  color: #0a1e3a;
+  margin-bottom: 30px;
+}
+
+.btn-get-started {
+  background-color: #01223e;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-get-started:hover {
+  background-color: #1674a3;
+}
+
+.hero-right {
+  position: relative;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.hero-main {
+  width: 380px;
+  z-index: 2;
+}
+
+/* Icon trang trí gọn quanh hình */
+.icon {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  animation: float 3s ease-in-out infinite;
+}
+
+.icon.globe {
+  top: 0;
+  left: 10%;
+}
+
+.icon.flask {
+  bottom: 0;
+  left: 0;
+}
+
+.icon.book {
+  top: 10%;
+  right: 10%;
+}
+.icon.phantu {
+  top: 60%;
+  right: 0%;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .hero-images {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .main-img,
+  .main-img.second {
+    width: 180px;
+  }
+}
+
