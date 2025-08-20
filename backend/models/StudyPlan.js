@@ -16,7 +16,7 @@ const StudyPlanSchema = new mongoose.Schema({
       progress: Number
     }
   ], // Giờ là mảng object thay vì chuỗi JSON
-  analysis: String,
+  analysis: { type: mongoose.Schema.Types.Mixed }, // 🔹 cho phép object
   createdAt: { type: Date, default: Date.now }
 });
 

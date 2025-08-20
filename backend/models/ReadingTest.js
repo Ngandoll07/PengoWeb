@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
-const ReadingQuestionSchema = new mongoose.Schema({
+const QuestionSchema = new mongoose.Schema({
+  questionNumber: String,   // ví dụ: 147 (Part 7) hoặc số thứ tự (Part 6/5)
   question: String,
   options: {
     A: String,
@@ -8,28 +9,22 @@ const ReadingQuestionSchema = new mongoose.Schema({
     C: String,
     D: String,
   },
-  answer: String,
-  part: Number,
-  level: {
-    type: String,
-    enum: ['easy', 'medium', 'hard'],
-    default: 'medium',
-  },
+  answer: String,          // đáp án đúng (A/B/C/D)
+  label: String,           // nhãn AI phân tích: grammar/vocabulary/inference...
+  explanation: String,     // giải thích ngắn (AI sinh ra)
 });
 
-
-const ReadingBlockSchema = new mongoose.Schema({
-  passage: String,
-  questions: [ReadingQuestionSchema],
+const BlockSchema = new mongoose.Schema({
+  passage: String,          // dùng cho Part 6
+  imagePath: String,        // dùng cho Part 7
+  questions: [QuestionSchema],
 });
 
 const ReadingTestSchema = new mongoose.Schema({
-  title: String,
-  part: Number,
-  questions: [ReadingQuestionSchema], // Part 5 & 7
-  blocks: [ReadingBlockSchema],       // Part 6 & 7
-  createdAt: { type: Date, default: Date.now },
-});
+  title: { type: String, required: true },   // tên đề thi
+  part: { type: Number, required: true },    // Part 5 / 6 / 7
+  questions: [QuestionSchema],               // Part 5: lưu trực tiếp
+  blocks: [BlockSchema],                     // Part 6 & 7: gom theo passage hoặc imagePath
+}, { timestamps: true });
 
-const ReadingTest = mongoose.model("ReadingTest", ReadingTestSchema);
-export default ReadingTest;
+export default mongoose.model("ReadingTest", ReadingTestSchema);

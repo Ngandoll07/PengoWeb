@@ -11,71 +11,92 @@ export default function PracticeListening() {
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [scorePopup, setScorePopup] = useState(null);
+
+  const [time, setTime] = useState(0);
+  const [isRunning, setIsRunning] = useState(true);
   const questionRefs = useRef({});
 
+  // Timer
   useEffect(() => {
-    fetch("/data/test1_listening.json")
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setQuestions(data);
-        } else {
-          console.error("❌ Dữ liệu không phải mảng:", data);
-          setError("Dữ liệu câu hỏi không đúng định dạng.");
-        }
-      })
-      .catch((err) => {
-        console.error("❌ Lỗi tải dữ liệu:", err);
-        setError("Không thể tải câu hỏi.");
-      });
-  }, []);
+    let interval;
+    if (isRunning) interval = setInterval(() => setTime((t) => t + 1), 1000);
+    return () => clearInterval(interval);
+  }, [isRunning]);
 
-  const handleSubmit = async () => {
-    if (Object.keys(selectedAnswers).length === 0) return;
-    setLoading(true);
-    setError("");
-    const payload = {
-      questionIds: Object.keys(selectedAnswers),
-      selectedAnswers,
-    };
-
-    try {
-      const res = await fetch("http://localhost:5000/api/evaluate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        const text = await res.text();
-        console.error("Evaluate error:", text);
-        setError("Lỗi server khi chấm bài.");
-        setResults(null);
-      } else {
-        const data = await res.json();
-        setResults(data);
-      }
-    } catch (err) {
-      console.error("❌ Lỗi submit:", err);
-      setError("Không thể kết nối tới server.");
-    } finally {
-      setLoading(false);
-    }
+  const formatTime = (s) => {
+    const h = String(Math.floor(s / 3600)).padStart(2, "0");
+    const m = String(Math.floor((s % 3600) / 60)).padStart(2, "0");
+    const sec = String(s % 60).padStart(2, "0");
+    return `${h}:${m}:${sec}`;
   };
+
+  // Lấy câu hỏi từ BE
+useEffect(() => {
+ fetch("http://localhost:5000/api/listening-questions")
+  .then(res => res.json())
+  .then(data => {
+    if (data.success && Array.isArray(data.questions)) {
+      setQuestions(data.questions);
+    } else {
+      setError("❌ Dữ liệu không hợp lệ từ server");
+    }
+  })
+  .catch(() => setError("❌ Không thể tải dữ liệu"));
+
+}, []);
+
+const handleSubmit = () => {
+  if (questions.length === 0) return;
+  setIsRunning(false);
+
+  let totalCorrect = 0, totalIncorrect = 0, totalSkipped = 0;
+
+  const evaluated = questions.map((q) => {
+    const userAnswer = selectedAnswers[q.id] || null;
+    const isCorrect = userAnswer === q.answer;
+
+    if (!userAnswer) totalSkipped++;
+    else if (isCorrect) totalCorrect++;
+    else totalIncorrect++;
+
+    return {
+      ...q,
+      userAnswer,
+      correctAnswer: q.answer,
+      isCorrect,
+    };
+  });
+
+  const totalQuestions = evaluated.length;
+  const accuracy = totalQuestions ? ((totalCorrect / totalQuestions) * 100).toFixed(1) : 0;
+
+  setResults({ results: evaluated });
+
+  setScorePopup({
+    correct: totalCorrect,
+    incorrect: totalIncorrect,
+    skipped: totalSkipped,
+    accuracy,
+    time: formatTime(time),
+    score: totalCorrect * 5,
+    total: totalQuestions,
+  });
+};
+
 
   const handleClickQuestion = (id) => {
     setSelectedQuestion(id);
-    const target = questionRefs.current[id];
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    const el = questionRefs.current[id];
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const questionsInPart = Array.isArray(questions)
-    ? questions.filter((q) => parseInt(q.part, 10) === activePart)
-    : [];
+  const questionsInPart = questions.filter(
+    (q) => parseInt(q.part, 10) === activePart
+  );
 
   const resultMap =
-    results?.results?.reduce((acc, r) => {
+    results?.results.reduce((acc, r) => {
       acc[r.id] = r;
       return acc;
     }, {}) || {};
@@ -90,131 +111,156 @@ export default function PracticeListening() {
             <button
               className="score-button"
               onClick={handleSubmit}
-              disabled={loading || Object.keys(selectedAnswers).length === 0}
+              disabled={loading || !Object.keys(selectedAnswers).length}
             >
               {loading ? "Đang chấm..." : "Chấm điểm"}
             </button>
-            <span className="timer">{new Date(0).toISOString().substr(11, 8)}</span>
+            <span className="timer">{formatTime(time)}</span>
             <button
               className="reset-button"
               onClick={() => {
                 setSelectedAnswers({});
                 setResults(null);
                 setError("");
+                setTime(0);
+                setIsRunning(true);
+                setScorePopup(null);
               }}
             >
-              🔁 Làm lại
+              <img src="/assets/Undo Arrow.png" className="undo" alt="reset" />{" "}
+              Làm lại
             </button>
           </div>
 
           <div className="part-tabs">
-            {partList.map((part, idx) => (
+            {partList.map((p, i) => (
               <button
-                key={idx}
-                className={activePart === idx + 1 ? "part-tab active" : "part-tab"}
+                key={i}
+                className={activePart === i + 1 ? "part-tab active" : "part-tab"}
                 onClick={() => {
-                  setActivePart(idx + 1);
+                  setActivePart(i + 1);
                   setSelectedQuestion(null);
                 }}
               >
-                {part}
+                {p}
               </button>
             ))}
           </div>
-
-          <div className="question-grid">
-            {Array.isArray(questionsInPart) &&
-              questionsInPart.map((q) => (
-                <div
-                  key={q.id}
-                  className={`question-circle ${
-                    selectedQuestion === q.id ? "selected" : ""
-                  } ${selectedAnswers[q.id] ? "answered" : ""}`}
-                  onClick={() => handleClickQuestion(q.id)}
-                >
-                  {q.id.replace("q", "")}
-                </div>
-              ))}
-          </div>
-
+                <div className="question-grid">
+          {questionsInPart.map((q, index) => (
+            <div
+              key={q.id}
+              className={`question-circle ${
+                selectedQuestion === q.id ? "selected" : ""
+              } ${selectedAnswers[q.id] ? "answered" : ""}`}
+              onClick={() => handleClickQuestion(q.id)}
+            >
+              {index + 1}
+            </div>
+          ))}
+        </div>
           {error && <div className="sidebar-error">{error}</div>}
-        
         </div>
 
-        {/* Content area */}
+        {/* Content */}
         <div className="content-area">
-          {Array.isArray(questionsInPart) &&
-            questionsInPart.map((q) => {
-              const res = resultMap[q.id];
-              return (
+          {questionsInPart.map((q) => {
+            const res = resultMap[q.id];
+            return (
+              <div
+                key={q.id}
+                ref={(el) => (questionRefs.current[q.id] = el)}
+                className="question-block"
+              >
+               <h4>Câu {Number(q.id.split("_q")[1])}</h4>
+                <audio controls>
+                  <source src={q.audio} type="audio/mp3" />
+                </audio>
+                {q.image && (
+                  <img src={q.image} alt={`Câu ${q.id}`} className="question-image" />
+                )}
+                <p>{q.question}</p>
+
+                <div className="option-list">
+                  {Object.entries(q.options).map(([k, v]) => (
+                    <div
+                      key={k}
+                      className={`option-item ${
+                        selectedAnswers[q.id] === k ? "selected" : ""
+                      } ${
+                        res
+                          ? res.correctAnswer === k
+                            ? "correct-opt"
+                            : ""
+                          : ""
+                      } ${
+                        res && selectedAnswers[q.id] === k && res.correctAnswer !== k
+                          ? "wrong-opt"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        setSelectedAnswers((prev) => ({ ...prev, [q.id]: k }))
+                      }
+                    >
+                      <strong>{k}.</strong> {v}
+                    </div>
+                  ))}
+                </div>
+
+              {res && (
                 <div
-                  key={q.id}
-                  ref={(el) => (questionRefs.current[q.id] = el)}
-                  className="question-block"
+                  className={`question-result ${res.isCorrect ? "correct" : "wrong"}`}
                 >
-                  <h4>Câu {q.id.replace("q", "")}</h4>
-                  <audio controls>
-                    <source src={q.audio} type="audio/mp3" />
-                  </audio>
-                  {q.image && (
-                    <img src={q.image} alt={`Câu ${q.id}`} className="question-image" />
-                  )}
-                  <p>{q.question}</p>
-                  <div className="option-list">
-                    {q.options &&
-                      Object.entries(q.options).map(([key, value]) => (
-                        <div
-                          key={key}
-                          className={`option-item ${
-                            selectedAnswers[q.id] === key ? "selected" : ""
-                          } ${res ? (res.correctAnswer === key ? "correct-opt" : "") : ""} ${
-                            res && selectedAnswers[q.id] === key && res.correctAnswer !== key
-                              ? "wrong-opt"
-                              : ""
-                          }`}
-                          onClick={() =>
-                            setSelectedAnswers((prev) => ({
-                              ...prev,
-                              [q.id]: key,
-                            }))
-                          }
-                        >
-                          <strong>{key}.</strong> {value}
-                        </div>
-                      ))}
+                  <div className="result-header">
+                    {res.isCorrect ? (
+                      <span className="status correct">✔️ Chính xác</span>
+                    ) : (
+                      <span className="status wrong">
+                        ❌ Sai &nbsp;|&nbsp; 
+                        <strong>Bạn chọn:</strong> {res.userAnswer || "Không chọn"} &nbsp; 
+                        <strong>Đáp án đúng:</strong> {res.correctAnswer}
+                      </span>
+                    )}
+                    {q.label && <span className="focus-topic">[{q.label}]</span>}
                   </div>
 
-                  {/* Kết quả từng câu */}
-                  {res && (
-                    <div className={`question-result ${res.isCorrect ? "correct" : "wrong"}`}>
-                      <div className="result-header">
-                        {res.isCorrect ? (
-                          <span className="status correct">✔️ Đúng</span>
-                        ) : (
-                          <span className="status wrong">
-                            ❌ Sai (Bạn chọn: {res.userAnswer || "Không chọn"}, Đáp án đúng:{" "}
-                            {res.correctAnswer})
-                          </span>
-                        )}
-                        {res.focusTopic && (
-                          <span className="focus-topic">[{res.focusTopic}]</span>
-                        )}
-                      </div>
-                      {res.explanation && (
-                        <p className="explanation">{res.explanation}</p>
-                      )}
-                      {res.transcript && (
-                        <div className="transcript-line">
-                          🗣️ <em>{res.transcript}</em>
-                        </div>
-                      )}
+                  {q.explanation && (
+                    <p className="explanation">
+                      <strong>💡 Giải thích:</strong> {q.explanation}
+                    </p>
+                  )}
+
+                  {q.transcript && (
+                    <div className="transcript-line">
+                      🗣️ <em>{q.transcript}</em>
                     </div>
                   )}
                 </div>
-              );
-            })}
+              )}
+                
+              </div>
+            );
+          })}
         </div>
       </div>
+
+      {/* Popup điểm */}
+      {scorePopup && (
+        <div className="popup-overlay">
+          <div className="result-popup">
+            <div className="result-content">
+              <h3>Kết quả bài thi</h3>
+              <p>✅ Đúng: {scorePopup.correct}</p>
+              <p>❌ Sai: {scorePopup.incorrect}</p>
+              <p>⚪ Bỏ qua: {scorePopup.skipped}</p>
+              <p>📊 Chính xác: {scorePopup.accuracy}%</p>
+              <p>🕒 Thời gian: {scorePopup.time}</p>
+              <p>🏆 Điểm: {scorePopup.score}</p>
+              <button onClick={() => setScorePopup(null)}>Đóng</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

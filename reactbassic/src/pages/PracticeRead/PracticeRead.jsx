@@ -1,22 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import './PracticeRead.css';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const PracticeRead = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const showAnswers = location.state?.showAnswers || false;
-  const storedAnswers = location.state?.result?.answersByPart;
-  const storedFeedback = location.state?.result?.aiFeedback || location.state?.stateToPassBack?.aiFeedback || [];
 
-  const [aiFeedback, setAiFeedback] = useState(storedFeedback);
+  // Nếu bạn có lưu kết quả ở trang trước thì lấy ra (đặt tên là aiFeedback cho tương thích – chỉ là kết quả chấm, không AI)
+  const storedAnswers = location.state?.result?.answersByPart;
+  const storedFeedback = location.state?.result?.aiFeedback || [];
+
+  // State
+  const [aiFeedback, setAiFeedback] = useState(storedFeedback); // kết quả chấm chi tiết theo từng câu
   const [questionsByPart, setQuestionsByPart] = useState({ 5: [], 6: [], 7: [] });
-  const [answersByPart, setAnswersByPart] = useState({ 5: [], 6: [], 7: [] });
-  const [submitted, setSubmitted] = useState(showAnswers);
+  const [answersByPart, setAnswersByPart] = useState({ 5: [], 6: [], 7: [] }); // lưu A/B/C/D theo chỉ mục nội bộ từng Part
+  const [submitted, setSubmitted] = useState(showAnswers); // true -> hiển thị đáp án
   const [activePart, setActivePart] = useState(5);
   const [elapsedTime, setElapsedTime] = useState(0);
-  const [feedbackByPart, setFeedbackByPart] = useState({ 5: [], 6: [], 7: [] });
+  const [resultSummary, setResultSummary] = useState(null);
+  const [showResultPopup, setShowResultPopup] = useState(false);
 
+  // Fetch data
   const fetchData = async () => {
     try {
       const [res5, res6, res7] = await Promise.all([
@@ -25,19 +29,25 @@ const PracticeRead = () => {
         fetch('http://localhost:5000/api/reading-tests/part/7')
       ]);
 
-      const data5 = await res5.json();
-      const blocks6 = await res6.json();
-      const blocks7 = await res7.json();
+      const data5 = await res5.json();     // array câu hỏi Part 5
+      const blocks6 = await res6.json();   // array block Part 6
+      const blocks7 = await res7.json();   // array block Part 7
 
+      // Chuẩn hoá Part 5 về options array và answer là A/B/C/D
       const formatted5 = data5.map(q => ({
         question: q.question,
         options: [q.options.A, q.options.B, q.options.C, q.options.D],
-        answer: q.answer
+        answer: q.answer, // "A" | "B" | "C" | "D"
+        explanation: q.explanation || "Không có giải thích.",
+        label: q.label
       }));
 
-      const countQuestions = arr => arr.reduce((acc, block) => acc + block.questions.length, 0);
+      const countQuestions = (arr) =>
+        Array.isArray(arr) ? arr.reduce((acc, block) => acc + (block?.questions?.length || 0), 0) : 0;
 
       setQuestionsByPart({ 5: formatted5, 6: blocks6, 7: blocks7 });
+
+      // Khởi tạo đáp án rỗng theo số câu thực tế từng Part (giữ lại nếu có storedAnswers)
       setAnswersByPart({
         5: storedAnswers?.[5] || Array(formatted5.length).fill(null),
         6: storedAnswers?.[6] || Array(countQuestions(blocks6)).fill(null),
@@ -48,371 +58,321 @@ const PracticeRead = () => {
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
+  useEffect(() => { fetchData(); }, []);
   useEffect(() => {
     const timer = setInterval(() => setElapsedTime(prev => prev + 1), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  const formatTime = (seconds) => {
-    const hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
-    const mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-    const secs = String(seconds % 60).padStart(2, '0');
-    return `${hrs}:${mins}:${secs}`;
+  const formatTime = sec => {
+    const h = String(Math.floor(sec / 3600)).padStart(2, '0');
+    const m = String(Math.floor((sec % 3600) / 60)).padStart(2, '0');
+    const s = String(sec % 60).padStart(2, '0');
+    return `${h}:${m}:${s}`;
   };
 
-  const handleSelect = (index, option) => {
-    if (submitted) return;
-    const updated = [...answersByPart[activePart]];
-    updated[index] = option;
-    setAnswersByPart(prev => ({ ...prev, [activePart]: updated }));
-  };
-
-  const handleReset = () => {
-    const length = activePart === 5
-      ? questionsByPart[5].length
-      : questionsByPart[activePart]?.reduce((acc, block) => acc + block.questions.length, 0);
-    setAnswersByPart(prev => ({ ...prev, [activePart]: Array(length).fill(null) }));
-    setSubmitted(false);
-    setElapsedTime(0);
-  };
-
-  const getGlobalIndexOffset = (part) => {
+  // Tính offset global theo dữ liệu thực tế: 
+  // Part 5: bắt đầu 0, Part 6: sau Part 5, Part 7: sau Part 5 + Part 6
+  const getGlobalStart = (part) => {
     const count5 = questionsByPart[5]?.length || 0;
-    const count6 = questionsByPart[6]?.reduce((acc, block) => acc + block.questions.length, 0) || 0;
+    const count6 = (questionsByPart[6] || []).reduce((acc, b) => acc + (b?.questions?.length || 0), 0);
+    if (part === 5) return 0;
     if (part === 6) return count5;
     if (part === 7) return count5 + count6;
     return 0;
   };
 
- const handleSubmit = async () => {
-  setSubmitted(true);
-  const resultByPart = {};
-  let totalCorrect = 0;
-  let totalSkipped = 0;
-  let totalQuestions = 0;
-  const feedbackTemp = [];
+  // Chọn đáp án — index là chỉ mục nội bộ theo từng Part (không phải global)
+  const handleSelect = (part, localIndex, letter) => {
+    if (submitted) return;
+    setAnswersByPart(prev => {
+      const updated = { ...prev };
+      const arr = [...(updated[part] || [])];
+      arr[localIndex] = letter; // lưu A/B/C/D
+      updated[part] = arr;
+      return updated;
+    });
+  };
 
-  try {
-    for (const part of [5, 6, 7]) {
-      const partKey = `part${part}`;
-      resultByPart[partKey] = { correct: 0, skipped: 0, total: 0, feedback: [] };
+  // Làm lại riêng Part đang mở (không ảnh hưởng part khác)
+  const handleReset = () => {
+    const length =
+      activePart === 5
+        ? (questionsByPart[5]?.length || 0)
+        : (questionsByPart[activePart] || []).reduce((acc, b) => acc + (b?.questions?.length || 0), 0);
 
-      if (part === 5) {
-        // Gửi toàn bộ câu hỏi Part 5 trong 1 request
-        const formattedQuestions = questionsByPart[5].map(q => ({
-          question: q.question.trim(),
-          options: [q.options.A, q.options.B, q.options.C, q.options.D],
-          answer: q.answer
-        }));
+    setAnswersByPart(prev => ({ ...prev, [activePart]: Array(length).fill(null) }));
+    setSubmitted(false);
+    setElapsedTime(0);
+    setResultSummary(null);
+    setAiFeedback([]);
+    setShowResultPopup(false);
+  };
 
-        const response = await fetch('http://localhost:5000/api/reading/score-reading-part', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            part: 5,
-            questions: formattedQuestions,
-            answers: answersByPart[5] ?? []
-          })
+  // Chấm điểm: so sánh trực tiếp với answer trong DB, đánh số global 1→100
+  const handleSubmit = () => {
+    setSubmitted(true);       // để hiện đáp án trên UI
+    setShowResultPopup(true); // mở popup kết quả
+
+    let totalCorrect = 0;
+    let totalSkipped = 0;
+    let totalQuestions = 0;
+    const feedbackTemp = [];
+
+    let globalCounter = 1; // đánh số liên tục 1→100
+
+    [5, 6, 7].forEach(part => {
+      const qList =
+        part === 5
+          ? questionsByPart[5]
+          : (questionsByPart[part] || []).flatMap(b => b.questions || []);
+
+      qList.forEach((q, localIdx) => {
+        const userAns = answersByPart[part]?.[localIdx] || null;
+        const isSkipped = !userAns;
+        const isCorrect = userAns === q.answer;
+
+        if (isCorrect) totalCorrect++;
+        if (isSkipped) totalSkipped++;
+        totalQuestions++;
+
+        feedbackTemp.push({
+          part,
+          globalIndex: globalCounter, // 1..100
+          userAnswer: userAns || "Không chọn",
+          correctAnswer: q.answer,    // "A"/"B"/"C"/"D"
+          correct: isCorrect,
+          explanation: q.explanation || "Không có giải thích.",
+          label: q.label || `Câu ${globalCounter}`
         });
 
-        const result = await response.json();
-        resultByPart[partKey].correct += result.correct;
-        resultByPart[partKey].skipped += result.skipped;
-        resultByPart[partKey].total += result.total;
+        globalCounter++;
+      });
+    });
 
-        if (result.feedback) {
-          const enriched = result.feedback.map((fb, idx) => ({
-            ...fb,
-            part,
-            globalIndex: getGlobalIndexOffset(part) + idx
-          }));
-          resultByPart[partKey].feedback.push(...enriched);
-          feedbackTemp.push(...enriched);
-        }
-
-        totalCorrect += result.correct;
-        totalSkipped += result.skipped;
-        totalQuestions += result.total;
-      } 
-      else {
-        // Giữ nguyên logic Part 6 & 7
-        const blocks = questionsByPart[part];
-        let globalIndex = 0;
-
-        for (const block of blocks) {
-          const passage = block.passage || '';
-
-          for (let i = 0; i < block.questions.length; i++) {
-            const q = block.questions[i];
-            const globalIdx = getGlobalIndexOffset(part) + globalIndex;
-
-            const response = await fetch('http://localhost:5000/api/reading/score-reading-part', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                part,
-                questions: [{
-                  question: `${passage}\n${q.question}`.trim(),
-                  options: [q.options.A, q.options.B, q.options.C, q.options.D],
-                  answer: q.answer
-                }],
-                answers: [answersByPart[part]?.[globalIndex] ?? 'Không chọn']
-              })
-            });
-
-            const result = await response.json();
-            resultByPart[partKey].correct += result.correct;
-            resultByPart[partKey].skipped += result.skipped;
-            resultByPart[partKey].total += result.total;
-
-            if (result.feedback) {
-              const enriched = result.feedback.map(fb => ({
-                ...fb,
-                part,
-                globalIndex: globalIdx
-              }));
-              resultByPart[partKey].feedback.push(...enriched);
-              feedbackTemp.push(...enriched);
-            }
-
-            totalCorrect += result.correct;
-            totalSkipped += result.skipped;
-            totalQuestions += result.total;
-            globalIndex++;
-
-            // Delay giữa mỗi câu
-            await new Promise(res => setTimeout(res, part === 6 ? 8000 : 15000));
-          }
-        }
-      }
-    }
-
-    const result = {
+    setAiFeedback(feedbackTemp);
+    setResultSummary({
       correct: totalCorrect,
       incorrect: totalQuestions - totalCorrect - totalSkipped,
       skipped: totalSkipped,
       answered: totalQuestions - totalSkipped,
       total: totalQuestions,
-      score: totalCorrect * 5,
-      accuracy: Math.round((totalCorrect / totalQuestions) * 100),
+      score: totalCorrect * 5, // mỗi câu đúng 5 điểm (tuỳ bạn quy đổi)
+      accuracy: totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : 0,
       time: formatTime(elapsedTime),
       answersByPart,
       aiFeedback: feedbackTemp
-    };
-
-    const groupedFeedback = { 5: [], 6: [], 7: [] };
-    feedbackTemp.forEach(fb => {
-      if ([5, 6, 7].includes(fb.part)) groupedFeedback[fb.part].push(fb);
     });
+  };
 
-    setAiFeedback(feedbackTemp);
-    setFeedbackByPart(groupedFeedback);
-
-    navigate('/result', {
-      state: {
-        result,
-        sourcePage: '/practiceread',
-        scoreResult: resultByPart,
-        stateToPassBack: {
-          showAnswers: true,
-          result,
-          aiFeedback: feedbackTemp
-        }
-      }
+  // Render radio options: dùng name theo globalIndex để không va chạm giữa các câu
+  const renderOptions = (part, localIndex, options, globalNumber) => {
+    return options.map((opt, idx) => {
+      const letter = String.fromCharCode(65 + idx); // "A/B/C/D"
+      const checked = answersByPart[part]?.[localIndex] === letter;
+      return (
+        <label key={idx} className={`option ${checked ? 'selected' : ''}`}>
+          <input
+            type="radio"
+            name={`q-${globalNumber}`}        // đảm bảo mỗi câu là 1 group riêng
+            value={letter}
+            checked={checked}
+            onChange={() => handleSelect(part, localIndex, letter)}
+          />
+          {letter}. {opt}
+        </label>
+      );
     });
-  } catch (err) {
-    console.error('❌ Lỗi khi gọi AI chấm điểm:', err);
-  }
-};
+  };
 
-const currentAnswers = answersByPart[activePart] || [];
+  // Render câu hỏi theo Part với đánh số global
+  const renderQuestions = (part) => {
+    if (part === 5) {
+      const start = getGlobalStart(5); // 0
+      return questionsByPart[5].map((q, i) => {
+        const globalNumber = start + i + 1; // 1..n
+        const fb = aiFeedback.find(f => f.globalIndex === globalNumber);
+        const correctLetter = fb?.correctAnswer;
+        const userLetter = fb?.userAnswer;
 
-  return (
-      <div className="toeic-container">
-        <h1 className="page-title">Luyện đọc TOEIC - Part {activePart}</h1>
-        <div className="test-panel">
-          <div className="sidebar">
-            <div className="sidebar-header">
-              <button className="score-button" onClick={handleSubmit}>Chấm điểm</button>
-              <span className="timer">{formatTime(elapsedTime)}</span>
-              <button className="reset-button" onClick={handleReset}>
-                <img src="/assets/Undo Arrow.png" className="undo" alt="reset" /> Làm lại
-              </button>
-            </div>
-            <div className="part-tabs-bar">
-              {[5, 6, 7].map(part => (
-                <button
-                  key={part}
-                  className={`part-tab ${activePart === part ? 'active' : ''}`}
-                  onClick={() => setActivePart(part)}
-                >
-                  Part {part}
-                </button>
-              ))}
-            </div>
-            <div className="question-grid">
-              {currentAnswers.map((ans, i) => (
-                <button
-                  key={i}
-                  className={`question-number ${ans ? 'answered' : ''}`}
-                  onClick={() => document.getElementById(`q${i}`)?.scrollIntoView({ behavior: 'smooth' })}
-                >
-                  {i + 1}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="question-area">
-            {(activePart === 5 && questionsByPart[5].map((q, i) => (
-              <div className="question-block" key={i} id={`q${i}`}>
-                <h4>Câu {i + 1}</h4>
-                <p>{q.question}</p>
-                <div className="options">
-                  {q.options.map((opt, idx) => (
-                    <label key={idx} className={`option ${currentAnswers[i] === opt ? 'selected' : ''}`}>
-                      <input
-                        type="radio"
-                        name={`q${i}`}
-                        value={opt}
-                        checked={currentAnswers[i] === opt}
-                        onChange={() => handleSelect(i, opt)}
-                      />
-                      {String.fromCharCode(65 + idx)}. {opt}
-                    </label>
-                  ))}
-                </div>
-                 {submitted && aiFeedback.length > 0 && (
-  <div className="ai-explanation">
-    ✅ <strong>Đáp án đúng:</strong> {aiFeedback.find(f => f.index === i + 1)?.correctAnswer || "?"} <br />
-    🧠 <strong>Giải thích:</strong> {aiFeedback.find(f => f.index === i + 1)?.comment || "Không có giải thích."}
-      🏷️ <strong>Nhóm lỗi:</strong> {aiFeedback.find(f => f.index === i + 1)?.label || "Không xác định"}
-  </div>
-)}
+        return (
+          <div className="question-block" key={globalNumber} id={`q-${globalNumber}`}>
+            <h4 className="number-question">Câu {globalNumber}</h4>
+            <p className="question">{q.question}</p>
+            <div className="options">{renderOptions(5, i, q.options, globalNumber)}</div>
 
-
+            {submitted && fb && (
+              <div className="ai-explanation">
+                <p><strong>Đáp án đúng:</strong> {correctLetter} {typeof correctLetter === 'string' ? `(${q.options[correctLetter.charCodeAt(0)-65]})` : ''}</p>
+                <p>
+                  <strong>Đáp án của bạn:</strong>{' '}
+                  {userLetter && userLetter !== "Không chọn"
+                    ? `${userLetter} (${q.options[userLetter.charCodeAt(0)-65]})`
+                    : "Không chọn"}
+                </p>
+                <p><strong>Giải thích:</strong> {q.explanation}</p>
+                <p><strong>Nhóm lỗi:</strong> {q.label}</p>
               </div>
-            )))}
-           {activePart === 6 && questionsByPart[6].map((block, blockIndex) => (
-  <div className="question-block" key={blockIndex}>
-    <p className="passage">{block.passage}</p>
+            )}
+          </div>
+        );
+      });
+    }
 
-    {block.questions.map((q, i) => {
-      const globalIndex = questionsByPart[6]
+    // Part 6 & 7: có block
+    const start = getGlobalStart(part);
+    return (questionsByPart[part] || []).map((block, blockIndex) => {
+      const beforeCount = (questionsByPart[part] || [])
         .slice(0, blockIndex)
-        .reduce((acc, b) => acc + b.questions.length, 0) + i;
-
-   const partStartIndex = {
-  5: 0,
-  6: questionsByPart[5]?.length || 0,
-  7: (questionsByPart[5]?.length || 0) + 
-     (questionsByPart[6]?.reduce((acc, block) => acc + block.questions.length, 0) || 0)
-};
-
-
-   const feedback = aiFeedback.find(
- f => f.globalIndex === partStartIndex[activePart] + globalIndex
-);
-
+        .reduce((acc, b) => acc + (b?.questions?.length || 0), 0);
 
       return (
-        <div key={globalIndex} id={`q${globalIndex}`}>
-          <h4>Câu {globalIndex + 1}</h4>
-          <p className="question">{q.question}</p>
-
-          <div className="options">
-            {Object.entries(q.options).map(([key, opt]) => (
-              <label
-                key={key}
-                className={`option ${answersByPart[6]?.[globalIndex] === opt ? 'selected' : ''}`}
-              >
-                <input
-                  type="radio"
-                  name={`q${globalIndex}`}
-                  value={opt}
-                  checked={answersByPart[6]?.[globalIndex] === opt}
-                  onChange={() => handleSelect(globalIndex, opt)}
+        <div className="question-block" key={`p${part}-b${blockIndex}`}>
+          {block?.imagePath && (
+            <div className="part7-image-gallery">
+              {block.imagePath.split(/\r?\n/).map((img, i) => (
+                <img
+                  key={i}
+                  src={img.trim()}
+                  alt={`Part ${part} ${blockIndex}-${i}`}
+                  className="part7-image"
                 />
-                {opt}
-              </label>
+              ))}
+            </div>
+          )}
+          {block.passage && (
+            <div className="passage">
+              {block.passage}
+            </div>
+          )}
+          {(block?.questions || []).map((q, i) => {
+            const localIndex = beforeCount + i;           // chỉ mục nội bộ Part
+            const globalNumber = start + localIndex + 1;  // số câu toàn bài
+            const fb = aiFeedback.find(f => f.globalIndex === globalNumber);
+            const opts = [q.options?.A, q.options?.B, q.options?.C, q.options?.D];
+
+            const correctLetter = fb?.correctAnswer;
+            const userLetter = fb?.userAnswer;
+
+            return (
+              <div key={`q-${globalNumber}`} id={`q-${globalNumber}`}>
+                <h4 className="number-question">Câu {globalNumber}</h4>
+                <p className="question">{q.question}</p>
+                <div className="options">{renderOptions(part, localIndex, opts, globalNumber)}</div>
+
+                {submitted && fb && (
+                  <div className="ai-explanation">
+                    <p><strong>Đáp án đúng:</strong> {correctLetter} {typeof correctLetter === 'string' ? `(${opts[correctLetter.charCodeAt(0)-65]})` : ''}</p>
+                    <p>
+                      <strong>Đáp án của bạn:</strong>{' '}
+                      {userLetter && userLetter !== "Không chọn"
+                        ? `${userLetter} (${opts[userLetter.charCodeAt(0)-65]})`
+                        : "Không chọn"}
+                    </p>
+                    <p><strong>Giải thích:</strong> {q.explanation}</p>
+                    <p><strong>Nhóm lỗi:</strong> {q.label}</p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      );
+    });
+  };
+
+  return (
+    <div className="toeic-container">
+      <h1 className="page-title">Luyện đọc TOEIC - Part {activePart}</h1>
+
+      {showResultPopup && resultSummary && (
+        <div className="result-popup">
+          <div className="result-content">
+            <h3>Kết quả bài thi</h3>
+            <p>✅ Đúng: {resultSummary.correct}</p>
+            <p>❌ Sai: {resultSummary.incorrect}</p>
+            <p>⚪ Bỏ qua: {resultSummary.skipped}</p>
+            <p>📊 Chính xác: {resultSummary.accuracy}%</p>
+            <p>🕒 Thời gian: {resultSummary.time}</p>
+            <p>🏆 Điểm: {resultSummary.score}</p>
+            {/* Đóng popup nhưng vẫn giữ submitted=true để hiển thị đáp án trong trang */}
+            <button className="close-btn" onClick={() => setShowResultPopup(false)}>Đóng</button>
+          </div>
+        </div>
+      )}
+
+      <div className="test-panel">
+        <div className="sidebar">
+          <div className="sidebar-header">
+            <button className="score-button" onClick={handleSubmit}>Chấm điểm</button>
+            <span className="timer">{formatTime(elapsedTime)}</span>
+            <button className="reset-button" onClick={handleReset}>
+              <img src="/assets/Undo Arrow.png" className="undo" alt="reset" /> Làm lại
+            </button>
+          </div>
+
+          <div className="part-tabs">
+            {[5, 6, 7].map(part => (
+              <button
+                key={part}
+                className={activePart === part ? 'part-tab active' : 'part-tab'}
+                onClick={() => setActivePart(part)}
+              >
+                Part {part}
+              </button>
             ))}
           </div>
 
-          {submitted && feedback && (
-            <div className="ai-explanation">
-                <p><strong>Đáp án đúng:</strong> {feedback?.correctAnswer || "Chưa chấm"}</p>
-    <p><strong>Đáp án của bạn:</strong> {feedback?.userAnswer || "Chưa chọn"}</p>
-    <p><strong>Giải thích:</strong> {feedback?.comment || "Đang chờ AI chấm"}</p>
-        <p><strong>Nhóm lỗi:</strong> {feedback?.label || "Không xác định"}</p>
-            </div>
-          )}
+          {/* Sidebar question grid — đánh số theo globalIndex, check trạng thái theo localIndex của từng Part */}
+          <div className="question-grid">
+            {activePart === 5 && questionsByPart[5].map((_, i) => {
+              const globalNumber = getGlobalStart(5) + i + 1; // 1..n
+              const answered = !!answersByPart[5]?.[i];
+              return (
+                <button
+                  key={`sb-${globalNumber}`}
+                  className={answered ? 'answered' : ''}
+                  onClick={() => document.getElementById(`q-${globalNumber}`)?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  {globalNumber}
+                </button>
+              );
+            })}
+
+            {activePart !== 5 &&
+              (questionsByPart[activePart] || []).map((block, blockIndex) => {
+                const beforeCount = (questionsByPart[activePart] || [])
+                  .slice(0, blockIndex)
+                  .reduce((acc, b) => acc + (b?.questions?.length || 0), 0);
+
+                return (block?.questions || []).map((_, i) => {
+                  const localIndex = beforeCount + i;
+                  const globalNumber = getGlobalStart(activePart) + localIndex + 1;
+                  const answered = !!answersByPart[activePart]?.[localIndex];
+                  return (
+                    <button
+                      key={`sb-${globalNumber}`}
+                      className={answered ? 'answered' : ''}
+                      onClick={() => document.getElementById(`q-${globalNumber}`)?.scrollIntoView({ behavior: 'smooth' })}
+                    >
+                      {globalNumber}
+                    </button>
+                  );
+                });
+              })
+            }
+          </div>
         </div>
-      );
-    })}
-  </div>
-))}
 
-  {activePart === 7 && questionsByPart[7].map((block, blockIndex) => (
-    <div className="question-block" key={blockIndex}>
-      <p className="passage">{block.passage}</p>
-      {block.questions.map((q, i) => {
-        const globalIndex = questionsByPart[7]
-          .slice(0, blockIndex)
-          .reduce((acc, b) => acc + b.questions.length, 0) + i;
-           // 🔧 Thêm đoạn này vào:
-     const partStartIndex = {
-  5: 0,
-  6: questionsByPart[5]?.length || 0,
-  7: (questionsByPart[5]?.length || 0) + 
-     (questionsByPart[6]?.reduce((acc, block) => acc + block.questions.length, 0) || 0)
-};
-
-       const feedback = aiFeedback.find(
-  f => f.globalIndex === partStartIndex[7] + globalIndex
-      );
-        return (
-          <div key={globalIndex} id={`q${globalIndex}`}>
-            <h4>Câu {globalIndex + 1}</h4>
-              <p className="question">{q.question}</p> {/* ✅ THÊM DÒNG NÀY */}
-            <div className="options">
-              {Object.entries(q.options).map(([key, opt]) => (
-                <label key={key} className={`option ${answersByPart[7]?.[globalIndex] === opt ? 'selected' : ''}`}>
-                  <input
-                    type="radio"
-                    name={`q${globalIndex}`}
-                    value={opt}
-                    checked={answersByPart[7]?.[globalIndex] === opt}
-                    onChange={() => handleSelect(globalIndex, opt)}
-                  />
-                  {opt}
-                </label>
-              ))}
-            </div>
-            {submitted && feedback && (
-            <div className="ai-explanation">
-                <p><strong>Đáp án đúng:</strong> {feedback?.correctAnswer || "Chưa chấm"}</p>
-    <p><strong>Đáp án của bạn:</strong> {feedback?.userAnswer || "Chưa chọn"}</p>
-    <p><strong>Giải thích:</strong> {feedback?.comment || "Đang chờ AI chấm"}</p>
-    <p><strong>Nhóm lỗi:</strong> {feedback?.label || "Không xác định"}</p>
-            </div>
+        <div className="question-area">
+          {renderQuestions(activePart)}
+          {(answersByPart[activePart] || []).length > 0 && (
+            <button className="submit-btn" onClick={handleSubmit}>NỘP BÀI</button>
           )}
-
-          </div>
-        );
-      })}
-    </div>
-  ))}
-
-            {currentAnswers.length > 0 && (
-              <button className="submit-btn" onClick={handleSubmit}>NỘP BÀI</button>
-            )}
-          </div>
         </div>
       </div>
-    );
+    </div>
+  );
 };
 
 export default PracticeRead;

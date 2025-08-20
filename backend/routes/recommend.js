@@ -8,7 +8,7 @@ import RoadmapItem from "../models/RoadmapItem.js";
 const router = express.Router();
 const JWT_SECRET = "123";
 
-// ✅ POST: Phân tích từ AI ➝ sinh roadmap ngày 1
+// POST: Phân tích từ AI ➝ sinh roadmap ngày 1 duy nhất
 router.post("/recommend", async (req, res) => {
   const { listeningScore, readingScore, targetScore, studyDuration } = req.body;
   const token = req.headers.authorization?.split(" ")[1];
@@ -18,27 +18,32 @@ const prompt = `
 Tôi là một học viên đang luyện thi TOEIC.
 
 🧪 Kết quả đầu vào của tôi:
-- Listening: ${listeningScore}/50
-- Reading: ${readingScore}/50
+- Listening: ${listeningScore}/450
+- Reading: ${readingScore}/450
 
 🎯 Mục tiêu của tôi là đạt khoảng ${targetScore} điểm TOEIC.
-⏰ Tôi có khoảng ${studyDuration} để luyện thi.
+⏰ Tôi có khoảng ${studyDuration} tuần để luyện thi.
 
 🎓 Hãy giúp tôi:
-1.  Phân tích điểm mạnh, điểm yếu của tôi
-2. **Đề xuất kế hoạch ôn luyện cho ngày 1** với 1 kỹ năng duy nhất (listening hoặc reading), tập trung vào phần (Part) phù hợp nhất với năng lực hiện tại.
-3. Gợi ý **mức độ phù hợp** (level: easy / medium / hard) để bắt đầu ôn luyện ngày đầu sao cho hiệu quả nhất.
 
-📋 Trả về JSON đúng định dạng sau:
+1. Phân tích **chi tiết** điểm mạnh và điểm yếu:
+   - Điểm mạnh: chỉ ra kỹ năng nào cao hơn, phần nào làm tốt hơn, ví dụ Part nào.
+   - Điểm yếu: chỉ ra kỹ năng nào cần cải thiện, phần nào làm chưa tốt.
+   - So sánh Listening và Reading, nêu gợi ý cải thiện cụ thể.
+
+2. Chỉ tạo **1 ngày đầu tiên** (day 1) với 1 kỹ năng duy nhất (listening hoặc reading), tập trung vào Part phù hợp nhất.
+3. Gợi ý **level**: easy / medium / hard.
+
+⚠️ Trả về **chỉ JSON**, đúng định dạng:
 
 {
-  "analysis": "**Phân tích điểm mạnh, điểm yếu của bạn:**",
+  "analysis": "Phân tích chi tiết điểm mạnh, điểm yếu, nêu ví dụ cụ thể",
   "plan": [
     {
       "day": 1,
       "title": "Tên bài học gợi ý cho ngày 1",
       "skill": "listening hoặc reading",
-      "part": Số, // part phù hợp như 1, 2, 5, v.v.
+      "part": Số Part phù hợp (1-7),
       "level": "easy hoặc medium hoặc hard",
       "status": "pending",
       "progress": 0
@@ -46,9 +51,8 @@ Tôi là một học viên đang luyện thi TOEIC.
   ]
 }
 
-⚠️ Chỉ trả về đúng định dạng JSON trên. Không viết bất kỳ lời giải thích nào bên ngoài JSON.
+Chỉ trả về JSON, không thêm giải thích hay text nào khác.
 `;
-
 
   try {
     const aiRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -73,7 +77,7 @@ Tôi là một học viên đang luyện thi TOEIC.
     const decoded = jwt.verify(token, JWT_SECRET);
     const userId = decoded.userId;
 
-    // Xoá roadmap cũ nếu có
+    // Xóa roadmap cũ
     await RoadmapItem.deleteMany({ userId });
 
     // Lưu StudyPlan
@@ -82,7 +86,7 @@ Tôi là một học viên đang luyện thi TOEIC.
       listeningScore,
       readingScore,
       suggestion: plan,
-      analysis
+      analysis: JSON.stringify(analysis),  // 🔹 stringify trước khi lưu
     }).save();
 
     // Tạo RoadmapItem
@@ -96,8 +100,7 @@ Tôi là một học viên đang luyện thi TOEIC.
   }
 });
 
-// ✅ GET: Lấy roadmap
-// ✅ GET: Lấy roadmap kèm cập nhật tiến trình nếu có kết quả
+// GET: Lấy roadmap + cập nhật tiến trình nếu có
 router.get("/recommend", async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(401).json({ error: "Thiếu token!" });
@@ -106,29 +109,20 @@ router.get("/recommend", async (req, res) => {
     const decoded = jwt.verify(token, JWT_SECRET);
     const userId = decoded.userId;
 
-    // 🔍 Tìm roadmap của user
     const roadmapItems = await RoadmapItem.find({ userId }).sort({ day: 1 });
-
-    // 🔍 Tìm kết quả làm bài
     const results = await import("../models/UserLessonResult.js").then(m => m.default.find({ userId }));
 
-    // 🧠 Tạo map từ roadmapItemId -> score
     const scoreMap = {};
     results.forEach(result => {
-      if (result.roadmapItemId) {
-        scoreMap[result.roadmapItemId.toString()] = result.score;
-      }
+      if (result.roadmapItemId) scoreMap[result.roadmapItemId.toString()] = result.score;
     });
 
-    // ✅ Cập nhật trạng thái dựa vào score
     const updatedItems = await Promise.all(
-      roadmapItems.map(async (item) => {
+      roadmapItems.map(async item => {
         const score = scoreMap[item._id.toString()];
         if (score !== undefined) {
           const newStatus = score >= 50 ? "done" : "pending";
           const newProgress = score;
-
-          // Chỉ update nếu khác
           if (item.status !== newStatus || item.progress !== newProgress) {
             item.status = newStatus;
             item.progress = newProgress;
@@ -150,6 +144,5 @@ router.get("/recommend", async (req, res) => {
     res.status(500).json({ error: "Lỗi server khi lấy lộ trình." });
   }
 });
-
 
 export default router;

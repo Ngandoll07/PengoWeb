@@ -14,30 +14,7 @@
 }
 
 /* ===== SIDEBAR BÊN TRÁI ===== */
-.sidebar {
-  width: 400px;
-  background-color: #eef7ff;
-  padding: 16px;
-  border-radius: 10px;
-  height: 100vh;
-  overflow-y: auto;
-  position: sticky;
-  top: 0;
-  margin-left: 10px;
-}
 
-.sidebar-header {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  background-color: #bfe8fb;
-  width: 430px;
-  height: 70px;
-  margin-left: -15px;
-  margin-top: -16px;
-  font-size: 16px;
-  padding-left: 50px;
-}
 
 .score-button,
 .reset-button {
@@ -65,17 +42,7 @@
   font-weight: bold;
 }
 
-.part-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  justify-content: space-between;
-  margin-bottom: 15px;
-  background-color: white;
-  width: 431px;
-  height: 50px;
-  margin-left: -15px;
-}
+
 
 .part-tab {
   padding: 6px 10px;
@@ -96,11 +63,7 @@
 }
 
 /* ===== DANH SÁCH CÂU HỎI ===== */
-.question-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
+
 
 .question-circle {
   width: 36px;
@@ -131,14 +94,6 @@
   overflow-y: auto;
 }
 
-.question-block {
-  background: #f9f9f9;
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 20px;
-  scroll-margin-top: 100px;
-  border-left: 4px solid #007bff;
-}
 
 .question-block h4 {
   margin-bottom: 8px;
@@ -221,6 +176,7 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
+  margin-top: 50px;
 }
 
 .goal-popup-box h3 {
@@ -319,4 +275,12 @@
 @keyframes scaleUp {
   from { transform: scale(0.8); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
+}
+
+.target-form {
+  position: relative;
+  z-index: 1001; /* cao hơn overlay */
+}
+.goal-popup-overlay {
+  z-index: 1000;
 }

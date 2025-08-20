@@ -27,6 +27,7 @@ import WritingTopic from "../pages/Admin/WritingTopic/WritingTopic"
 import RoadmapAdminPage from "../pages/Admin/RoadmapAdminPage/RoadmapAdminPage";
 import AdminUserRoadmap from "../pages/Admin/RoadmapAdminPage/AdminUserRoadmap.jsx";
 import ExamResultPage from "../pages/Admin/ExamResultPage/ExamResultPage";
+import LisnReadTopic from "../pages/Admin/LisnReadTopic/LisnReadTopic"
 
 import UploadLessonPage from "../pages/Admin/UploadLessonPage/UploadLessonPage.jsx"
 import ListeningTopic from "../pages/Admin/ListeningTopic/ListeningTopic";
@@ -161,6 +162,10 @@ export const routes = [
     {
         path: '/admin/listeningtopic',
         page: ListeningTopic,
+    },
+    {
+        path: '/admin/lisnreadtopic',
+        page: LisnReadTopic,
     },
     {
         path: "/admin/courseadmin",

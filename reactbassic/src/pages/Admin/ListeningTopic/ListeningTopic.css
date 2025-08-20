@@ -49,6 +49,7 @@
     gap: 12px;
     margin-bottom: 20px;
     margin-left: 300px;
+    margin-top: 15px;
 }
 
 .listening-part-select1 button {
@@ -112,4 +113,12 @@
     white-space: normal;
     word-break: break-word;
     overflow: hidden;
+}
+.delete-btn{
+    background-color: #c60b2f;
+    color: #fff;
+    padding: 10px 10px;
+    margin-left: 300px;
+    font-size: 16px;
+    border-radius: 10px;
 }

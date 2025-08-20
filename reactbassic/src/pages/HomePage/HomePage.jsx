@@ -194,9 +194,6 @@ export default function HomePage({ course }) {
               <div className="title">{s.name}</div>
               <div className="subtitle">{s.subtitle}</div>
             </div>
-            <div className="action">
-              <span className="arrow1">➚</span>
-            </div>
           </div>
         ))}
       </div>

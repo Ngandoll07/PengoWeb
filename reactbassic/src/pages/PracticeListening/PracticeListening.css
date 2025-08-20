@@ -4,6 +4,7 @@
   flex-direction: column;
   font-family: Arial, sans-serif;
   padding: 16px;
+  font-size: 13px;
 }
 
 .page-title {
@@ -19,29 +20,6 @@
 }
 
 /* ===== SIDEBAR BÊN TRÁI ===== */
-.sidebar {
-  width: 400px;
-  background-color: #eef7ff;
-  padding: 16px;
-  border-radius: 10px;
-  height: 100vh;
-  overflow-y: auto;
-  position: sticky;
-  top: 0;
-}
-
-.sidebar-header {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  background-color: #bfe8fb;
-  width: 430px;
-  height: 70px;
-  margin-left: -15px;
-  margin-top: -16px;
-  font-size: 16px;
-  padding-left: 50px;
-}
 
 .score-button,
 .reset-button {
@@ -72,9 +50,8 @@
   justify-content: space-between;
   margin-bottom: 15px;
   background-color: white;
-  width: 431px;
+  width: 400px;
   height: 50px;
-  margin-left: -15px;
 }
 
 .part-tab {
@@ -95,12 +72,6 @@
 }
 
 /* ===== DANH SÁCH CÂU HỎI ===== */
-.question-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-
 .question-circle {
   width: 36px;
   height: 36px;
@@ -130,14 +101,7 @@
   overflow-y: auto;
 }
 
-.question-block {
-  background: #f9f9f9;
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 20px;
-  scroll-margin-top: 100px;
-  border-left: 4px solid #007bff;
-}
+
 
 .question-block h4 {
   margin-bottom: 8px;
@@ -156,22 +120,62 @@ audio {
   width: 100%;
 }
 .question-result {
-  margin-top: 6px;
-  font-weight: bold;
+  margin-top: 12px;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  line-height: 1.6;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
+
 .question-result.correct {
-  color: green;
+  border: 1px solid #4caf50;
+  background: #e8f5e9;
 }
+
 .question-result.wrong {
-  color: red;
+  border: 1px solid #f44336;
+  background: #fdecea;
 }
-.transcript-line {
-  margin-top: 4px;
-  font-size: 0.9rem;
-  color: #555;
-  background: #f9f9f9;
-  padding: 4px 8px;
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.status.correct {
+  color: #2e7d32;
+}
+
+.status.wrong {
+  color: #c62828;
+  font-size: 13px;
+}
+
+.focus-topic {
+  background: #1976d2;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-left: 8px;
+}
+
+.explanation {
+  margin: 8px 0;
+  padding: 10px;
+  border-left: 4px solid #ff9800;
+  background: #fff8e1;
   border-radius: 6px;
 }
 
-
+.transcript-line {
+  margin-top: 6px;
+  font-style: italic;
+  color: #555;
+  padding-left: 8px;
+  border-left: 3px solid #90caf9;
+}

@@ -96,10 +96,10 @@ const ListeningTopic = () => {
                 <button onClick={handleUploadExcel}>📤 Tải lên file Excel và phân tích</button>
             </div>
 
-            <button onClick={handleClear} style={{ backgroundColor: "crimson", color: "white", marginLeft: 300 }}>
+            <button className="delete-btn" onClick={handleClear}>
                 🗑 Xoá toàn bộ
             </button>
-
+            
             <div className="listening-part-select1">
                 {[1, 2, 3, 4].map((p) => (
                     <button
@@ -112,16 +112,6 @@ const ListeningTopic = () => {
                 ))}
             </div>
 
-            <div className="level-filter1">
-                <label>Độ khó:</label>
-                <select value={selectedLevel} onChange={(e) => setSelectedLevel(e.target.value)}>
-                    <option value="">Tất cả</option>
-                    <option value="easy">Dễ</option>
-                    <option value="medium">Trung bình</option>
-                    <option value="hard">Khó</option>
-                </select>
-            </div>
-
             {loading ? (
                 <p>⏳ Đang tải dữ liệu...</p>
             ) : (
@@ -131,15 +121,12 @@ const ListeningTopic = () => {
                             <tr>
                                 <th>#</th>
                                 <th>Câu hỏi</th>
-                                <th>A</th>
-                                <th>B</th>
-                                <th>C</th>
-                                <th>D</th>
                                 <th>Đáp án</th>
                                 <th>Audio</th>
                                 <th>Ảnh</th>
                                 <th>Transcript</th>
-                                <th>Level</th>
+                                <th>Label</th>
+                                <th>Explanation</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -147,15 +134,12 @@ const ListeningTopic = () => {
                                 <tr key={q.id}>
                                     <td>{(currentPage - 1) * ITEMS_PER_PAGE + idx + 1}</td>
                                     <td>{q.question}</td>
-                                    <td>{q.options?.A}</td>
-                                    <td>{q.options?.B}</td>
-                                    <td>{q.options?.C}</td>
-                                    <td>{q.options?.D}</td>
                                     <td><b>{q.answer}</b></td>
                                     <td><audio controls style={{ width: "160px" }} src={q.audio} /></td>
                                     <td>{q.image ? <img src={q.image} alt="" width="60" /> : "–"}</td>
                                     <td className="transcript-cell">{q.transcript || "–"}</td>
-                                    <td>{q.level || "–"}</td>
+                                    <td>{q.label || "–"}</td>
+                                    <td>{q.explanation || "–"}</td>
                                 </tr>
                             ))}
                         </tbody>

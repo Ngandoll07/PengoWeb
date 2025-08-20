@@ -64,7 +64,7 @@ const Header = () => {
                         <FaTicket />
                         <span className="sidebar-text">Đề luyện nói</span>
                     </li>
-                    <li className={location.pathname === "/reviews" ? "active" : ""} onClick={() => navigate("/admin/manage_review")}>
+                    <li className={location.pathname === "/lisnreadtopic" ? "active" : ""} onClick={() => navigate("/admin/lisnreadtopic")}>
                         <FaRocketchat />
                         <span className="sidebar-text">Đề thi TOEIC LR</span>
                     </li>

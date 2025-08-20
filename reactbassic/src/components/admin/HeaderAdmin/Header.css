@@ -85,7 +85,7 @@
 .admin-header {
     position: fixed;
     top: 0;
-    left: 280px;
+    left: 250px;
     width: calc(100% - 200px);
     height: 80px;
     display: flex;

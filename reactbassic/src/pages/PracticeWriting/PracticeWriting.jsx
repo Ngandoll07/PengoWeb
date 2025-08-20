@@ -114,8 +114,8 @@ const PracticeWriting = () => {
 
   return (
     <div className="writing-page">
-      <div className="writing-sidebar">
-        <div className="writingsidebar-header">
+      <div className="sidebar">
+        <div class="sidebar-header">
           <button className="score-button" onClick={handleSubmit} disabled={loading}>Chấm điểm</button>
           <span className="timer">{formatTime(time)}</span>
           <button className="reset-button" onClick={handleReset}>
@@ -123,22 +123,25 @@ const PracticeWriting = () => {
             Làm lại
           </button>
         </div>
-        <div className="dropdown-topic">
-          <label><strong>Chọn đề:</strong></label>
-          <select
-            value={currentIndex}
-            onChange={(e) => {
-              setCurrentIndex(Number(e.target.value));
-              handleReset();
-            }}
-          >
-            {writingTopics.map((topic, idx) => (
-              <option key={topic._id} value={idx}>
-                Đề {idx + 1}
-              </option>
-            ))}
-          </select>
-        </div>
+       <div className="dropdown-topic">
+  <label className="dropdown-label">📚 Chọn đề:</label>
+  <div className="select-wrapper">
+    <select
+      value={currentIndex}
+      onChange={(e) => {
+        setCurrentIndex(Number(e.target.value));
+        handleReset();
+      }}
+    >
+      {writingTopics.map((topic, idx) => (
+        <option key={topic._id} value={idx}>
+          Đề {idx + 1}
+        </option>
+      ))}
+    </select>
+  </div>
+</div>
+
         <div className="tab-container">
           {[1, 2, 3].map((part) => (
             <button

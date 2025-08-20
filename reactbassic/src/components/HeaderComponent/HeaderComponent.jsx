@@ -63,7 +63,6 @@ useEffect(() => {
   </div>
 
   <a href="#" className="nav-item">Giới thiệu</a>
-  <a href="#" className="nav-item">Liên hệ</a>
 </nav>
 
       <div className="auth-edtech">

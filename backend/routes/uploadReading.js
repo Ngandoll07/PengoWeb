@@ -19,31 +19,105 @@ function chunkArray(arr, size) {
 // helper delay
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-// gọi AI với retry + backoff
-async function callAnalyzeDifficultyWithBackoff(payload, maxRetries = 4) {
+async function callAnalyzeLabelWithBackoff(payload, maxRetries = 4) {
   let attempt = 0;
-  let wait = 1000; // bắt đầu 1s
+  let wait = 1000;
+  const systemMessage = `
+You are an AI assistant for TOEIC Reading (Part 5/6/7).
+Task: For each question, analyze and assign one of the following labels:
+- "vocabulary", "grammar", "main_idea", "detail", "inference", "scanning",
+  "skimming", "context", "reference", "cohesion", "organization",
+  "tone_purpose", "logical_connection", "paraphrase", "other"
+
+Additionally, provide a short explanation (1–2 sentences) for why this answer is correct.
+
+Return only a valid JSON array, no extra text.
+Each element must follow this format:
+{
+  "questionIndex": "<example: '1' or '2.3'>",
+  "label": "<one of the labels above>",
+  "explanation": "<short explanation (1–2 sentences) in English for why this answer is correct>"
+}
+`;
+
   while (attempt < maxRetries) {
     try {
-      const res = await axios.post("http://localhost:5000/api/analyze-difficulty", payload);
-      return res.data;
+      const res = await axios.post(
+        "https://api.groq.com/openai/v1/chat/completions",
+        {
+          model: "llama3-8b-8192",
+          messages: [
+            { role: "system", content: systemMessage },
+            { role: "user", content: JSON.stringify(payload, null, 2) },
+          ],
+          temperature: 0.4,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      let aiText = res.data.choices?.[0]?.message?.content?.trim() || "";
+      if (!aiText.startsWith("[")) {
+        const first = aiText.indexOf("[");
+        const last = aiText.lastIndexOf("]");
+        if (first !== -1 && last !== -1) {
+          aiText = aiText.slice(first, last + 1);
+        }
+      }
+      return JSON.parse(aiText);
     } catch (err) {
-      const code = err.response?.data?.error?.code;
-      const isRateLimit = code === "rate_limit_exceeded";
       attempt++;
       if (attempt >= maxRetries) throw err;
-      // tăng dần thời gian chờ, nếu rate limit thì nhân thêm
-      const backoff = isRateLimit ? wait * 2 : wait;
-      console.warn(`⚠️ Thử lại lần ${attempt} sau ${backoff}ms vì lỗi:`, err.response?.data || err.message);
-      await sleep(backoff);
+      await sleep(wait);
       wait *= 2;
     }
   }
 }
 
+// --- New helper: call OpenRouter to extract text from image
+/**
+ * Gọi OpenRouter để phân tích ảnh Part 7 từ local file
+ * @param {string} localPath - đường dẫn file local
+ * @returns {string} - Text trích xuất từ ảnh
+ */
+async function callOpenRouterAnalyzeImage(localPath) {
+  try {
+    // Đọc file và encode base64
+    const absolutePath = path.resolve(localPath);
+    const fileData = fs.readFileSync(absolutePath, { encoding: "base64" });
+    const dataUrl = `data:image/png;base64,${fileData}`;
+
+    const res = await axios.post(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        model: "gpt-4.1-mini",
+        messages: [
+          { role: "system", content: "You are an AI assistant for TOEIC Part 7 image reading." },
+          { role: "user", content: `Extract the text content and relevant info from this image: ${dataUrl}` }
+        ],
+        temperature: 0.3
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    return res.data.choices?.[0]?.message?.content || "";
+  } catch (err) {
+    console.error("❌ OpenRouter error:", err.message);
+    return "";
+  }
+}
+
+// --- Route
 router.post("/upload-reading", upload.single("file"), async (req, res) => {
   const { title, part } = req.body;
-
   if (!req.file || !title || !part) {
     return res.status(400).json({ message: "Thiếu dữ liệu!" });
   }
@@ -56,16 +130,13 @@ router.post("/upload-reading", upload.single("file"), async (req, res) => {
     const partNumber = parseInt(part);
     const payload = { title, part: partNumber };
 
-    if (partNumber === 6 || partNumber === 7) {
+    if (partNumber === 6) {
+      // --- Part 6: passage text ---
       const passageCol = Object.keys(rows[0] || {}).find(key =>
-        key.toLowerCase().includes("passage") || key.toLowerCase().includes("passenger")
+        key.toLowerCase().includes("passage")
       );
+      if (!passageCol) return res.status(400).json({ message: "Không tìm thấy cột passage." });
 
-      if (!passageCol) {
-        return res.status(400).json({ message: "Không tìm thấy cột chứa đoạn văn (passage/passenger) trong file Excel." });
-      }
-
-      // Xây blocks
       const blockMap = new Map();
       let currentPassage = "";
 
@@ -75,131 +146,158 @@ router.post("/upload-reading", upload.single("file"), async (req, res) => {
         if (!currentPassage) return;
 
         const questionObj = {
-          question: row["Column B (Question Text)"],
+          questionNumber: row["Column A (Question Number)"] || "",
+          question: row["Column B (Question Text)"] || "[blank]",
           options: {
-            A: row["Column C (Option A)"],
-            B: row["Column D (Option B)"],
-            C: row["Column E (Option C)"],
-            D: row["Column F (Option D)"]
+            A: row["Column C (Option A)"] || "",
+            B: row["Column D (Option B)"] || "",
+            C: row["Column E (Option C)"] || "",
+            D: row["Column F (Option D)"] || ""
           },
-          answer: row["Answer"],
-          part: partNumber,
+          answer: row["Answer"] || "",
+          part: partNumber
         };
 
-        if (!blockMap.has(currentPassage)) {
-          blockMap.set(currentPassage, []);
-        }
+        if (!blockMap.has(currentPassage)) blockMap.set(currentPassage, []);
         blockMap.get(currentPassage).push(questionObj);
       });
 
-      const blocks = Array.from(blockMap.entries()).map(([passage, questions]) => ({ passage, questions }));
-      payload.blocks = blocks;
+      payload.blocks = Array.from(blockMap.entries()).map(([passage, questions]) => ({ passage, questions }));
 
-      // Flatten từng câu kèm passage và index để chunk
-      const flatList = [];
-      payload.blocks.forEach((block, bi) => {
-        block.questions.forEach((q, qi) => {
-          flatList.push({
-            questionObj: q,
-            questionIndex: `${bi + 1}.${qi + 1}`,
-            passage: block.passage,
-          });
-        });
-      });
+    } else if (partNumber === 7) {
+  // --- Part 7: multiple images per block + OpenRouter OCR (with cache) ---
+  const blockMap = new Map(); // key = imagesKey (join bằng "|")
+  const ocrCache = new Map(); // imagePath -> extractedText
+  let currentImages = [];
 
-      // Chunk nhỏ để tránh prompt quá dài; chỉnh size nếu cần
-      const CHUNK_SIZE = 5;
-      const chunks = chunkArray(flatList, CHUNK_SIZE);
-      const perQuestionAccum = [];
+  for (const row of rows) {
+    // 1) Tách nhiều ảnh trong 1 ô (xuống dòng)
+    const imagesInCell = String(row["imagePath"] || "")
+      .split(/\r?\n/)
+      .map(s => s.trim())
+      .filter(Boolean);
 
-      for (const chunk of chunks) {
-        // Tái cấu trúc block nhỏ giữ nguyên passage để gửi
-        const batchBlocksMap = new Map();
-        chunk.forEach(item => {
-          if (!batchBlocksMap.has(item.passage)) {
-            batchBlocksMap.set(item.passage, []);
-          }
-          // giữ câu nguyên dạng để analyze-difficulty hiểu block + câu
-          batchBlocksMap.get(item.passage).push({
-            question: item.questionObj.question,
-            options: item.questionObj.options,
-          });
-        });
+    // nếu ô có ảnh -> cập nhật "currentImages", nếu trống -> dùng ảnh của block hiện tại
+    if (imagesInCell.length > 0) currentImages = imagesInCell;
+    if (currentImages.length === 0) continue; // chưa có ảnh để gán block
 
-        const batchBlocks = Array.from(batchBlocksMap.entries()).map(([passage, questions]) => ({
-          passage,
-          questions: questions.map(q => ({
-            question: q.question,
-            options: q.options,
-          })),
-        }));
+    // 2) Tạo key cho block theo bộ ảnh hiện tại
+    const imagesKey = currentImages.join("|");
 
-        // Gọi AI với retry
-        let perQuestionBatch = [];
-        try {
-          const aiRes = await callAnalyzeDifficultyWithBackoff({
-            part: partNumber,
-            questions: [],
-            blocks: batchBlocks,
-          });
-          perQuestionBatch = aiRes.perQuestion || [];
-          // merge vào tổng
-          perQuestionAccum.push(...perQuestionBatch);
-        } catch (err) {
-          console.warn("⚠️ Batch AI lỗi hoàn toàn, fallback medium cho chunk:", err.message);
-          // fallback medium cho mỗi câu trong chunk
-          chunk.forEach(item => {
-            perQuestionAccum.push({ questionIndex: item.questionIndex, level: "medium" });
-          });
+    // 3) Nếu block chưa tồn tại -> OCR tất cả ảnh (dùng cache) và tạo context gộp
+    if (!blockMap.has(imagesKey)) {
+      const extractedList = [];
+      for (const img of currentImages) {
+        let txt = ocrCache.get(img);
+        if (!txt) {
+          txt = await callOpenRouterAnalyzeImage(img); // OCR 1 lần/ảnh
+          ocrCache.set(img, txt);
         }
+        extractedList.push({ imagePath: img, text: txt });
       }
 
-      // Gán level trở lại đúng câu trong payload.blocks
-      payload.blocks.forEach((block, bi) => {
-        block.questions.forEach((q, qi) => {
-          const idx = `${bi + 1}.${qi + 1}`;
-          const match = perQuestionAccum.find(p => String(p.questionIndex) === idx);
-          if (match) {
-            q.level = match.level;
-          }
-          // nếu không có match thì giữ default 'medium'
-        });
+      const context =
+        extractedList
+          .map((e, i) => `[Image ${i + 1}] ${e.imagePath}\n${e.text}`)
+          .join("\n\n");
+
+      blockMap.set(imagesKey, {
+        images: [...currentImages],          // <-- nhiều hình trong 1 block
+        imagePath: currentImages.join("\n"), // (giữ để tương thích cũ nếu cần)
+        context,                             // <-- OCR gộp
+        questions: []
       });
-    } else {
-      // Part 5
-      const questions = rows.map(row => ({
-        question: row["Column B (Question Text)"],
+    }
+
+    // 4) Push câu hỏi vào đúng block
+    const block = blockMap.get(imagesKey);
+    block.questions.push({
+      questionNumber: row["Column A (Question Number)"] || "",
+      question: row["Column B (Question Text)"] || "[blank]",
+      options: {
+        A: row["Column C (Option A)"] || "",
+        B: row["Column D (Option B)"] || "",
+        C: row["Column E (Option C)"] || "",
+        D: row["Column F (Option D)"] || ""
+      },
+      answer: row["Answer"] || "",
+      part: partNumber
+    });
+  }
+
+  // 5) Chuyển thành payload.blocks
+  payload.blocks = Array.from(blockMap.values());
+
+  // 6) Gọi Groq AI để gán label/explanation cho từng block (dùng context gộp)
+  for (const block of payload.blocks) {
+    try {
+      const aiRes = await callAnalyzeLabelWithBackoff(
+        block.questions.map((q, i) => ({
+          questionIndex: q.questionNumber || `${i + 1}`,
+          question: q.question,
+          options: q.options,
+          context: block.context   // <-- dùng context gộp nhiều hình
+        }))
+      );
+
+      block.questions.forEach(q => {
+        const match = aiRes.find(p => String(p.questionIndex) === String(q.questionNumber));
+        if (match) {
+          q.label = match.label;
+          q.explanation = match.explanation;
+        }
+      });
+    } catch (err) {
+      block.questions.forEach(q => {
+        q.label = "other";
+        q.explanation = "Default label due to AI error.";
+      });
+    }
+  }
+}
+else {
+      // --- Part 5 ---
+      const questions = rows.map((row, i) => ({
+        question: row["Column B (Question Text)"] || "[blank]",
         options: {
-          A: row["Column C (Option A)"],
-          B: row["Column D (Option B)"],
-          C: row["Column E (Option C)"],
-          D: row["Column F (Option D)"]
+          A: row["Column C (Option A)"] || "",
+          B: row["Column D (Option B)"] || "",
+          C: row["Column E (Option C)"] || "",
+          D: row["Column F (Option D)"] || ""
         },
-        answer: row["Answer"],
-        part: partNumber,
+        answer: row["Answer"] || "",
+        part: partNumber
       }));
-      payload.questions = questions;
 
       try {
-        const aiRes = await callAnalyzeDifficultyWithBackoff({
-          part: partNumber,
-          questions: questions,
-          blocks: [],
-        });
-        const perQuestion = aiRes.perQuestion || [];
+        const aiRes = await callAnalyzeLabelWithBackoff(
+          questions.map((q, i) => ({
+            questionIndex: `${i + 1}`,
+            question: q.question,
+            options: q.options
+          }))
+        );
         questions.forEach((q, i) => {
-          const match = perQuestion.find(p => String(p.questionIndex) === String(i + 1));
-          if (match) q.level = match.level;
+          const match = aiRes.find(p => String(p.questionIndex) === String(i + 1));
+          if (match) {
+            q.label = match.label;
+            q.explanation = match.explanation;
+          }
         });
       } catch (err) {
-        console.warn("⚠️ AI lỗi khi phân tích độ khó Part 5:", err.message);
-        // giữ default mỗi câu là 'medium'
+        questions.forEach(q => {
+          q.label = "grammar";
+          q.explanation = "Default label due to AI error.";
+        });
       }
+
+      payload.questions = questions;
     }
 
     const test = new ReadingTest(payload);
     const saved = await test.save();
     res.status(200).json(saved);
+
   } catch (err) {
     console.error("❌ Lỗi xử lý file:", err);
     res.status(500).json({ message: "Lỗi xử lý file Excel" });

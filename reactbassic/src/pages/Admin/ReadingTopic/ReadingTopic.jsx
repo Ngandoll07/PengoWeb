@@ -98,13 +98,10 @@ const ReadingTopic = () => {
               <tr>
                 <th>#</th>
                 <th>Câu hỏi</th>
-                <th>A</th>
-                <th>B</th>
-                <th>C</th>
-                <th>D</th>
                 <th>Đáp án</th>
                 <th>Part</th>
-                <th>Level</th>
+                <th>Label</th>
+                <th>Giải thích</th>
               </tr>
             </thead>
             <tbody>
@@ -113,35 +110,56 @@ const ReadingTopic = () => {
                 <tr key={`q-${idx}`}>
                   <td>{idx + 1}</td>
                   <td>{q.question}</td>
-                  <td>{q.options?.A}</td>
-                  <td>{q.options?.B}</td>
-                  <td>{q.options?.C}</td>
-                  <td>{q.options?.D}</td>
                   <td><b>{q.answer}</b></td>
                   <td>{selectedTest.part}</td>
-                  <td>{q.level || "?"}</td>
+                  <td>{q.label || "?"}</td>
+                  <td>{q.explanation  || "?"}</td>
                 </tr>
               ))}
 
               {/* 📌 Part 6 & 7 - block with passage */}
-              {selectedTest.blocks?.map((block, blockIdx) =>
-                block.questions.map((q, idx) => (
-                  <tr key={`b-${blockIdx}-${idx}`}>
-                    <td>{idx + 1}</td>
-                    <td>
-                      <div><b>Đoạn văn:</b> {block.passage || "Không có đoạn văn"}</div>
-                      <div><b>Câu hỏi:</b> {q.question}</div>
-                    </td>
-                    <td>{q.options?.A}</td>
-                    <td>{q.options?.B}</td>
-                    <td>{q.options?.C}</td>
-                    <td>{q.options?.D}</td>
-                    <td><b>{q.answer}</b></td>
-                    <td>{selectedTest.part}</td>
-                    <td>{q.level || "?"}</td>
-                  </tr>
-                ))
-              )}
+         {/* 📌 Part 6 & 7 - block with passage + optional image */}
+{selectedTest.blocks?.map((block, blockIdx) =>
+  block.questions.map((q, idx) => (
+    <tr key={`b-${blockIdx}-${idx}`}>
+      <td>{idx + 1}</td>
+
+      {/* Cột ảnh riêng */}
+      <td>
+    {block.imagePath ? (
+  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+    {block.imagePath.split(/\r?\n|,|;/).map((img, idx) => (
+      <img
+        key={idx}
+        src={process.env.PUBLIC_URL + img.trim()}
+        alt={`Part 7 illustration ${idx + 1}`}
+        style={{ maxWidth: "100px", borderRadius: "8px" }}
+      />
+    ))}
+  </div>
+) : (
+  "Không có ảnh"
+)}
+
+
+
+      </td>
+
+      {/* Cột đoạn văn + câu hỏi */}
+      <td>
+        <div><b>Đoạn văn:</b> {block.passage || "Không có đoạn văn"}</div>
+        <div><b>Câu hỏi:</b> {q.question}</div>
+      </td>
+
+      <td><b>{q.answer}</b></td>
+      <td>{selectedTest.part}</td>
+      <td>{q.label || "?"}</td>
+      <td>{q.explanation || "?"}</td>
+    </tr>
+  ))
+)}
+
+
             </tbody>
           </table>
         </div>

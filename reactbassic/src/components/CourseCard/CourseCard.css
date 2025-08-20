@@ -74,16 +74,18 @@
 
 .course-title {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 16px;
   font-weight: 600;
   line-height: 1.2;
   color: #1f2d3a;
+  font-family: Arial, sans-serif;
 }
 
 .course-description {
   margin: 4px 0 0;
-  font-size: 0.85rem;
-  color: #6b7280;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #162c57;
   flex: 1;
   overflow: hidden;
   display: -webkit-box;
@@ -99,15 +101,16 @@
 }
 
 .original-price {
-  font-size: 0.8rem;
-  color: #9ca3af;
+  font-size: 1.2rem;
+  color: #d03333;
   text-decoration: line-through;
+  font-weight: 500;
 }
 
 .current-price {
-  font-size: 1rem;
+  font-size: 1.7rem;
   font-weight: 700;
-  color: #1f2d3a;
+  color: #1fb2c6;
 }
 
 .course-actions {
@@ -123,7 +126,7 @@
   padding: 10px 12px;
   border: none;
   border-radius: 10px;
-  font-size: 0.85rem;
+  font-size: 1.3rem;
   cursor: pointer;
   font-weight: 600;
   transition: background .2s ease, transform .2s ease;
@@ -139,12 +142,12 @@
 }
 
 .buy-button {
-  background: #6366f1;
+  background: #248cac;
   color: #fff;
 }
 
 .buy-button:hover {
-  background: #4f46e5;
+  background: #46c9ea;
 }
 
 @media (max-width: 768px) {

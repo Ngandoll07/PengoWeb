@@ -56,6 +56,8 @@ import gradeLessonRoute from "./routes/gradeLesson.js";
 import roadmapRoutes from "./routes/roadmap.js";
 import speakingEvaluateRoutes from "./routes/speaking.js";
 
+import uploadLisnRead from "./routes/uploadLisnRead.js";
+
 
 const app = express();
 app.use(cors());
@@ -104,6 +106,8 @@ app.use("/api/purchase", purchaseRoutes);
 app.use('/api/grammar-check', grammarCheckRoute);
 app.use('/api/reading', readingCheckRouter);
 app.use('/api', readingCheckRoute);
+
+app.use("/api/upload-excel-reading", uploadLisnRead);
 
 // ✅ Route test kết nối backend
 app.get("/api/test", (req, res) => {
