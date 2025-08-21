@@ -162,8 +162,34 @@ router.post("/upload-reading", upload.single("file"), async (req, res) => {
         blockMap.get(currentPassage).push(questionObj);
       });
 
-      payload.blocks = Array.from(blockMap.entries()).map(([passage, questions]) => ({ passage, questions }));
+     payload.blocks = Array.from(blockMap.entries()).map(([passage, questions]) => ({ passage, questions }));
 
+      // 🔑 Gọi AI phân tích cho từng block của Part 6
+      for (const block of payload.blocks) {
+        try {
+          const aiRes = await callAnalyzeLabelWithBackoff(
+            block.questions.map((q, i) => ({
+              questionIndex: q.questionNumber || `${i + 1}`,
+              question: q.question,
+              options: q.options,
+              context: block.passage   // <-- dùng passage làm context
+            }))
+          );
+
+          block.questions.forEach(q => {
+            const match = aiRes.find(p => String(p.questionIndex) === String(q.questionNumber));
+            if (match) {
+              q.label = match.label;
+              q.explanation = match.explanation;
+            }
+          });
+        } catch (err) {
+          block.questions.forEach(q => {
+            q.label = "other";
+            q.explanation = "Default label due to AI error.";
+          });
+        }
+      }
     } else if (partNumber === 7) {
   // --- Part 7: multiple images per block + OpenRouter OCR (with cache) ---
   const blockMap = new Map(); // key = imagesKey (join bằng "|")
