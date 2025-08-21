@@ -139,26 +139,30 @@ const handleDayClick = async (item) => {
             <p style={{ whiteSpace: "pre-line" }}>{analysis}</p>
           </div>
 
-          <div className="day-list">
-            {learningData.map((item, index) => (
-              <div
-                key={index}
-                className={`day-card ${item.skill}`}
-    onClick={() => handleDayClick(item)}   // ✅ ĐÚNG CÁCH
-              >
-                <h3>Day {item.day}</h3>
-                <p>{item.title}</p>
-                <p>Kỹ năng: {item.skill}</p>
+         <div className="day-list">
+  {learningData.map((item, index) => (
+    <div
+      key={index}
+      className={`day-card ${item.skill}`}
+      onClick={() => handleDayClick(item)}
+    >
+      <h3>📅 Day {item.day}</h3>
+      <p className="title">{item.title}</p>
+      <p className="skill">Kỹ năng: <b>{item.skill}</b></p>
 
-                <div className={`status ${item.status}`}>
-                  <span className="sub-progress">{item.progress}%</span>
-                  <span className="status-label">
-                    {item.status === "done" ? "✅ Hoàn thành" : "⚠️ Chưa hoàn thành"}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
+    <div className={`status ${item.status}`}>
+  <div className="progress-bar">
+    <div className="progress-fill" style={{ width: `${item.progress}%` }}></div>
+  </div>
+  <p className="status-label">
+    {item.status === "done" ? "✅ Hoàn thành" : "⚠️ Chưa hoàn thành"}
+  </p>
+</div>
+
+    </div>
+  ))}
+</div>
+
        
         </>
       )}

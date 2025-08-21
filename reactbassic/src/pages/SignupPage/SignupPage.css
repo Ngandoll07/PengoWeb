@@ -6,93 +6,17 @@
     min-height: 100vh;
     padding: 20px;
     box-sizing: border-box;
-    font-family: 'Arial', sans-serif;
+    font-family: "Segoe UI", Roboto, sans-serif;
 }
-
 
 .signup-box {
     display: flex;
-    width: 895px;
-    height: 400px;
-    max-width: 100%;
+    width: 800px;
     background-color: white;
     border-radius: 30px;
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
-
-.signup-right {
-    flex: 1;
-    padding: 40px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 15px;
-}
-
-.signup-right h2 {
-    font-size: 24px;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-style: bold;
-
-}
-
-.signup-right input {
-    padding: 12px;
-    border-radius: 25px;
-    border: 1px solid #ccc;
-    outline: none;
-    font-size: 14px;
-    width: 100%;
-}
-
-.password-wrapper {
-    position: relative;
-}
-
-.password-wrapper input {
-    padding-right: 10px;
-}
-
-.eye-icon {
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #000;
-}
-
-
-.signup-btn {
-    background-color: #0d2c54;
-    padding: 12px;
-    border: none;
-    border-radius: 25px;
-    font-size: 16px;
-    cursor: pointer;
-    width: 100%;
-    transition: background-color 0.3s ease;
-    color: #7dedff;
-}
-
-.signup-btn:hover {
-    background-color: #123572;
-}
-
-.or-text {
-    text-align: center;
-    font-size: 14px;
-}
-
-
 
 .signup-left {
     flex: 1;
@@ -109,16 +33,84 @@
     max-width: 300px;
 }
 
-.back-to-home {
+.signup-right {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+}
+
+.back-to-login {
     display: flex;
     align-items: center;
     cursor: pointer;
-    margin-bottom: 10px;
-    color: #1a1a1a;
-    font-weight: bold;
-    font-size: 15px;
+    margin-bottom: 15px;
+    color: #0d2c54;
+    font-size: 14px;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.back-to-login:hover {
+    color: #123572;
 }
 
 .back-icon {
     margin-right: 6px;
+    font-size: 16px;
+}
+
+.signup-right h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.signup-right input {
+    padding: 12px;
+    border-radius: 25px;
+    border: 1px solid #ccc;
+    outline: none;
+    font-size: 14px;
+    width: 100%;
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper input {
+    padding-right: 40px;
+}
+
+.eye-icon {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #000;
+}
+
+/* 🔥 Nút giống login */
+.signup-btn {
+    background-color: #0d2c54;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.signup-btn:hover {
+    background-color: #123572;
 }

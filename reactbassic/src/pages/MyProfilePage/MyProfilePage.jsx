@@ -1,37 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import './MyProfilePage.css';
 import Footer from '../../components/FooterComponents/FooterComponent';
+import axios from 'axios';
 
 export default function MyProfilePage() {
   const [formData, setFormData] = useState({
-    name: '',
     email: '',
-    phone: '',
-    birthdate: '',
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
-  const [activeTab, setActiveTab] = useState('info');
   const [image, setImage] = useState(null);
+  const [user, setUser] = useState(null); // thêm state user
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (storedUser) {
+      setUser(storedUser);
       setFormData(prev => ({
         ...prev,
-        email: user.email || '',
-        name: user.name || '',
-        phone: user.phone || '',
-        birthdate: user.birthdate || ''
+        email: storedUser.email || ''
       }));
     }
   }, []);
 
+  // Xử lý thay đổi input
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Xử lý ảnh đại diện (tạm thời chỉ preview)
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -39,58 +37,86 @@ export default function MyProfilePage() {
     }
   };
 
+  // Xử lý lưu
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!formData.currentPassword || !formData.newPassword || !formData.confirmPassword) {
+      alert("Vui lòng nhập đầy đủ mật khẩu!");
+      return;
+    }
+    if (formData.newPassword !== formData.confirmPassword) {
+      alert("Mật khẩu mới và xác nhận không khớp!");
+      return;
+    }
+
+    try {
+      const userId = localStorage.getItem("userId");
+      const res = await axios.put("http://localhost:5000/api/users/change-password", {
+        userId,
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword
+      });
+      alert(res.data.message || "Đổi mật khẩu thành công!");
+    } catch (err) {
+      alert(err.response?.data?.message || "Đổi mật khẩu thất bại!");
+    }
+  };
+
   return (
     <div className="profile-container">
       <div className="main">
-        <div className="sidebar-custom">
-          <button
-            className={`sidebar-btn ${activeTab === 'info' ? 'active' : ''}`}
-            onClick={() => setActiveTab('info')}
-          >
-            <span className="icon">👁‍🗨</span> Thông tin
-          </button>
-          <button
-            className={`sidebar-btn ${activeTab === 'password' ? 'active' : ''}`}
-            onClick={() => setActiveTab('password')}
-          >
-            <span className="icon key">🗝️</span> Mật khẩu
-          </button>
-        </div>
-
         <div className="content">
-          {activeTab === 'info' && (
-            <>
-              <div className="avatar-container">
-                <img src={image || '/assets/user/logo.png'} alt="Avatar" className="avatar" />
-                <label className="upload-label">
-                  Chọn ảnh
-                  <input type="file" className="hidden" onChange={handleImageChange} />
-                </label>
-              </div>
-              <div className="form">
-                <input name="name" placeholder="Tên" value={formData.name} onChange={handleInputChange} />
-                <input name="email" placeholder="Email" value={formData.email} onChange={handleInputChange} readOnly />
-                <input name="phone" placeholder="Số điện thoại" value={formData.phone} onChange={handleInputChange} />
-                <input name="birthdate" type="date" value={formData.birthdate} onChange={handleInputChange} />
-                <div className="form-buttons">
-                  <button className="cancel">Hủy</button>
-                  <button className="save">Lưu</button>
-                </div>
-              </div>
-            </>
-          )}
+          {/* Avatar + Email + Đổi mật khẩu */}
+          <div className="avatar-container">
+            <img
+              src={image || user?.avatar || '/assets/user/logo.png'}
+              alt="Avatar"
+              className="avatar"
+            />
+            <label className="upload-label">
+              Chọn ảnh
+              <input type="file" className="hidden" onChange={handleImageChange} />
+            </label>
+          </div>
 
-          {activeTab === 'password' && (
-            <div className="form">
-              <input name="currentPassword" type="password" placeholder="Mật khẩu hiện tại" onChange={handleInputChange} />
-              <input name="newPassword" type="password" placeholder="Mật khẩu mới" onChange={handleInputChange} />
-              <input name="confirmPassword" type="password" placeholder="Xác nhận mật khẩu" onChange={handleInputChange} />
-              <div className="form-buttons">
-                <button className="cancel">Hủy</button>
-                <button className="save">Đổi mật khẩu</button>
-              </div>
+          <form className="form" onSubmit={handleSubmit}>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              readOnly
+            />
+
+            <input
+              type="password"
+              name="currentPassword"
+              placeholder="Mật khẩu hiện tại"
+              value={formData.currentPassword}
+              onChange={handleInputChange}
+            />
+
+            <input
+              type="password"
+              name="newPassword"
+              placeholder="Mật khẩu mới"
+              value={formData.newPassword}
+              onChange={handleInputChange}
+            />
+
+            <input
+              type="password"
+              name="confirmPassword"
+              placeholder="Xác nhận mật khẩu"
+              value={formData.confirmPassword}
+              onChange={handleInputChange}
+            />
+
+            <div className="form-buttons">
+              <button type="button" className="cancel">Hủy</button>
+              <button type="submit" className="save">Lưu</button>
             </div>
-          )}
+          </form>
         </div>
       </div>
 

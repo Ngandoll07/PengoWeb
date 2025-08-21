@@ -57,9 +57,9 @@ export default function SignupPage() {
                 </div>
 
                 <div className="signup-right">
-                    <div className="back-to-home" onClick={() => navigate('/')}>
+                    <div className="back-to-login" onClick={() => navigate('/login')}>
                         <FaArrowLeft className="back-icon" />
-                        <span>Trang chủ</span>
+                        <span>Đăng nhập</span>
                     </div>
 
                     <h2>Đăng ký</h2>

@@ -71,20 +71,38 @@
 }
 
 .status {
-  font-size: 12px;
+  margin-top: 12px;
+  text-align: center;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #eee;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4facfe, #00f2fe);
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.status-label {
+  font-size: 14px;
   font-weight: 500;
+  color: #444;
+}
+.status.done .status-label {
+  color: green;
+}
+.status.pending .status-label {
+  color: orange;
 }
 
-.status.done {
-  color: #0ab39c;
-}
-
-.status.pending {
-  color: #f7b731;
-}
-.status-label{
-    margin-left: 10px;
-}
 .analysis-box {
   padding: 20px 25px;
   margin-bottom: 30px;

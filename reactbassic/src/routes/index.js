@@ -19,7 +19,10 @@ import LoadingResultPage from "../pages/LoadingResultPage/LoadingResultPage";
 import SpeakingPractice from "../pages/SpeakingPractice/SpeakingPractice"
 
 import PracticeWriting from "../pages/PracticeWriting/PracticeWriting";
- 
+
+import ResetPasswordPage from "../pages/ResetPasswordPage/ResetPasswordPage";
+import ForgotPasswordPage from "../pages/ForgotPasswordPage/ForgotPasswordPage";
+
 import Dashboard from "../pages/Admin/AdminDashboard/Dashboard.jsx";
 import AdminUser from "../pages/Admin/AdminUser/User";
 import ReadingTopic from "../pages/Admin/ReadingTopic/ReadingTopic";
@@ -129,9 +132,19 @@ export const routes = [
         page: PracticeReadingPage,
         isShowHeader: true
     },
-       {
+    {
         path: '/practicewrite',
         page: PracticeWriting,
+        isShowHeader: true
+    },
+       {
+        path: '/forgot-password',
+        page: ForgotPasswordPage,
+        isShowHeader: true
+    },
+     {
+        path: '/reset-password/:token',
+        page: ResetPasswordPage,   // đây là trang nhập mật khẩu mới
         isShowHeader: true
     },
     //  admin

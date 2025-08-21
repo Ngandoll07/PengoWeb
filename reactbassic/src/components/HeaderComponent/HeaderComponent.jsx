@@ -30,7 +30,6 @@ useEffect(() => {
     localStorage.removeItem("token");
     localStorage.removeItem("userName");
     setIsLoggedIn(false);
-    alert("Bạn đã đăng xuất");
     navigate("/");
   };
 

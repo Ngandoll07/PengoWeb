@@ -178,29 +178,6 @@ export default function PracticeLisnRead() {
     <div className="toeic-page">
       <h1 className="page-title">Luyện tập TOEIC Listening & Reading</h1>
 
-      {/* Form nhập mục tiêu */}
-      <div className="target-form">
-        <h3>Nhập mục tiêu luyện thi</h3>
-        <div className="form-group">
-          <label>Mục tiêu điểm TOEIC:</label>
-          <input
-            type="number"
-            placeholder="VD: 700"
-            value={targetScore}
-            onChange={(e) => setTargetScore(e.target.value ? Number(e.target.value) : "")}
-          />
-        </div>
-        <div className="form-group">
-          <label>Thời gian luyện thi (số tuần):</label>
-          <input
-            type="number"
-            placeholder="VD: 4"
-            value={studyDuration}
-            onChange={(e) => setStudyDuration(e.target.value ? Number(e.target.value) : "")}
-          />
-        </div>
-      </div>
-
       <div className="toeic-page1">
         <div className="sidebar">
           <div className="sidebar-header">
@@ -235,6 +212,28 @@ export default function PracticeLisnRead() {
         </div>
 
       <div className="content-area">
+         {/* Form nhập mục tiêu */}
+      <div className="target-form">
+        <h3>Nhập mục tiêu luyện thi</h3>
+        <div className="form-group">
+          <label>Mục tiêu điểm TOEIC:</label>
+          <input
+            type="number"
+            placeholder="VD: 700"
+            value={targetScore}
+            onChange={(e) => setTargetScore(e.target.value ? Number(e.target.value) : "")}
+          />
+        </div>
+        <div className="form-group">
+          <label>Thời gian luyện thi (số tuần):</label>
+          <input
+            type="number"
+            placeholder="VD: 4"
+            value={studyDuration}
+            onChange={(e) => setStudyDuration(e.target.value ? Number(e.target.value) : "")}
+          />
+        </div>
+      </div>
   <h2>{partList[activePart - 1]}</h2>
 
   {questionsByPartForRender.map(q => (
