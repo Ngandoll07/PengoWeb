@@ -9,8 +9,11 @@ import jwt from "jsonwebtoken";
 import multer from "multer";
 import xlsx from "xlsx";
 import fs from "fs";
+import crypto from "crypto"; // ✅ Phải import crypto ở đây
+import nodemailer from "nodemailer";
 import path from "path";
 import fetch from "node-fetch";
+
 
 import ReadingTest from "./models/ReadingTest.js";
 import StudyPlan from "./models/StudyPlan.js";
@@ -114,6 +117,15 @@ app.get("/api/test", (req, res) => {
     res.send("✅ Backend đang hoạt động");
 });
 
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+const JWT_SECRET = "123"; // 👉 Nên để vào .env thay vì hardcode
 // MongoDB
 mongoose.connect("mongodb://127.0.0.1:27017/Pengo", {
     useNewUrlParser: true,
@@ -124,77 +136,129 @@ mongoose.connect("mongodb://127.0.0.1:27017/Pengo", {
     console.error("❌ Lỗi kết nối MongoDB:", err);
 });
 
-const JWT_SECRET = "123";
-
 // User model
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: String,
+  avatar: String,
   role: { type: String, default: "user" },
   createdAt: { type: Date, default: Date.now },
-  isLocked: { type: Boolean, default: false }, // thêm dòng này
+  isLocked: { type: Boolean, default: false },
+resetPasswordToken: String,
+  resetPasswordExpires: Date
 });
 const User = mongoose.model("User", userSchema);
 
+//
 // Đăng ký
+//
 app.post("/api/register", async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        const hashed = await bcrypt.hash(password, 10);
-        const newUser = new User({ email, password: hashed });
-        await newUser.save();
-        res.status(201).json({ message: "Đăng ký thành công!" });
-    } catch (err) {
-        if (err.code === 11000) {
-            res.status(400).json({ message: "Email đã tồn tại!" });
-        } else {
-            res.status(500).json({ message: "Đăng ký thất bại!" });
-        }
+  const { email, password } = req.body;
+  try {
+    const hashed = await bcrypt.hash(password, 10);
+    const newUser = new User({ email, password: hashed });
+    await newUser.save();
+    res.status(201).json({ message: "Đăng ký thành công!" });
+  } catch (err) {
+    if (err.code === 11000) {
+      res.status(400).json({ message: "Email đã tồn tại!" });
+    } else {
+      res.status(500).json({ message: "Đăng ký thất bại!" });
     }
+  }
 });
 
-// Đăng nhập
+//
+// Đăng nhập thường
+//
 app.post("/api/login", async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ message: "Tài khoản không tồn tại!" });
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: "Mật khẩu không đúng!" });
-        }
-
-        // ✅ Chặn nếu tài khoản bị khóa
-        if (user.isLocked === true) {
-            return res.status(403).json({ message: "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên." });
-        }
-
-        const token = jwt.sign(
-            { userId: user._id, email: user.email, role: user.role },
-            JWT_SECRET,
-            { expiresIn: "1d" }
-        );
-
-        res.json({ message: "Đăng nhập thành công!", token, user });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Đăng nhập thất bại!" });
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "Tài khoản không tồn tại!" });
     }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Mật khẩu không đúng!" });
+    }
+
+    if (user.isLocked === true) {
+      return res
+        .status(403)
+        .json({ message: "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên." });
+    }
+
+    const token = jwt.sign(
+      { userId: user._id, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.json({ message: "Đăng nhập thành công!", token, user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Đăng nhập thất bại!" });
+  }
 });
 
+//
+// Đăng nhập bằng Google
+//
+app.post("/api/google-login", async (req, res) => {
+  try {
+    const { email, name, avatar } = req.body;
 
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Nếu chưa có thì tạo mới
+      user = new User({
+        email,
+        name,
+        avatar,
+        password: "", // Google login không cần password
+        role: "user",
+        isLocked: false,
+      });
+      await user.save();
+    }
+
+    if (user.isLocked) {
+      return res
+        .status(403)
+        .json({ message: "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên." });
+    }
+
+    const token = jwt.sign(
+      { userId: user._id, email: user.email, role: user.role },
+      JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.json({ message: "Đăng nhập Google thành công!", token, user });
+  } catch (err) {
+    console.error("Google login error:", err);
+    res.status(500).json({ message: "Đăng nhập Google thất bại!" });
+  }
+});
+
+//
 // Lấy danh sách user
+//
 app.get("/api/users", async (req, res) => {
-    try {
-        const users = await User.find().select("-password");
-        res.json(users);
-    } catch (err) {
-        res.status(500).json({ message: "Lỗi server khi lấy danh sách user!" });
-    }
+  try {
+    const users = await User.find().select("-password");
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: "Lỗi server khi lấy danh sách user!" });
+  }
 });
+
+//
+// Khóa/mở khóa user
+//
 app.put("/api/users/:id/lock", async (req, res) => {
   try {
     const { isLocked } = req.body;
@@ -210,7 +274,118 @@ app.put("/api/users/:id/lock", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+//
+// Đổi mật khẩu
+//
+app.put("/api/users/change-password", async (req, res) => {
+  try {
+    const { userId, currentPassword, newPassword } = req.body;
 
+    if (!userId || !currentPassword || !newPassword) {
+      return res.status(400).json({ message: "Thiếu thông tin!" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "Không tìm thấy người dùng!" });
+    }
+
+    // Nếu user login bằng Google thì có thể không có password
+    if (!user.password) {
+      return res.status(400).json({ message: "Tài khoản này không thể đổi mật khẩu (Google login)!" });
+    }
+
+    // Kiểm tra mật khẩu cũ
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Mật khẩu hiện tại không đúng!" });
+    }
+
+    // Hash mật khẩu mới
+    const hashed = await bcrypt.hash(newPassword, 10);
+    user.password = hashed;
+    await user.save();
+
+    res.json({ message: "Đổi mật khẩu thành công!" });
+  } catch (err) {
+    console.error("Change password error:", err);
+    res.status(500).json({ message: "Lỗi server khi đổi mật khẩu!" });
+  }
+});
+// =============================
+// Quên mật khẩu
+// =============================
+// Forgot password
+app.post("/api/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: "Vui lòng nhập email!" });
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: "Email không tồn tại!" });
+
+    const token = crypto.randomBytes(32).toString("hex");
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 phút
+    await user.save();
+
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      return res.status(500).json({ message: "Server chưa cấu hình email!" });
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const resetUrl = `http://localhost:3000/reset-password/${token}`;
+
+  // ... trong route forgot-password
+await transporter.sendMail({
+  from: `"Support" <${process.env.EMAIL_USER}>`,
+  to: user.email,
+  subject: "Đặt lại mật khẩu",
+  html: `<p>Nhấn vào link để đặt lại mật khẩu:</p>
+         <a href="${resetUrl}">${resetUrl}</a>
+         <p>Link chỉ có hiệu lực 15 phút.</p>`,
+});
+
+
+    res.json({ message: "Email đặt lại mật khẩu đã được gửi!" });
+  } catch (err) {
+    console.error("Forgot password error:", err);
+    res.status(500).json({ message: "Lỗi server khi gửi email!" });
+  }
+});
+// =============================
+// Reset mật khẩu
+// =============================
+app.post("/api/reset-password/:token", async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { newPassword } = req.body;
+
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) return res.status(400).json({ message: "Token không hợp lệ hoặc đã hết hạn!" });
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.json({ message: "Đặt lại mật khẩu thành công!" });
+  } catch (err) {
+    console.error("Reset password error:", err);
+    res.status(500).json({ message: "Lỗi server!" });
+  }
+});
 // Lấy đề đọc
 app.get("/api/reading-tests", async (req, res) => {
     try {

@@ -26,11 +26,7 @@ Tôi là một học viên đang luyện thi TOEIC.
 
 🎓 Hãy giúp tôi:
 
-1. Phân tích **chi tiết** điểm mạnh và điểm yếu:
-   - Điểm mạnh: chỉ ra kỹ năng nào cao hơn, phần nào làm tốt hơn, ví dụ Part nào.
-   - Điểm yếu: chỉ ra kỹ năng nào cần cải thiện, phần nào làm chưa tốt.
-   - So sánh Listening và Reading, nêu gợi ý cải thiện cụ thể.
-
+1. Phân tích **chi tiết** điểm mạnh và điểm yếu.
 2. Chỉ tạo **1 ngày đầu tiên** (day 1) với 1 kỹ năng duy nhất (listening hoặc reading), tập trung vào Part phù hợp nhất.
 3. Gợi ý **level**: easy / medium / hard.
 
