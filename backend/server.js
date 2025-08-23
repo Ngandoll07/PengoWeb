@@ -60,6 +60,8 @@ import roadmapRoutes from "./routes/roadmap.js";
 import speakingEvaluateRoutes from "./routes/speaking.js";
 
 import uploadLisnRead from "./routes/uploadLisnRead.js";
+import questionsRouter from "./routes/questions.js";
+import coachRoutes from "./routes/coach.js";
 
 
 const app = express();
@@ -111,10 +113,12 @@ app.use('/api/reading', readingCheckRouter);
 app.use('/api', readingCheckRoute);
 
 app.use("/api/upload-excel-reading", uploadLisnRead);
+app.use("/questions", questionsRouter);
+app.use("/api/coach", coachRoutes);
 
 // ✅ Route test kết nối backend
 app.get("/api/test", (req, res) => {
-    res.send("✅ Backend đang hoạt động");
+  res.send("✅ Backend đang hoạt động");
 });
 
 const transporter = nodemailer.createTransport({
@@ -128,12 +132,12 @@ const transporter = nodemailer.createTransport({
 const JWT_SECRET = "123"; // 👉 Nên để vào .env thay vì hardcode
 // MongoDB
 mongoose.connect("mongodb://127.0.0.1:27017/Pengo", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 }).then(() => {
-    console.log("✅ Đã kết nối MongoDB");
+  console.log("✅ Đã kết nối MongoDB");
 }).catch(err => {
-    console.error("❌ Lỗi kết nối MongoDB:", err);
+  console.error("❌ Lỗi kết nối MongoDB:", err);
 });
 
 // User model
@@ -144,7 +148,7 @@ const userSchema = new mongoose.Schema({
   role: { type: String, default: "user" },
   createdAt: { type: Date, default: Date.now },
   isLocked: { type: Boolean, default: false },
-resetPasswordToken: String,
+  resetPasswordToken: String,
   resetPasswordExpires: Date
 });
 const User = mongoose.model("User", userSchema);
@@ -343,15 +347,15 @@ app.post("/api/forgot-password", async (req, res) => {
 
     const resetUrl = `http://localhost:3000/reset-password/${token}`;
 
-  // ... trong route forgot-password
-await transporter.sendMail({
-  from: `"Support" <${process.env.EMAIL_USER}>`,
-  to: user.email,
-  subject: "Đặt lại mật khẩu",
-  html: `<p>Nhấn vào link để đặt lại mật khẩu:</p>
+    // ... trong route forgot-password
+    await transporter.sendMail({
+      from: `"Support" <${process.env.EMAIL_USER}>`,
+      to: user.email,
+      subject: "Đặt lại mật khẩu",
+      html: `<p>Nhấn vào link để đặt lại mật khẩu:</p>
          <a href="${resetUrl}">${resetUrl}</a>
          <p>Link chỉ có hiệu lực 15 phút.</p>`,
-});
+    });
 
 
     res.json({ message: "Email đặt lại mật khẩu đã được gửi!" });
@@ -388,20 +392,20 @@ app.post("/api/reset-password/:token", async (req, res) => {
 });
 // Lấy đề đọc
 app.get("/api/reading-tests", async (req, res) => {
-    try {
-        const tests = await ReadingTest.find();
-        res.json(tests);
-    } catch (err) {
-        res.status(500).json({ message: "Lỗi khi lấy danh sách đề" });
-    }
+  try {
+    const tests = await ReadingTest.find();
+    res.json(tests);
+  } catch (err) {
+    res.status(500).json({ message: "Lỗi khi lấy danh sách đề" });
+  }
 });
 
 // API đề xuất lộ trình học từ Groq
 app.post("/api/recommend", async (req, res) => {
-    const { listeningScore, readingScore, targetScore, studyDuration } = req.body;
-    const token = req.headers.authorization?.split(" ")[1];
+  const { listeningScore, readingScore, targetScore, studyDuration } = req.body;
+  const token = req.headers.authorization?.split(" ")[1];
 
-    const prompt = `
+  const prompt = `
 Tôi là học viên đang luyện thi TOEIC.
 Kết quả đầu vào:
 - Listening: ${listeningScore}/50
@@ -416,140 +420,140 @@ Hãy:
 3. Chia rõ theo từng tuần và từng kỹ năng nếu có thể.
 `;
 
-    try {
-        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                model: "llama-3.1-8b-instant",
-                messages: [{ role: "user", content: prompt }],
-                temperature: 0.7
-            })
-        });
+  try {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "llama-3.1-8b-instant",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.7
+      })
+    });
 
-        const data = await response.json();
-        let suggestion = "Không có phản hồi từ Groq.";
-        if (Array.isArray(data.choices) && data.choices[0]?.message?.content) {
-            suggestion = data.choices[0].message.content;
-        }
-
-        if (token) {
-            try {
-                const decoded = jwt.verify(token, JWT_SECRET);
-                const plan = new StudyPlan({
-                    userId: decoded.userId,
-                    listeningScore,
-                    readingScore,
-                    suggestion
-                });
-                await plan.save();
-            } catch {
-                console.warn("⚠️ Token không hợp lệ hoặc hết hạn, không lưu lộ trình.");
-            }
-        }
-
-        res.json({ suggestion });
-    } catch (err) {
-        console.error("❌ Lỗi khi gọi Groq:", err);
-        res.status(500).json({ error: "Không thể tạo lộ trình học từ Groq." });
+    const data = await response.json();
+    let suggestion = "Không có phản hồi từ Groq.";
+    if (Array.isArray(data.choices) && data.choices[0]?.message?.content) {
+      suggestion = data.choices[0].message.content;
     }
+
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const plan = new StudyPlan({
+          userId: decoded.userId,
+          listeningScore,
+          readingScore,
+          suggestion
+        });
+        await plan.save();
+      } catch {
+        console.warn("⚠️ Token không hợp lệ hoặc hết hạn, không lưu lộ trình.");
+      }
+    }
+
+    res.json({ suggestion });
+  } catch (err) {
+    console.error("❌ Lỗi khi gọi Groq:", err);
+    res.status(500).json({ error: "Không thể tạo lộ trình học từ Groq." });
+  }
 });
 
 // ✅ Upload đề Speaking từ Excel
 app.post("/api/speaking/upload", multer({ dest: "uploads/" }).single("file"), async (req, res) => {
-    try {
-        const questions = await parseSpeakingExcel(req.file.path);
-        fs.unlinkSync(req.file.path);
+  try {
+    const questions = await parseSpeakingExcel(req.file.path);
+    fs.unlinkSync(req.file.path);
 
-        // Lọc ra các câu hỏi chưa tồn tại (ID chưa có)
-        const ids = questions.map(q => q.id);
-        const existing = await SpeakingQuestion.find({ id: { $in: ids } }).select("id");
-        const existingIds = new Set(existing.map(e => e.id));
+    // Lọc ra các câu hỏi chưa tồn tại (ID chưa có)
+    const ids = questions.map(q => q.id);
+    const existing = await SpeakingQuestion.find({ id: { $in: ids } }).select("id");
+    const existingIds = new Set(existing.map(e => e.id));
 
-        const newQuestions = questions.filter(q => !existingIds.has(q.id));
+    const newQuestions = questions.filter(q => !existingIds.has(q.id));
 
-        if (newQuestions.length === 0) {
-            return res.status(200).json({ message: "❗Tất cả ID trong file đã tồn tại.", count: 0 });
-        }
-
-        await SpeakingQuestion.insertMany(newQuestions);
-        res.json({
-            message: `✅ Đã thêm ${newQuestions.length} câu mới. (${questions.length - newQuestions.length} bị bỏ qua do trùng ID)`,
-            count: newQuestions.length,
-        });
-    } catch (err) {
-        console.error("❌ Lỗi upload:", err);
-        res.status(500).json({ message: "Lỗi xử lý file Excel" });
+    if (newQuestions.length === 0) {
+      return res.status(200).json({ message: "❗Tất cả ID trong file đã tồn tại.", count: 0 });
     }
+
+    await SpeakingQuestion.insertMany(newQuestions);
+    res.json({
+      message: `✅ Đã thêm ${newQuestions.length} câu mới. (${questions.length - newQuestions.length} bị bỏ qua do trùng ID)`,
+      count: newQuestions.length,
+    });
+  } catch (err) {
+    console.error("❌ Lỗi upload:", err);
+    res.status(500).json({ message: "Lỗi xử lý file Excel" });
+  }
 });
 
 
 // ✅ Lấy toàn bộ đề Speaking
 app.get("/api/speaking/all", async (req, res) => {
-    try {
-        const questions = await SpeakingQuestion.find().sort({ part: 1 });
-        res.json(questions);
-    } catch (err) {
-        console.error("❌ Lỗi lấy đề Speaking:", err);
-        res.status(500).json({ message: "Không thể lấy danh sách đề Speaking" });
-    }
+  try {
+    const questions = await SpeakingQuestion.find().sort({ part: 1 });
+    res.json(questions);
+  } catch (err) {
+    console.error("❌ Lỗi lấy đề Speaking:", err);
+    res.status(500).json({ message: "Không thể lấy danh sách đề Speaking" });
+  }
 });
 // ✅ Xoá toàn bộ câu hỏi Speaking
 app.delete("/api/speaking/clear", async (req, res) => {
-    try {
-        await SpeakingQuestion.deleteMany({});
-        res.json({ message: "🧹 Đã xoá toàn bộ câu hỏi Speaking" });
-    } catch (err) {
-        console.error("❌ Lỗi xoá toàn bộ:", err);
-        res.status(500).json({ message: "Không thể xoá toàn bộ dữ liệu" });
-    }
+  try {
+    await SpeakingQuestion.deleteMany({});
+    res.json({ message: "🧹 Đã xoá toàn bộ câu hỏi Speaking" });
+  } catch (err) {
+    console.error("❌ Lỗi xoá toàn bộ:", err);
+    res.status(500).json({ message: "Không thể xoá toàn bộ dữ liệu" });
+  }
 });
 
 // ✅ Xoá một câu hỏi Speaking theo _id
 app.delete("/api/speaking/:id", async (req, res) => {
-    try {
-        const result = await SpeakingQuestion.findByIdAndDelete(req.params.id);
-        if (!result) {
-            return res.status(404).json({ message: "❌ Không tìm thấy câu hỏi để xoá" });
-        }
-        res.json({ message: "🗑️ Đã xoá thành công" });
-    } catch (err) {
-        console.error("❌ Lỗi xoá câu hỏi:", err);
-        res.status(500).json({ message: "Lỗi server khi xoá câu hỏi" });
+  try {
+    const result = await SpeakingQuestion.findByIdAndDelete(req.params.id);
+    if (!result) {
+      return res.status(404).json({ message: "❌ Không tìm thấy câu hỏi để xoá" });
     }
+    res.json({ message: "🗑️ Đã xoá thành công" });
+  } catch (err) {
+    console.error("❌ Lỗi xoá câu hỏi:", err);
+    res.status(500).json({ message: "Lỗi server khi xoá câu hỏi" });
+  }
 });
 
 // ✅ Lấy 1 câu hỏi ngẫu nhiên theo Part (1–5)
 app.get("/api/speaking/random/:part", async (req, res) => {
-    const part = parseInt(req.params.part);
-    if (![1, 2, 3, 4, 5].includes(part)) {
-        return res.status(400).json({ message: "Part không hợp lệ (chỉ 1–5)" });
-    }
+  const part = parseInt(req.params.part);
+  if (![1, 2, 3, 4, 5].includes(part)) {
+    return res.status(400).json({ message: "Part không hợp lệ (chỉ 1–5)" });
+  }
 
-    try {
-        const count = await SpeakingQuestion.countDocuments({ part });
-        const randomIndex = Math.floor(Math.random() * count);
-        const randomQuestion = await SpeakingQuestion.findOne({ part }).skip(randomIndex);
-        if (!randomQuestion) {
-            return res.status(404).json({ message: "Không tìm thấy câu hỏi nào" });
-        }
-        res.json(randomQuestion);
-    } catch (err) {
-        console.error("❌ Lỗi lấy câu hỏi ngẫu nhiên:", err);
-        res.status(500).json({ message: "Lỗi server" });
+  try {
+    const count = await SpeakingQuestion.countDocuments({ part });
+    const randomIndex = Math.floor(Math.random() * count);
+    const randomQuestion = await SpeakingQuestion.findOne({ part }).skip(randomIndex);
+    if (!randomQuestion) {
+      return res.status(404).json({ message: "Không tìm thấy câu hỏi nào" });
     }
+    res.json(randomQuestion);
+  } catch (err) {
+    console.error("❌ Lỗi lấy câu hỏi ngẫu nhiên:", err);
+    res.status(500).json({ message: "Lỗi server" });
+  }
 });
 
 
 // Trang gốc
 app.get("/", (req, res) => {
-    res.send("✅ Backend Pengo đang hoạt động!");
+  res.send("✅ Backend Pengo đang hoạt động!");
 });
 
 // ✅ Start server cuối cùng
 app.listen(5000, () => {
-    console.log("🚀 Backend chạy tại http://localhost:5000");
+  console.log("🚀 Backend chạy tại http://localhost:5000");
 });

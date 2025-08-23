@@ -162,7 +162,7 @@ router.post("/upload-reading", upload.single("file"), async (req, res) => {
         blockMap.get(currentPassage).push(questionObj);
       });
 
-     payload.blocks = Array.from(blockMap.entries()).map(([passage, questions]) => ({ passage, questions }));
+      payload.blocks = Array.from(blockMap.entries()).map(([passage, questions]) => ({ passage, questions }));
 
       // 🔑 Gọi AI phân tích cho từng block của Part 6
       for (const block of payload.blocks) {
@@ -191,97 +191,97 @@ router.post("/upload-reading", upload.single("file"), async (req, res) => {
         }
       }
     } else if (partNumber === 7) {
-  // --- Part 7: multiple images per block + OpenRouter OCR (with cache) ---
-  const blockMap = new Map(); // key = imagesKey (join bằng "|")
-  const ocrCache = new Map(); // imagePath -> extractedText
-  let currentImages = [];
+      // --- Part 7: multiple images per block + OpenRouter OCR (with cache) ---
+      const blockMap = new Map(); // key = imagesKey (join bằng "|")
+      const ocrCache = new Map(); // imagePath -> extractedText
+      let currentImages = [];
 
-  for (const row of rows) {
-    // 1) Tách nhiều ảnh trong 1 ô (xuống dòng)
-    const imagesInCell = String(row["imagePath"] || "")
-      .split(/\r?\n/)
-      .map(s => s.trim())
-      .filter(Boolean);
+      for (const row of rows) {
+        // 1) Tách nhiều ảnh trong 1 ô (xuống dòng)
+        const imagesInCell = String(row["imagePath"] || "")
+          .split(/\r?\n/)
+          .map(s => s.trim())
+          .filter(Boolean);
 
-    // nếu ô có ảnh -> cập nhật "currentImages", nếu trống -> dùng ảnh của block hiện tại
-    if (imagesInCell.length > 0) currentImages = imagesInCell;
-    if (currentImages.length === 0) continue; // chưa có ảnh để gán block
+        // nếu ô có ảnh -> cập nhật "currentImages", nếu trống -> dùng ảnh của block hiện tại
+        if (imagesInCell.length > 0) currentImages = imagesInCell;
+        if (currentImages.length === 0) continue; // chưa có ảnh để gán block
 
-    // 2) Tạo key cho block theo bộ ảnh hiện tại
-    const imagesKey = currentImages.join("|");
+        // 2) Tạo key cho block theo bộ ảnh hiện tại
+        const imagesKey = currentImages.join("|");
 
-    // 3) Nếu block chưa tồn tại -> OCR tất cả ảnh (dùng cache) và tạo context gộp
-    if (!blockMap.has(imagesKey)) {
-      const extractedList = [];
-      for (const img of currentImages) {
-        let txt = ocrCache.get(img);
-        if (!txt) {
-          txt = await callOpenRouterAnalyzeImage(img); // OCR 1 lần/ảnh
-          ocrCache.set(img, txt);
+        // 3) Nếu block chưa tồn tại -> OCR tất cả ảnh (dùng cache) và tạo context gộp
+        if (!blockMap.has(imagesKey)) {
+          const extractedList = [];
+          for (const img of currentImages) {
+            let txt = ocrCache.get(img);
+            if (!txt) {
+              txt = await callOpenRouterAnalyzeImage(img); // OCR 1 lần/ảnh
+              ocrCache.set(img, txt);
+            }
+            extractedList.push({ imagePath: img, text: txt });
+          }
+
+          const context =
+            extractedList
+              .map((e, i) => `[Image ${i + 1}] ${e.imagePath}\n${e.text}`)
+              .join("\n\n");
+
+          blockMap.set(imagesKey, {
+            images: [...currentImages],          // <-- nhiều hình trong 1 block
+            imagePath: currentImages.join("\n"), // (giữ để tương thích cũ nếu cần)
+            context,                             // <-- OCR gộp
+            questions: []
+          });
         }
-        extractedList.push({ imagePath: img, text: txt });
+
+        // 4) Push câu hỏi vào đúng block
+        const block = blockMap.get(imagesKey);
+        block.questions.push({
+          questionNumber: row["Column A (Question Number)"] || "",
+          question: row["Column B (Question Text)"] || "[blank]",
+          options: {
+            A: row["Column C (Option A)"] || "",
+            B: row["Column D (Option B)"] || "",
+            C: row["Column E (Option C)"] || "",
+            D: row["Column F (Option D)"] || ""
+          },
+          answer: row["Answer"] || "",
+          part: partNumber
+        });
       }
 
-      const context =
-        extractedList
-          .map((e, i) => `[Image ${i + 1}] ${e.imagePath}\n${e.text}`)
-          .join("\n\n");
+      // 5) Chuyển thành payload.blocks
+      payload.blocks = Array.from(blockMap.values());
 
-      blockMap.set(imagesKey, {
-        images: [...currentImages],          // <-- nhiều hình trong 1 block
-        imagePath: currentImages.join("\n"), // (giữ để tương thích cũ nếu cần)
-        context,                             // <-- OCR gộp
-        questions: []
-      });
-    }
+      // 6) Gọi Groq AI để gán label/explanation cho từng block (dùng context gộp)
+      for (const block of payload.blocks) {
+        try {
+          const aiRes = await callAnalyzeLabelWithBackoff(
+            block.questions.map((q, i) => ({
+              questionIndex: q.questionNumber || `${i + 1}`,
+              question: q.question,
+              options: q.options,
+              context: block.context   // <-- dùng context gộp nhiều hình
+            }))
+          );
 
-    // 4) Push câu hỏi vào đúng block
-    const block = blockMap.get(imagesKey);
-    block.questions.push({
-      questionNumber: row["Column A (Question Number)"] || "",
-      question: row["Column B (Question Text)"] || "[blank]",
-      options: {
-        A: row["Column C (Option A)"] || "",
-        B: row["Column D (Option B)"] || "",
-        C: row["Column E (Option C)"] || "",
-        D: row["Column F (Option D)"] || ""
-      },
-      answer: row["Answer"] || "",
-      part: partNumber
-    });
-  }
-
-  // 5) Chuyển thành payload.blocks
-  payload.blocks = Array.from(blockMap.values());
-
-  // 6) Gọi Groq AI để gán label/explanation cho từng block (dùng context gộp)
-  for (const block of payload.blocks) {
-    try {
-      const aiRes = await callAnalyzeLabelWithBackoff(
-        block.questions.map((q, i) => ({
-          questionIndex: q.questionNumber || `${i + 1}`,
-          question: q.question,
-          options: q.options,
-          context: block.context   // <-- dùng context gộp nhiều hình
-        }))
-      );
-
-      block.questions.forEach(q => {
-        const match = aiRes.find(p => String(p.questionIndex) === String(q.questionNumber));
-        if (match) {
-          q.label = match.label;
-          q.explanation = match.explanation;
+          block.questions.forEach(q => {
+            const match = aiRes.find(p => String(p.questionIndex) === String(q.questionNumber));
+            if (match) {
+              q.label = match.label;
+              q.explanation = match.explanation;
+            }
+          });
+        } catch (err) {
+          block.questions.forEach(q => {
+            q.label = "other";
+            q.explanation = "Default label due to AI error.";
+          });
         }
-      });
-    } catch (err) {
-      block.questions.forEach(q => {
-        q.label = "other";
-        q.explanation = "Default label due to AI error.";
-      });
+      }
     }
-  }
-}
-else {
+    else {
       // --- Part 5 ---
       const questions = rows.map((row, i) => ({
         question: row["Column B (Question Text)"] || "[blank]",
@@ -329,5 +329,18 @@ else {
     res.status(500).json({ message: "Lỗi xử lý file Excel" });
   }
 });
-
+// ✅ Xoá TẤT CẢ đề theo Part (5/6/7)
+router.delete("/reading-tests/part/:part", async (req, res) => {
+  try {
+    const partNumber = parseInt(req.params.part);
+    if (![5,6,7].includes(partNumber)) {
+      return res.status(400).json({ message: "Part không hợp lệ (5/6/7)" });
+    }
+    const result = await ReadingTest.deleteMany({ part: partNumber });
+    res.json({ deletedCount: result.deletedCount || 0, message: `Đã xoá toàn bộ đề Part ${partNumber}` });
+  } catch (err) {
+    console.error("❌ Lỗi xoá theo Part:", err);
+    res.status(500).json({ message: "Lỗi xoá đề theo Part" });
+  }
+});
 export default router;

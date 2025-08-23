@@ -8,7 +8,7 @@ import { useCart } from "../../context/CartContext"; // Thêm dòng này
 import { FiAward, FiZap, FiBookOpen, FiRefreshCw } from "react-icons/fi";
 
 const skills = [
-  { name: "Grammar", subtitle: "Luyện ngữ pháp", icon: "🧠" },
+  { name: "Grammar", subtitle: "Luyện ngữ pháp", icon: "🧠" , href: "/toeicframe"},
   { name: "Listening", subtitle: "Luyện nghe", icon: "🎧" },
   { name: "Writing", subtitle: "Luyện viết", icon: "✍️" },
   { name: "Speaking", subtitle: "Luyện nói", icon: "🗣️" },
@@ -191,7 +191,7 @@ export default function HomePage({ course }) {
           <div className="card2" key={s.name}>
             <div className="icon1">{s.icon}</div>
             <div className="info">
-              <div className="title">{s.name}</div>
+              <div className="title"><a href= {s.href}>{s.name}</a></div>
               <div className="subtitle">{s.subtitle}</div>
             </div>
           </div>

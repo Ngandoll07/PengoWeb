@@ -16,7 +16,7 @@ const __dirname = path.dirname(__filename);
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-const PYTHON_PATH = "C:/Users/LENOVO/Documents/KLTN/PengoWeb/backend/ai/venv/Scripts/python.exe";
+const PYTHON_PATH = "D:/KLTN/PengoWeb/backend/ai/venv/Scripts/python.exe";
 const SCRIPT_PATH = path.join(__dirname, "../ai/analyze_audio.py");
 const GROQ_KEY = process.env.GROQ_API_KEY;
 

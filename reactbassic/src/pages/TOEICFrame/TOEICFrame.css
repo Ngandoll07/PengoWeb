@@ -1,0 +1,288 @@
+/* ===== Root layout ===== */
+.toeic-frame {
+    min-height: 100vh;
+    background: #E6F4FF;
+    display: flex;
+    flex-direction: column;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+/* ===== Top header ===== */
+.tf-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #06A2FF;
+    color: #fff;
+    padding: 12px 18px;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, .04);
+}
+
+.tf-top__title {
+    font-weight: 800;
+    letter-spacing: .5px;
+}
+
+.tf-top__right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.tf-top__qn {
+    opacity: .95;
+    font-size: 14px;
+}
+
+.tf-timer {
+    background: #fff;
+    color: #0871B8;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    min-width: 86px;
+    text-align: center;
+}
+
+/* Buttons */
+.tf-btn {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #dbeafe;
+    background: #fff;
+    color: #0969A2;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.tf-btn--light {
+    background: rgba(255, 255, 255, .25);
+    border-color: transparent;
+    color: #fff;
+}
+
+.tf-btn--primary {
+    background: #06A2FF;
+    border-color: #06A2FF;
+    color: #fff;
+}
+
+.tf-btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+/* ===== Middle card ===== */
+.tf-card {
+    max-width: 1100px;
+    width: 100%;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid #bfe1ff;
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .04);
+    padding: 16px 18px;
+}
+
+.tf-card__bar {
+    display: inline-block;
+    background: #0BA5EC;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+/* Grid / panes */
+.tf-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+@media (max-width: 992px) {
+    .tf-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.tf-pane {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 14px;
+    background: #fff;
+}
+
+.tf-pane--scroll {
+    max-height: 60vh;
+    overflow: auto;
+}
+
+/* Media blocks */
+.tf-imgwrap {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 8px 0;
+}
+
+.tf-imgwrap img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.tf-audio {
+    margin-top: 8px;
+}
+
+.tf-audio--inline audio {
+    width: 240px;
+}
+
+/* Passage */
+.tf-passage {
+    white-space: pre-wrap;
+    line-height: 1.6;
+    color: #0f172a;
+}
+
+.tf-passage h4 {
+    margin: 8px 0 6px;
+    font-size: 15px;
+}
+
+/* ===== Question + Answer list (custom buttons, không radio) ===== */
+.tf-question {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.tf-qtext {
+    color: #0f172a;
+    line-height: 1.6;
+    margin: 0 0 4px 0;
+}
+
+.tf-opts {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tf-opt {
+    margin: 0;
+}
+
+.tf-opt:last-child {
+    margin-bottom: 0;
+}
+
+.tf-opt__btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    border-radius: 12px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
+}
+
+.tf-opt__btn:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, .06);
+    background: #F0F9FF;
+}
+
+.tf-opt.is-selected .tf-opt__btn {
+    border-color: #1677ff;
+    box-shadow: 0 0 0 3px rgba(22, 119, 255, .15);
+    background: #f0f7ff;
+}
+
+.tf-opt__label {
+    width: 22px;
+    display: inline-block;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.tf-opt__text {
+    flex: 1;
+}
+
+/* Loại mọi ảnh hưởng chặn click ở phần tử con: click ở đâu cũng trúng button */
+.tf-opt__btn * {
+    pointer-events: none;
+}
+
+/* ===== Bottom toolbar ===== */
+.tf-bottom {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(230, 244, 255, .92);
+    backdrop-filter: saturate(120%) blur(2px);
+    border-top: 1px solid #bfe1ff;
+}
+
+.tf-bottom>div {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+}
+
+.tf-bottom__left,
+.tf-bottom__right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tf-check {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    color: #0c4a6e;
+}
+
+/* ===== Mode switch ===== */
+.tf-modeswitch {
+    display: inline-flex;
+    gap: 8px;
+    margin-left: 10px;
+}
+
+.tf-chip {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, .4);
+    background: rgba(255, 255, 255, .2);
+    color: #fff;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.tf-chip.is-active {
+    background: #fff;
+    color: #0871B8;
+    border-color: #fff;
+}
+
+.tf-chip:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
