@@ -18,7 +18,7 @@ const router = express.Router();
 const upload = multer({ dest: "uploads/" });
 
 // ===== Cấu hình Whisper =====
-const PYTHON_PATH = "C:/Users/LENOVO/Documents/KLTN/PengoWeb/backend/ai/venv/Scripts/python.exe";
+const PYTHON_PATH = "D:/KLTN/PengoWeb/backend/ai/venv/Scripts/python.exe";
 const SCRIPT_PATH = path.join(__dirname, "../ai/analyze_audio.py");
 
 // ===== Cấu hình GROQ =====
@@ -143,20 +143,20 @@ router.post("/upload-excel-listening", upload.single("file"), async (req, res) =
           execFile(PYTHON_PATH, [SCRIPT_PATH, audioAbsPath, tempFile], { maxBuffer: 1024 * 1024 * 10 }, (err, stdout, stderr) => {
             if (err) return reject(stderr.toString());
             try { resolve(JSON.parse(stdout)); }
-            catch(e) { reject(e); }
+            catch (e) { reject(e); }
           });
         });
 
         const transcript = whisperOutput.transcript || "";
 
         // --- GROQ ---
-       const groqResult = await analyzeWithGroq(transcript, q);
+        const groqResult = await analyzeWithGroq(transcript, q);
 
         results.push({
-        ...q,
-        transcript,
-        explanation: groqResult.explanation,
-        label: groqResult.label
+          ...q,
+          transcript,
+          explanation: groqResult.explanation,
+          label: groqResult.label
         });
 
 

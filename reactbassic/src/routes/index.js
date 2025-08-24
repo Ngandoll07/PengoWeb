@@ -37,6 +37,8 @@ import ListeningTopic from "../pages/Admin/ListeningTopic/ListeningTopic";
 import CourseAdmin from "../pages/Admin/CourseAdmin/CourseAdmin";
 import AdminOrders from "../pages/Admin/AdminOrders/AdminOrders";
 import SpeakingTopic from "../pages/Admin/SpeakingTopic/SpeakingTopic";
+import TOEICFrame from "../pages/TOEICFrame/TOEICFrame.jsx";
+import ToeicDay1Runner from "../pages/TOEICFrame/ToeicDay1Runner.jsx";
 
 
 
@@ -127,7 +129,7 @@ export const routes = [
         page: LoadingResultPage,
         isShowHeader: true
     },
-   {
+    {
         path: '/practice-reading',
         page: PracticeReadingPage,
         isShowHeader: true
@@ -137,14 +139,19 @@ export const routes = [
         page: PracticeWriting,
         isShowHeader: true
     },
-       {
+    {
         path: '/forgot-password',
         page: ForgotPasswordPage,
         isShowHeader: true
     },
-     {
+    {
         path: '/reset-password/:token',
         page: ResetPasswordPage,   // đây là trang nhập mật khẩu mới
+        isShowHeader: true
+    },
+    {
+        path: '/toeicframe',
+        page: ToeicDay1Runner,
         isShowHeader: true
     },
     //  admin
@@ -159,9 +166,9 @@ export const routes = [
     {
         path: '/admin/readtopic',
         page: ReadingTopic,
-    },  
+    },
     {
-        path:'/admin/writingtopic',
+        path: '/admin/writingtopic',
         page: WritingTopic,
     },
     {
@@ -196,7 +203,7 @@ export const routes = [
         path: "/admin/roadmap",
         page: RoadmapAdminPage,
     },
-     {
+    {
         path: "/admin/examresult",
         page: ExamResultPage,
     },

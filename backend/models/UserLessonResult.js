@@ -6,6 +6,7 @@ const QuestionResultSchema = new mongoose.Schema({
   userAnswer: String,
   correctAnswer: String,
   isCorrect: Boolean,
+  label: String,   
 });
 
 const UserLessonResultSchema = new mongoose.Schema({

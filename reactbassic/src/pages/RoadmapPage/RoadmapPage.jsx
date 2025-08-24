@@ -1,176 +1,146 @@
+// src/pages/RoadmapPage.jsx
 import React, { useEffect, useState } from "react";
-import './RoadmapPage.css';
-import { useNavigate,useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import "./RoadmapPage.css";
 import Footer from "../../components/FooterComponents/FooterComponent";
-import axios from "axios";
 
-const RoadmapPage = () => {
-  const [learningData, setLearningData] = useState([]);
-  const [analysis, setAnalysis] = useState("");
+const API =
+  (typeof process !== "undefined" && process.env.REACT_APP_API_URL?.replace(/\/$/, "")) ||
+  "http://localhost:5000";
+const RUNNER_ROUTE = "/toeicframe";
+
+export default function RoadmapPage() {
+  const nav = useNavigate();
+  const [items, setItems] = useState([]);      // RoadmapItem[] trong DB (Day 1, Day 2, ...)
+  const [analysis, setAnalysis] = useState(""); // chỉ để hiển thị box phân tích
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-  const location = useLocation();
 
-useEffect(() => {
-  const fetchPlan = async () => {
-    const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token") || "";
+
+  const fetchRoadmap = async () => {
+    setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/recommend", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      // 1) Lấy roadmap đã sinh trong DB → sẽ có Day 2 nếu bạn vừa Finish Day 1
+      const r = await fetch(`${API}/api/roadmap`, { headers: { Authorization: `Bearer ${token}` } });
+      const arr = await r.json();
+      const sorted = Array.isArray(arr) ? [...arr].sort((a, b) => (a.day || 0) - (b.day || 0)) : [];
+      setItems(sorted);
 
-      const data = await res.json();
-
-      if (Array.isArray(data.suggestion)) {
-        setLearningData(data.suggestion);
-      } else {
-        setLearningData([]);
-      }
-
-      setAnalysis(data.analysis || "");
-
-      // ✅ Lưu bài học ngày 1 và level
-      if (data.lesson) {
-        localStorage.setItem("lesson_day1", JSON.stringify(data.lesson));
-        localStorage.setItem("level", data.level);
-      }
-
-    } catch (err) {
-      console.error("❌ Lỗi khi fetch lộ trình:", err);
+      // 2) Optional: lấy phân tích AI đã lưu (không ảnh hưởng Day hiển thị)
+      try {
+        const a = await (await fetch(`${API}/api/recommend`, { headers: { Authorization: `Bearer ${token}` } })).json();
+        setAnalysis(a?.analysis || "");
+      } catch { }
     } finally {
       setLoading(false);
     }
   };
 
-  fetchPlan();
-}, []);
+  useEffect(() => { fetchRoadmap(); /* eslint-disable-next-line */ }, []);
 
-const handleDayClick = async (item) => {
-  console.log("🔍 Bạn đã click vào:", item);
-  console.log("➡️ part:", item.part, "level:", item.level, "skill:", item.skill);
-
-  try {
-    let questions = [];
-
-    if (item.skill === "listening") {
-      // Gọi API Listening
-      const res = await axios.get(`http://localhost:5000/api/listening-tests/part/${item.part}`, {
-        params: {
-          level: item.level,
-        },
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      questions = res.data;
-
-      if (!questions.length) {
-        alert("Không có câu hỏi listening phù hợp.");
-        return;
+  const startDay = async (it) => {
+    try {
+      if (!it?.questionIds?.length) {
+        // Nếu là Day 1 chưa có questionIds → nhờ server "khoá" Day 1
+        if (Number(it?.day) === 1) {
+          const r = await fetch(`${API}/api/roadmap/day1`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify({}),
+          });
+          const data = await r.json();
+          if (!r.ok) throw new Error(data?.error || "Không tạo được Day 1");
+          it = data.item;
+        } else {
+          alert("Bài học chưa sẵn sàng.");
+          return;
+        }
       }
-
-    } else if (item.skill === "reading") {
-      // Gọi API Reading
-      const res = await axios.get(  `http://localhost:5000/api/reading-tests/part/${item.part}?level=${item.level}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      const data = res.data;
-
-      // Với part 6 hoặc 7 sẽ là blocks, còn lại là questions
-      if ((item.part === 6 || item.part === 7) && Array.isArray(data)) {
-        questions = data;
-      } else if (Array.isArray(data)) {
-        questions = data;
-      }
-
-      if (!questions.length) {
-        alert("Không có câu hỏi reading phù hợp.");
-        return;
-      }
-    } else {
-      alert("Kỹ năng không hợp lệ.");
-      return;
+      nav(RUNNER_ROUTE, { state: { roadmapItem: it } });
+    } catch (e) {
+      console.error(e);
+      alert("Không thể mở bài học.");
     }
+  };
 
-    const lesson = {
-      title: item.title,
-      skill: item.skill,
-      part: item.part,
-      level: item.level,
-      questions,
-    };
+  const createDay1IfEmpty = async () => {
+    const hasAny = items.length > 0;
+    if (hasAny) return;
+    try {
+      const r = await fetch(`${API}/api/roadmap/day1`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({}),
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data?.error || "Không tạo được Day 1");
+      await fetchRoadmap();
+    } catch (e) {
+      console.error(e);
+      alert("Không thể tạo Day 1. Hãy chạy /api/recommend nếu bạn dùng plan từ AI.");
+    }
+  };
 
-    navigate("/practicelesson/ai", {
-      state: {
-        lesson,
-        day: item.day,
-        roadmapItemId: item._id || null,
-            status: item.status, // ✅ thêm dòng này
-      },
-    });
-  } catch (err) {
-    console.error("❌ Không lấy được câu hỏi:", err);
-    alert("Không thể tải bài luyện tập.");
-  }
-};
-
-
-
+  const Progress = ({ val = 0 }) => (
+    <div style={{ background: "#f1f5f9", borderRadius: 8, height: 8, overflow: "hidden" }}>
+      <div style={{ width: `${val}%`, background: "#0ea5e9", height: 8 }} />
+    </div>
+  );
 
   return (
     <div className="learning-container">
-  <div className="learning-path">
-      <h2>Lộ trình học của bạn</h2>
+      <div className="learning-path">
+        <h2>Lộ trình học của bạn</h2>
 
-      {loading ? (
-        <p>Đang tải lộ trình từ AI...</p>
-      ) : (
-        <>
-          <div className="analysis-box">
-            <h3>📊 Phân tích:</h3>
-            <p style={{ whiteSpace: "pre-line" }}>{analysis}</p>
-          </div>
+        {loading ? (
+          <p>Đang tải lộ trình…</p>
+        ) : (
+          <>
+            {analysis && (
+              <div className="analysis-box">
+                <h3>📊 Phân tích:</h3>
+                <p style={{ whiteSpace: "pre-line" }}>{analysis}</p>
+              </div>
+            )}
 
-         <div className="day-list">
-  {learningData.map((item, index) => (
-    <div
-      key={index}
-      className={`day-card ${item.skill}`}
-      onClick={() => handleDayClick(item)}
-    >
-      <h3>📅 Day {item.day}</h3>
-      <p className="title">{item.title}</p>
-      <p className="skill">Kỹ năng: <b>{item.skill}</b></p>
+            {!items.length && (
+              <div style={{ marginBottom: 16 }}>
+                <button className="tf-btn tf-btn--primary" onClick={createDay1IfEmpty}>
+                  Tạo Day 1
+                </button>
+              </div>
+            )}
 
-    <div className={`status ${item.status}`}>
-  <div className="progress-bar">
-    <div className="progress-fill" style={{ width: `${item.progress}%` }}></div>
-  </div>
-  <p className="status-label">
-    {item.status === "done" ? "✅ Hoàn thành" : "⚠️ Chưa hoàn thành"}
-  </p>
-</div>
+            <div className="day-list">
+              {items.map((it) => (
+                <div key={it._id || it.day} className={`day-card ${it.skill}`}>
+                  <h3>📅 Day {it.day}</h3>
+                  <p className="title">{it.title || `Lesson - ${it.skill} Part ${it.part}`}</p>
+                  <p className="skill">
+                    Kỹ năng: <b>{it.skill}</b> • Part {it.part} • Level {it.level}
+                  </p>
 
+                  <div className={`status ${it.status}`}>
+                    <Progress val={it.progress || 0} />
+                    <p className="status-label">
+                      {it.status === "done" ? "✅ Hoàn thành" : "⚠️ Chưa bắt đầu"}
+                    </p>
+                  </div>
+
+                  <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+                    <button className="tf-btn" onClick={() => startDay(it)}>Làm ngay</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ marginTop: 12 }}>
+              <button className="tf-btn" onClick={fetchRoadmap}>↻ Làm mới</button>
+            </div>
+          </>
+        )}
+      </div>
+      <Footer />
     </div>
-  ))}
-</div>
-
-       
-        </>
-      )}
-    </div>
-       <Footer />
-    </div>
-  
   );
-};
-
-export default RoadmapPage;
+}

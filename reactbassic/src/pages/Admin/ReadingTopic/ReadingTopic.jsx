@@ -47,6 +47,22 @@ const ReadingTopic = () => {
     }
   };
 
+  // ✅ Handler: Xoá toàn Part
+  const handleDeleteWholePart = async () => {
+    if (!window.confirm(`Xoá toàn bộ đề của Part ${part}? Hành động này không thể hoàn tác!`)) return;
+    try {
+      const res = await axios.delete(`http://localhost:5000/api/reading-tests/part/${part}`);
+      alert(`✅ ${res.data.message} (đã xoá ${res.data.deletedCount})`);
+      // cập nhật lại list
+      const refreshed = await axios.get("http://localhost:5000/api/reading-tests");
+      setTests(refreshed.data);
+      setSelectedTest(refreshed.data[0] || null);
+    } catch (err) {
+      console.error("❌ Xoá toàn Part lỗi:", err);
+      alert("❌ Xoá toàn Part thất bại");
+    }
+  };
+
   return (
     <div className="reading-admin-wrapper">
       <AdminHeader />
@@ -67,6 +83,11 @@ const ReadingTopic = () => {
         </select>
         <input type="file" accept=".xlsx, .xls" onChange={handleFileChange} />
         <button onClick={handleUpload}>📤 Tải lên</button>
+
+        {/* ✅ Nút xoá toàn Part */}
+        <button style={{ marginLeft: 8 }} onClick={handleDeleteWholePart}>
+          🗑 Xoá toàn Part {part}
+        </button>
       </div>
 
       {/* 📑 Danh sách đề đã tải */}
@@ -113,51 +134,51 @@ const ReadingTopic = () => {
                   <td><b>{q.answer}</b></td>
                   <td>{selectedTest.part}</td>
                   <td>{q.label || "?"}</td>
-                  <td>{q.explanation  || "?"}</td>
+                  <td>{q.explanation || "?"}</td>
                 </tr>
               ))}
 
               {/* 📌 Part 6 & 7 - block with passage */}
-         {/* 📌 Part 6 & 7 - block with passage + optional image */}
-{selectedTest.blocks?.map((block, blockIdx) =>
-  block.questions.map((q, idx) => (
-    <tr key={`b-${blockIdx}-${idx}`}>
-      <td>{idx + 1}</td>
+              {/* 📌 Part 6 & 7 - block with passage + optional image */}
+              {selectedTest.blocks?.map((block, blockIdx) =>
+                block.questions.map((q, idx) => (
+                  <tr key={`b-${blockIdx}-${idx}`}>
+                    <td>{idx + 1}</td>
 
-      {/* Cột ảnh riêng */}
-      <td>
-    {block.imagePath ? (
-  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-    {block.imagePath.split(/\r?\n|,|;/).map((img, idx) => (
-      <img
-        key={idx}
-        src={process.env.PUBLIC_URL + img.trim()}
-        alt={`Part 7 illustration ${idx + 1}`}
-        style={{ maxWidth: "100px", borderRadius: "8px" }}
-      />
-    ))}
-  </div>
-) : (
-  "Không có ảnh"
-)}
+                    {/* Cột ảnh riêng */}
+                    <td>
+                      {block.imagePath ? (
+                        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                          {block.imagePath.split(/\r?\n|,|;/).map((img, idx) => (
+                            <img
+                              key={idx}
+                              src={process.env.PUBLIC_URL + img.trim()}
+                              alt={`Part 7 illustration ${idx + 1}`}
+                              style={{ maxWidth: "100px", borderRadius: "8px" }}
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        "Không có ảnh"
+                      )}
 
 
 
-      </td>
+                    </td>
 
-      {/* Cột đoạn văn + câu hỏi */}
-      <td>
-        <div><b>Đoạn văn:</b> {block.passage || "Không có đoạn văn"}</div>
-        <div><b>Câu hỏi:</b> {q.question}</div>
-      </td>
+                    {/* Cột đoạn văn + câu hỏi */}
+                    <td>
+                      <div><b>Đoạn văn:</b> {block.passage || "Không có đoạn văn"}</div>
+                      <div><b>Câu hỏi:</b> {q.question}</div>
+                    </td>
 
-      <td><b>{q.answer}</b></td>
-      <td>{selectedTest.part}</td>
-      <td>{q.label || "?"}</td>
-      <td>{q.explanation || "?"}</td>
-    </tr>
-  ))
-)}
+                    <td><b>{q.answer}</b></td>
+                    <td>{selectedTest.part}</td>
+                    <td>{q.label || "?"}</td>
+                    <td>{q.explanation || "?"}</td>
+                  </tr>
+                ))
+              )}
 
 
             </tbody>
